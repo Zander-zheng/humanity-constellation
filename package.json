@@ -1,0 +1,10 @@
+{
+  "name": "humanity-constellation",
+  "private": true,
+  "scripts": {
+    "dev": "serve . -l 3457"
+  },
+  "devDependencies": {
+    "serve": "^14.2.4"
+  }
+}

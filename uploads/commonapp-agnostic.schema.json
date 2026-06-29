@@ -1,0 +1,1523 @@
+{
+  "schema": "commonapp-agnostic",
+  "version": "2025-2026",
+  "inherits": null,
+  "purpose": "Institution-independent Common Application reference-schema. Carries the field-level semantics, mechanical constraints, and fixed-choice options the profile-generator follows to produce a deployable Common App core artifact. Reference-data, not a functionality-profile.",
+  "source": {
+    "authority": "The Common Application (commonapp.org; apply.commonapp.org; appsupport.commonapp.org)",
+    "fetched": "2026-05-31",
+    "verification_status": "final_reference_2025-2026",
+    "verification_note": "Multi-subagent pass 2026-05-31: honors/activities/writing limits and structure cross-checked; profile/education gaps documented via _unverified and conditional_logic_model; re-ground live apply UI each cycle for datacatalog enums.",
+    "grounding": "Exhaustively re-grounded region-by-region into this canonical file. Each stratum was verified against the live Common Application applicant SPA bundle (apply.commonapp.org), the official 2025–26 first-year application materials, and Applicant Support articles cited in the consolidated region sources.",
+    "regions_merged": [
+      "profile/demographic (_region-profile-demographic.json)",
+      "education (_region-education.json)",
+      "honors (_region-honors.json)",
+      "activities including Responsibilities and circumstances (_region-activities.json)",
+      "writing: Personal Essay, Challenges and circumstances, Additional information (_region-writing.json; canonical stratum key: personal_statement)"
+    ],
+    "urls": [
+      "https://apply.commonapp.org/main.5bdb7fe72ba74a6b.js",
+      "https://appsupport.commonapp.org/applicantsupport/s/article/Completing-Course-Grades-310",
+      "https://appsupport.commonapp.org/applicantsupport/s/article/Courses-and-Grades-information",
+      "https://appsupport.commonapp.org/applicantsupport/s/article/Data-catalogs",
+      "https://appsupport.commonapp.org/applicantsupport/s/article/First-year-and-transfer-testing-best-practices",
+      "https://appsupport.commonapp.org/applicantsupport/s/article/How-can-I-make-an-international-payment-when-submitting-my-application",
+      "https://appsupport.commonapp.org/applicantsupport/s/article/How-do-I-identify-that-I-am-undocumented-or-have-DACA-status",
+      "https://appsupport.commonapp.org/applicantsupport/s/article/How-do-I-report-my-class-rank-and-GPA",
+      "https://appsupport.commonapp.org/applicantsupport/s/article/How-is-the-Common-App-different-for-international-applicants",
+      "https://appsupport.commonapp.org/applicantsupport/s/article/I-am-a-refugee-or-asylee-How-do-I-share-that-information-in-my-application",
+      "https://appsupport.commonapp.org/applicantsupport/s/article/I-was-born-in-the-U-S-Which-citizenship-option-should-I-choose",
+      "https://appsupport.commonapp.org/applicantsupport/s/article/What-do-I-do-if-my-activity-type-is-not-on-the-list",
+      "https://appsupport.commonapp.org/applicantsupport/s/article/What-does-U-S-Dual-Citizen-mean",
+      "https://appsupport.commonapp.org/applicantsupport/s/article/What-if-I-don-t-have-a-social-security-number",
+      "https://appsupport.commonapp.org/applicantsupport/s/article/What-s-the-difference-between-legal-sex-and-gender",
+      "https://appsupport.commonapp.org/applicantsupport/s/article/What-should-I-list-for-our-school-s-GPA-scale",
+      "https://empowerly.com/content-guides/a-guide-to-the-education-section-of-the-common-app/",
+      "https://nces.ed.gov/ipeds/report-your-data/race-ethnicity-collecting-data-for-reporting-purposes",
+      "https://www.collegevine.com/faq/11885/decoding-class-rank-reporting-on-college-apps-exact-decile-quintile",
+      "https://www.commonapp.org/apply/essay-prompts",
+      "https://www.commonapp.org/apply/first-year-students",
+      "https://www.commonapp.org/blog/announcing-2025-2026-common-app-essay-prompts",
+      "https://www.jraeducationalconsulting.com/blog/how-do-i-complete-the-education-page-of-common-app"
+    ],
+    "notes": "Education stratum is a sibling top-level stratum (not nested under profile). Writing → Challenges and circumstances (250-word) is distinct from Activities → Responsibilities and circumstances (8-checkbox multiselect), Aug 2025 cycle. School-type labels, course-level/subject catalogs, C&G grid labels, date-validation rules, and lookup fallbacks are verbatim from the 2025–26 applicant SPA bundle. Class-rank-reporting labels (Exact/Quartile/Decile/Quintile/none), rank-weighting and GPA-weighting labels (Weighted/Unweighted), and the conditional reveal flow are corroborated across reputable current-cycle walkthroughs (JRA Educational Consulting, Empowerly) and CollegeVine; these labels are server-loaded in the live app (datacatalog lookups) rather than embedded in the JS bundle. GPA scale is a numeric value (typically 4 to 100, keyed to the points an 'A' earns) and is therefore typed numeric without a fixed option set. Conditional logic is modeled with conditional_on/reveals: gateway counts of 0 (other schools, colleges, current-year courses, community-based organizations) collapse their subsections; a 'none' rank report and an empty GPA collapse their dependent fields."
+  },
+  "strata": {
+    "profile": {
+      "expects": "Applicant identity, nationality/geography, legal sex, gender identity, pronouns, federal race/ethnicity collection, and Family-derived first-generation inference. Fields progressively disclose via conditional_on and reveals.",
+      "conditional_logic_model": {
+        "expects": "Profile/demographic fields are progressively disclosed: a parent field's answer reveals dependent sub-fields. Each dependent field carries conditional_on (the triggering field path + the answer value(s) that reveal it); each triggering field carries reveals (the field paths it discloses). Fields without conditional_on are always shown.",
+        "operators": {
+          "equals": "Dependent field appears when the triggering field's value equals the given value.",
+          "in": "Dependent field appears when the triggering field's value is one of the given values.",
+          "includes": "Dependent field appears when the triggering multiselect's selections include the given value.",
+          "answered": "Dependent field appears when the triggering field has been submitted with any valid value (including No on a required enum).",
+          "not_equals": "Dependent field appears when the triggering field's value does not equal the given value.",
+          "present": "Dependent field appears when the triggering field has a non-empty value (e.g. cumulative GPA entered)."
+        }
+      },
+      "fields": {
+        "legal_name": {
+          "expects": "Applicant legal name as on birth certificate, driver's license, and/or U.S. state identification.",
+          "fields": {
+            "legal_first_name": {
+              "type": "text",
+              "expects": "Legal first name on official identification records.",
+              "constraint": {},
+              "required": true
+            },
+            "legal_last_name": {
+              "type": "text",
+              "expects": "Legal last name (family name) as on official identification records.",
+              "constraint": {},
+              "required": true
+            },
+            "legal_middle_name": {
+              "type": "text",
+              "expects": "Legal middle name or initial when present on official identification.",
+              "constraint": {},
+              "required": false
+            },
+            "share_different_first_name": {
+              "type": "enum",
+              "expects": "Would you like to share a different first name that people call you?",
+              "constraint": {},
+              "options": [
+                "Yes",
+                "No"
+              ],
+              "required": true,
+              "reveals": [
+                {
+                  "field": "legal_name.different_first_name",
+                  "when": {
+                    "value": "Yes"
+                  }
+                }
+              ]
+            },
+            "different_first_name": {
+              "type": "text",
+              "expects": "Different first name used in practice; the application prompts for this name only after Yes is selected on share_different_first_name.",
+              "constraint": {},
+              "required": false,
+              "conditional_on": {
+                "field": "legal_name.share_different_first_name",
+                "operator": "equals",
+                "value": "Yes"
+              }
+            }
+          }
+        },
+        "date_of_birth": {
+          "type": "text",
+          "expects": "Applicant date of birth on the Profile.",
+          "constraint": {},
+          "required": true
+        },
+        "permanent_address": {
+          "type": "text",
+          "expects": "Applicant permanent home or mailing address on the Profile.",
+          "constraint": {},
+          "required": true
+        },
+        "citizenship": {
+          "expects": "Citizenship status under Nationality and Geography in My Common Application; the chosen status progressively discloses country-of-citizenship, SSN, and visa follow-ups.",
+          "fields": {
+            "citizenship_status": {
+              "type": "enum",
+              "expects": "Primary citizenship status dropdown; selection drives the disclosed follow-up fields.",
+              "constraint": {},
+              "options": [
+                "U.S. citizen or U.S. National",
+                "U.S. dual citizen",
+                "U.S. resident",
+                "Citizen of a non-U.S. country"
+              ],
+              "required": true,
+              "reveals": [
+                {
+                  "field": "citizenship.social_security_number",
+                  "when": {
+                    "operator": "in",
+                    "values": [
+                      "U.S. citizen or U.S. National",
+                      "U.S. dual citizen"
+                    ]
+                  },
+                  "note": "SSN field refers to U.S. citizens; it is presented but not required and may be left blank."
+                },
+                {
+                  "field": "citizenship.country_of_citizenship",
+                  "when": {
+                    "operator": "in",
+                    "values": [
+                      "U.S. dual citizen",
+                      "U.S. resident",
+                      "Citizen of a non-U.S. country"
+                    ]
+                  },
+                  "note": "For U.S. dual citizen, only the option to list a country other than the United States is shown, since U.S. citizenship is already indicated. For U.S. resident the country listing is optional."
+                },
+                {
+                  "field": "citizenship.visa_information",
+                  "when": {
+                    "operator": "equals",
+                    "value": "Citizen of a non-U.S. country"
+                  },
+                  "note": "An applicant in the U.S. on a non-immigrant visa selects Citizen of a non-U.S. country and is prompted to provide visa information."
+                }
+              ]
+            },
+            "country_of_citizenship": {
+              "type": "enum",
+              "expects": "Country of citizenship listing. Disclosed for U.S. dual citizen (country other than the U.S. only), U.S. resident (optional), and Citizen of a non-U.S. country.",
+              "constraint": {},
+              "required": false,
+              "_unverified": true,
+              "_unverified_note": "Country options are server-loaded (datacatalog) in the live application; not inlined in this reference schema.",
+              "conditional_on": {
+                "field": "citizenship.citizenship_status",
+                "operator": "in",
+                "values": [
+                  "U.S. dual citizen",
+                  "U.S. resident",
+                  "Citizen of a non-U.S. country"
+                ]
+              }
+            },
+            "social_security_number": {
+              "type": "text",
+              "expects": "U.S. Social Security Number. Presented for U.S. citizen/national and dual-citizen paths; not required, and may be left blank if the applicant does not have an SSN.",
+              "constraint": {},
+              "required": false,
+              "conditional_on": {
+                "field": "citizenship.citizenship_status",
+                "operator": "in",
+                "values": [
+                  "U.S. citizen or U.S. National",
+                  "U.S. dual citizen"
+                ]
+              }
+            },
+            "visa_information": {
+              "type": "text",
+              "expects": "Non-immigrant visa information, prompted after Citizen of a non-U.S. country is selected for an applicant residing in the U.S. on a visa.",
+              "constraint": {},
+              "required": false,
+              "conditional_on": {
+                "field": "citizenship.citizenship_status",
+                "operator": "equals",
+                "value": "Citizen of a non-U.S. country"
+              }
+            }
+          }
+        },
+        "legal_sex": {
+          "type": "enum",
+          "expects": "Legal sex (required single-select), distinct from gender identity.",
+          "constraint": {},
+          "options": [
+            "female",
+            "male",
+            "X or another legal sex"
+          ],
+          "required": true
+        },
+        "gender_identity": {
+          "expects": "Optional gender identity multi-select, separate from legal sex; choosing Add another gender discloses a custom free-text field.",
+          "fields": {
+            "gender_identities": {
+              "type": "multiselect",
+              "expects": "Gender identity selections.",
+              "constraint": {},
+              "options": [
+                "Female",
+                "Male",
+                "Nonbinary",
+                "Add another gender"
+              ],
+              "required": false,
+              "reveals": [
+                {
+                  "field": "gender_identity.another_gender",
+                  "when": {
+                    "operator": "includes",
+                    "value": "Add another gender"
+                  }
+                }
+              ]
+            },
+            "another_gender": {
+              "type": "text",
+              "expects": "Custom gender identity free-text, disclosed when Add another gender is selected.",
+              "constraint": {},
+              "required": false,
+              "conditional_on": {
+                "field": "gender_identity.gender_identities",
+                "operator": "includes",
+                "value": "Add another gender"
+              }
+            }
+          }
+        },
+        "pronouns": {
+          "expects": "Optional pronoun multi-select; choosing Add another pronoun set discloses a custom free-text field.",
+          "fields": {
+            "pronoun_sets": {
+              "type": "multiselect",
+              "expects": "Third-person pronouns the applicant wants others to use.",
+              "constraint": {},
+              "options": [
+                "He/Him",
+                "She/Her",
+                "They/Them",
+                "Add another pronoun set"
+              ],
+              "required": false,
+              "reveals": [
+                {
+                  "field": "pronouns.another_pronoun_set",
+                  "when": {
+                    "operator": "includes",
+                    "value": "Add another pronoun set"
+                  }
+                }
+              ]
+            },
+            "another_pronoun_set": {
+              "type": "text",
+              "expects": "Custom pronoun set free-text, disclosed when Add another pronoun set is selected.",
+              "constraint": {},
+              "required": false,
+              "conditional_on": {
+                "field": "pronouns.pronoun_sets",
+                "operator": "includes",
+                "value": "Add another pronoun set"
+              }
+            }
+          }
+        },
+        "race_ethnicity": {
+          "expects": "Optional federal two-part race and ethnicity self-identification; the Hispanic/Latino ethnicity question is presented first, then the race multiselect.",
+          "fields": {
+            "hispanic_latino": {
+              "type": "enum",
+              "expects": "Hispanic/Latino ethnicity question (first part of the two-part federal collection sequence).",
+              "constraint": {},
+              "options": [
+                "Yes",
+                "No"
+              ],
+              "required": false
+            },
+            "races": {
+              "type": "multiselect",
+              "expects": "Select one or more of the following races (second part), presented after the ethnicity question.",
+              "constraint": {},
+              "options": [
+                "American Indian or Alaska Native",
+                "Asian",
+                "Black or African American",
+                "Native Hawaiian or Other Pacific Islander",
+                "White"
+              ],
+              "required": false,
+              "conditional_on": {
+                "field": "race_ethnicity.hispanic_latino",
+                "operator": "answered",
+                "note": "Federal two-part instrument presents ethnicity first, then race; race is shown after the ethnicity question regardless of Yes/No."
+              }
+            }
+          }
+        },
+        "first_generation": {
+          "expects": "First-generation status is inferred from Family / parent educational background, not a standalone Profile dropdown.",
+          "fields": {
+            "parents_bachelors_degree_or_higher": {
+              "type": "enum",
+              "expects": "Did either of your parents receive a bachelor's degree or higher? (Family Educational Background; first-generation testing path). A No answer corresponds to first-generation status reported to colleges.",
+              "constraint": {},
+              "options": [
+                "Yes",
+                "No"
+              ],
+              "required": false,
+              "reveals": [
+                {
+                  "derived_field": "first_generation_status",
+                  "when": {
+                    "operator": "equals",
+                    "value": "No"
+                  },
+                  "note": "First-generation is a derived classification (submitted first-generation in member data), not a separately entered field; it follows from a No answer on parental bachelor's-degree attainment."
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "education": {
+      "expects": "Secondary-school history, self-reported grades and rank, course lists for the current and senior years, optional college coursework, and—when required by colleges on the list—the Courses & Grades self-reported transcript. Honors are collected in a separate application section (not modeled here).",
+      "conditional_logic_model": {
+        "expects": "Education uses the same semantic model as profile (gateway counts and enum choices reveal or collapse subsections) but encodes triggers as path strings and comparison expressions for brevity. Parsers should treat string conditional_on and string reveals as equivalent to structured profile objects where noted in source.notes.",
+        "string_dsl_examples": [
+          "education.other_secondary_schools.other_schools_count > 0",
+          "education.grades.class_rank_reporting_method != 'none'",
+          "education.grades.cumulative_gpa is present"
+        ]
+      },
+      "current_secondary_school": {
+        "expects": "Current or most recent secondary/high school: lookup or manual entry, CEEB when listed, school type, location, and attendance/graduation dates.",
+        "school_lookup": {
+          "type": "lookup",
+          "expects": "Search and select the secondary school from the CEEB/high-school directory; if not listed, use the provided fallbacks.",
+          "constraint": {},
+          "required": true
+        },
+        "lookup_fallbacks": {
+          "type": "enum",
+          "expects": "When the school does not appear in search results.",
+          "constraint": {},
+          "options": [
+            "Homeschooled",
+            "I don't see my high school in this list"
+          ],
+          "required": false
+        },
+        "name": {
+          "type": "text",
+          "expects": "High school name as it should appear on the application (manual entry or display after lookup).",
+          "constraint": {
+            "max_chars": 60
+          },
+          "required": true
+        },
+        "ceeb_code": {
+          "type": "text",
+          "expects": "CEEB code for the selected high school when the directory supplies one.",
+          "constraint": {},
+          "required": false
+        },
+        "school_type": {
+          "type": "enum",
+          "expects": "Type of secondary institution attended.",
+          "constraint": {},
+          "options": [
+            "Public",
+            "Charter",
+            "Religious",
+            "Home school",
+            "Independent"
+          ],
+          "required": true
+        },
+        "country_region": {
+          "type": "text",
+          "expects": "Country/Region/Territory of the school.",
+          "constraint": {},
+          "required": true
+        },
+        "address_line_1": {
+          "type": "text",
+          "expects": "Street address line 1 of the school.",
+          "constraint": {
+            "max_chars": 60
+          },
+          "required": false
+        },
+        "address_line_2": {
+          "type": "text",
+          "expects": "Street address line 2 of the school.",
+          "constraint": {
+            "max_chars": 60
+          },
+          "required": false
+        },
+        "address_line_3": {
+          "type": "text",
+          "expects": "Street address line 3 of the school.",
+          "constraint": {
+            "max_chars": 60
+          },
+          "required": false
+        },
+        "city": {
+          "type": "text",
+          "expects": "City of the school.",
+          "constraint": {
+            "max_chars": 30
+          },
+          "required": true
+        },
+        "state_or_province": {
+          "type": "text",
+          "expects": "State/province of the school when applicable for the selected country.",
+          "constraint": {},
+          "required": false
+        },
+        "postal_code": {
+          "type": "text",
+          "expects": "ZIP/postal code of the school when applicable.",
+          "constraint": {},
+          "required": false
+        },
+        "date_of_entry": {
+          "type": "text",
+          "expects": "Date the applicant began attending this school (month/year). Must be earlier than graduation and exit dates.",
+          "constraint": {},
+          "required": true
+        },
+        "date_of_exit": {
+          "type": "text",
+          "expects": "Date the applicant left this school if applicable (month/year). Must be after date of entry.",
+          "constraint": {},
+          "required": false
+        },
+        "graduation_date": {
+          "type": "text",
+          "expects": "Expected or actual high school graduation date (month/year). Must be after date of entry.",
+          "constraint": {},
+          "required": true
+        }
+      },
+      "other_secondary_schools": {
+        "expects": "Additional secondary schools attended (transfer, study abroad, dual enrollment campus, etc.). Repeatable entries when the applicant has schools beyond the current/most recent institution.",
+        "other_schools_count": {
+          "type": "number",
+          "expects": "Gateway: number of other secondary schools attended, not counting the current/most recent school. A count of 0 collapses this subsection; a count greater than 0 reveals that many school entries.",
+          "constraint": {},
+          "required": true,
+          "reveals": "education.other_secondary_schools.entry (one repeated record per count > 0)"
+        },
+        "entry": {
+          "expects": "One record per additional secondary school; revealed only when other_schools_count > 0.",
+          "conditional_on": "education.other_secondary_schools.other_schools_count > 0",
+          "school_lookup": {
+            "type": "lookup",
+            "expects": "Search/select the other secondary school or use the same fallbacks as the current school.",
+            "constraint": {},
+            "required": true
+          },
+          "lookup_fallbacks": {
+            "type": "enum",
+            "expects": "Fallback when the other school is not in the directory.",
+            "constraint": {},
+            "options": [
+              "Homeschooled",
+              "I don't see my high school in this list"
+            ],
+            "required": false
+          },
+          "name": {
+            "type": "text",
+            "expects": "Other high school name.",
+            "constraint": {
+              "max_chars": 60
+            },
+            "required": true
+          },
+          "ceeb_code": {
+            "type": "text",
+            "expects": "CEEB code when available.",
+            "constraint": {},
+            "required": false
+          },
+          "school_type": {
+            "type": "enum",
+            "expects": "School type for the other institution.",
+            "constraint": {},
+            "options": [
+              "Public",
+              "Charter",
+              "Religious",
+              "Home school",
+              "Independent"
+            ],
+            "required": true
+          },
+          "country_region": {
+            "type": "text",
+            "expects": "Country/Region/Territory.",
+            "constraint": {},
+            "required": true
+          },
+          "address_line_1": {
+            "type": "text",
+            "expects": "Address line 1.",
+            "constraint": {
+              "max_chars": 60
+            },
+            "required": false
+          },
+          "address_line_2": {
+            "type": "text",
+            "expects": "Address line 2.",
+            "constraint": {
+              "max_chars": 60
+            },
+            "required": false
+          },
+          "address_line_3": {
+            "type": "text",
+            "expects": "Address line 3.",
+            "constraint": {
+              "max_chars": 60
+            },
+            "required": false
+          },
+          "city": {
+            "type": "text",
+            "expects": "City.",
+            "constraint": {
+              "max_chars": 30
+            },
+            "required": true
+          },
+          "state_or_province": {
+            "type": "text",
+            "expects": "State/province when applicable.",
+            "constraint": {},
+            "required": false
+          },
+          "postal_code": {
+            "type": "text",
+            "expects": "ZIP/postal code when applicable.",
+            "constraint": {},
+            "required": false
+          },
+          "date_of_entry": {
+            "type": "text",
+            "expects": "Entry date at this school.",
+            "constraint": {},
+            "required": true
+          },
+          "date_of_exit": {
+            "type": "text",
+            "expects": "Exit date from this school.",
+            "constraint": {},
+            "required": false
+          },
+          "graduation_date": {
+            "type": "text",
+            "expects": "Graduation date if graduated from this school.",
+            "constraint": {},
+            "required": false
+          }
+        }
+      },
+      "grades": {
+        "expects": "Self-reported summary of secondary-school performance: class rank (if the school reports it), cumulative GPA, scale, and weighting. Two conditional flows: the class-rank flow keys off the reporting method (a 'none' selection collapses the rank value, rank weighting, and class-size fields), and the GPA flow keys off whether a cumulative GPA is entered (which reveals scale and weighting).",
+        "class_rank_reporting_method": {
+          "type": "enum",
+          "expects": "Gateway: how the applicant's school reports class rank. Selecting 'none' collapses the dependent rank fields; any ranking method reveals the rank value, rank weighting, and graduating-class-size fields.",
+          "constraint": {},
+          "options": [
+            "Exact",
+            "Quartile",
+            "Decile",
+            "Quintile",
+            "none"
+          ],
+          "required": true,
+          "reveals": "education.grades.class_rank, education.grades.class_rank_weighting, education.grades.graduating_class_size (when not 'none')"
+        },
+        "class_rank": {
+          "type": "text",
+          "expects": "Applicant's class rank, entered as an exact number (Exact) or as the quartile/decile/quintile band the applicant falls in (or its percentage), matching the reporting method.",
+          "constraint": {},
+          "required": false,
+          "conditional_on": "education.grades.class_rank_reporting_method != 'none'"
+        },
+        "class_rank_weighting": {
+          "type": "enum",
+          "expects": "Whether the reported class rank is weighted or unweighted.",
+          "constraint": {},
+          "options": [
+            "Weighted",
+            "Unweighted"
+          ],
+          "required": false,
+          "conditional_on": "education.grades.class_rank_reporting_method != 'none'"
+        },
+        "graduating_class_size": {
+          "type": "number",
+          "expects": "Number of students in the applicant's graduating class, giving context to the reported rank.",
+          "constraint": {},
+          "required": false,
+          "conditional_on": "education.grades.class_rank_reporting_method != 'none'"
+        },
+        "cumulative_gpa": {
+          "type": "text",
+          "expects": "Gateway: cumulative grade point average to date on the school's scale, entered exactly as it appears on the transcript. Optional; entering a value reveals the GPA scale and weighting fields.",
+          "constraint": {},
+          "required": false,
+          "reveals": "education.grades.gpa_scale, education.grades.gpa_weighting"
+        },
+        "gpa_scale": {
+          "type": "number",
+          "expects": "Numeric grading scale on which the cumulative GPA is reported (the points an 'A' earns; typically 4 through 100, e.g. 4, 5, 6, 12, or 100). Selected from the application's GPA-scale dropdown.",
+          "constraint": {},
+          "required": false,
+          "conditional_on": "education.grades.cumulative_gpa is present"
+        },
+        "gpa_weighting": {
+          "type": "enum",
+          "expects": "Whether the cumulative GPA is weighted (extra points for Honors/AP/IB/AICE/Dual Enrollment) or unweighted.",
+          "constraint": {},
+          "options": [
+            "Weighted",
+            "Unweighted"
+          ],
+          "required": false,
+          "conditional_on": "education.grades.cumulative_gpa is present"
+        }
+      },
+      "current_or_most_recent_year_courses": {
+        "expects": "Courses in progress or completed in the current academic year (self-reported list distinct from the optional Courses & Grades transcript grid).",
+        "courses_count": {
+          "type": "number",
+          "expects": "Gateway: number of current-year courses to report, chosen before entering them. Reveals that many course rows. Changing the count after entering names forces re-entry of each course's schedule/timing.",
+          "constraint": {},
+          "required": true,
+          "reveals": "education.current_or_most_recent_year_courses.entry (one repeated row per count)"
+        },
+        "entry": {
+          "conditional_on": "education.current_or_most_recent_year_courses.courses_count > 0",
+          "course_name": {
+            "type": "text",
+            "expects": "Course title as listed on the schedule or transcript.",
+            "constraint": {
+              "max_chars": 100
+            },
+            "required": true
+          },
+          "course_level": {
+            "type": "enum",
+            "expects": "Academic level/rigor of the course.",
+            "constraint": {},
+            "options": [
+              "Regular/Standard",
+              "Accelerated",
+              "Advanced",
+              "Advanced Placement (AP)",
+              "AS/A-level/International A-level, Cambridge AICE",
+              "College Prep",
+              "Dual Enrollment",
+              "Enriched",
+              "GCSE, IGCSE",
+              "Gifted",
+              "High Honors",
+              "Honors",
+              "Intensive",
+              "International Baccalaureate (IB)",
+              "Pre-IB",
+              "Regents",
+              "N/A"
+            ],
+            "required": true
+          },
+          "subject": {
+            "type": "enum",
+            "expects": "Subject area of the course.",
+            "constraint": {},
+            "options": [
+              "Pre-Algebra",
+              "Algebra",
+              "Geometry",
+              "Trigonometry",
+              "Pre-Calculus",
+              "Calculus",
+              "Math (Other)",
+              "Biology",
+              "Chemistry",
+              "Physics",
+              "Earth/Environmental Science",
+              "Science (Other)",
+              "English",
+              "History/Social Science",
+              "Foreign/World Language",
+              "Physical Education/Health",
+              "Art (Visual or Performing)",
+              "Computer Science",
+              "Religion",
+              "Other/Elective"
+            ],
+            "required": true
+          },
+          "schedule": {
+            "type": "multiselect",
+            "expects": "Term(s) the course meets. Full Year cannot be combined with Semester, Trimester, or Quarter on the same row.",
+            "constraint": {},
+            "options": [
+              "Full Year",
+              "Semester",
+              "Trimester",
+              "Quarter"
+            ],
+            "required": true
+          }
+        }
+      },
+      "future_or_senior_year_courses": {
+        "expects": "Planned courses for the senior year or final year of secondary school.",
+        "entry": {
+          "course_name": {
+            "type": "text",
+            "expects": "Planned course title.",
+            "constraint": {
+              "max_chars": 100
+            },
+            "required": true
+          },
+          "course_level": {
+            "type": "enum",
+            "expects": "Expected course level/rigor.",
+            "constraint": {},
+            "options": [
+              "Regular/Standard",
+              "Accelerated",
+              "Advanced",
+              "Advanced Placement (AP)",
+              "AS/A-level/International A-level, Cambridge AICE",
+              "College Prep",
+              "Dual Enrollment",
+              "Enriched",
+              "GCSE, IGCSE",
+              "Gifted",
+              "High Honors",
+              "Honors",
+              "Intensive",
+              "International Baccalaureate (IB)",
+              "Pre-IB",
+              "Regents",
+              "N/A"
+            ],
+            "required": true
+          },
+          "subject": {
+            "type": "enum",
+            "expects": "Subject area.",
+            "constraint": {},
+            "options": [
+              "Pre-Algebra",
+              "Algebra",
+              "Geometry",
+              "Trigonometry",
+              "Pre-Calculus",
+              "Calculus",
+              "Math (Other)",
+              "Biology",
+              "Chemistry",
+              "Physics",
+              "Earth/Environmental Science",
+              "Science (Other)",
+              "English",
+              "History/Social Science",
+              "Foreign/World Language",
+              "Physical Education/Health",
+              "Art (Visual or Performing)",
+              "Computer Science",
+              "Religion",
+              "Other/Elective"
+            ],
+            "required": true
+          },
+          "schedule": {
+            "type": "multiselect",
+            "expects": "Term(s) for the planned course; Full Year is mutually exclusive with other term choices.",
+            "constraint": {},
+            "options": [
+              "Full Year",
+              "Semester",
+              "Trimester",
+              "Quarter"
+            ],
+            "required": true
+          }
+        }
+      },
+      "college_university_coursework": {
+        "expects": "College or university courses taken while in secondary school (dual credit / early college). AP and IB courses taught by high-school teachers do not count here.",
+        "colleges_count": {
+          "type": "number",
+          "expects": "Gateway: number of colleges/universities where the applicant has taken courses (count of institutions, not courses). A count of 0 collapses this subsection; a count greater than 0 reveals that many college entries.",
+          "constraint": {},
+          "required": true,
+          "reveals": "education.college_university_coursework.entry (one repeated record per count > 0)"
+        },
+        "entry": {
+          "conditional_on": "education.college_university_coursework.colleges_count > 0",
+          "institution_lookup": {
+            "type": "lookup",
+            "expects": "Search and select the college/university; fallback when not listed.",
+            "constraint": {},
+            "required": true
+          },
+          "lookup_fallback": {
+            "type": "enum",
+            "expects": "When the college does not appear in search results.",
+            "constraint": {},
+            "options": [
+              "I don't see the college I am looking for in this list"
+            ],
+            "required": false
+          },
+          "name": {
+            "type": "text",
+            "expects": "Name of college/university.",
+            "constraint": {
+              "max_chars": 60
+            },
+            "required": true
+          },
+          "country_region": {
+            "type": "text",
+            "expects": "Country/Region/Territory of the institution.",
+            "constraint": {},
+            "required": true
+          },
+          "city": {
+            "type": "text",
+            "expects": "City of the institution.",
+            "constraint": {
+              "max_chars": 30
+            },
+            "required": true
+          }
+        }
+      },
+      "future_plans": {
+        "expects": "Education section Future Plans: career interest and highest degree planned (labels typically loaded from datacatalog in the live application).",
+        "_unverified": true,
+        "fields": {
+          "career_interest": {
+            "type": "enum",
+            "expects": "Career area of interest from the application's career list.",
+            "constraint": {},
+            "required": false
+          },
+          "highest_degree_planned": {
+            "type": "enum",
+            "expects": "Highest degree the applicant plans to earn.",
+            "constraint": {},
+            "required": false
+          }
+        }
+      },
+      "community_based_organizations": {
+        "expects": "Community-based organizations (e.g. Boys & Girls Club, college-access programs) that provided free assistance preparing the application. Counted gateway followed by per-organization entries.",
+        "organizations_count": {
+          "type": "number",
+          "expects": "Gateway: number of community-based organizations that gave free college-application assistance. A count of 0 collapses this subsection; a count greater than 0 reveals that many organization entries.",
+          "constraint": {},
+          "required": true,
+          "reveals": "education.community_based_organizations.entry (one repeated record per count > 0)"
+        },
+        "entry": {
+          "conditional_on": "education.community_based_organizations.organizations_count > 0",
+          "organization_name": {
+            "type": "text",
+            "expects": "Name of the community-based organization that provided assistance.",
+            "constraint": {},
+            "required": true
+          }
+        }
+      },
+      "courses_and_grades": {
+        "expects": "Optional section (Common App section id 13) required only by colleges on the My Colleges list that mandate self-reported courses and grades. Structured as one or more transcripts; colleges may require the Personal Essay separately.",
+        "required_by_college": true,
+        "help_reference": "https://appsupport.commonapp.org/applicantsupport/s/article/Courses-and-Grades-information",
+        "transcript": {
+          "expects": "One transcript block per school year and grading schedule; additional transcripts for other schools or grading scales.",
+          "school_name": {
+            "type": "text",
+            "expects": "School Name on the transcript header.",
+            "constraint": {},
+            "required": true
+          },
+          "school_year": {
+            "type": "enum",
+            "expects": "Academic year for this transcript (values loaded from gridConfig.academicYears).",
+            "constraint": {},
+            "required": true
+          },
+          "grading_scale": {
+            "type": "enum",
+            "expects": "Grading Scale for this transcript (values loaded from gridConfig.gradingScale; includes letter and numeric grades such as A+ through F, Pass/Fail, Incomplete, Withdrawn).",
+            "constraint": {},
+            "required": true
+          },
+          "schedule": {
+            "type": "enum",
+            "expects": "Schedule type governing term columns for this transcript.",
+            "constraint": {},
+            "options": [
+              "Semester",
+              "Trimester",
+              "Quarter"
+            ],
+            "required": true
+          },
+          "course_row": {
+            "expects": "Each course on the transcript grid.",
+            "subject": {
+              "type": "enum",
+              "expects": "Subject.",
+              "constraint": {},
+              "options": [
+                "Pre-Algebra",
+                "Algebra",
+                "Geometry",
+                "Trigonometry",
+                "Pre-Calculus",
+                "Calculus",
+                "Math (Other)",
+                "Biology",
+                "Chemistry",
+                "Physics",
+                "Earth/Environmental Science",
+                "Science (Other)",
+                "English",
+                "History/Social Science",
+                "Foreign/World Language",
+                "Physical Education/Health",
+                "Art (Visual or Performing)",
+                "Computer Science",
+                "Religion",
+                "Other/Elective"
+              ],
+              "required": true
+            },
+            "course_name": {
+              "type": "text",
+              "expects": "Course Name.",
+              "constraint": {
+                "max_chars": 100
+              },
+              "required": true
+            },
+            "course_level": {
+              "type": "enum",
+              "expects": "Course Level.",
+              "constraint": {},
+              "options": [
+                "Regular/Standard",
+                "Accelerated",
+                "Advanced",
+                "Advanced Placement (AP)",
+                "AS/A-level/International A-level, Cambridge AICE",
+                "College Prep",
+                "Dual Enrollment",
+                "Enriched",
+                "GCSE, IGCSE",
+                "Gifted",
+                "High Honors",
+                "Honors",
+                "Intensive",
+                "International Baccalaureate (IB)",
+                "Pre-IB",
+                "Regents",
+                "N/A"
+              ],
+              "required": true
+            },
+            "term_grades": {
+              "type": "text",
+              "expects": "Grade per term column (labels 1–4 or S/T/Q prefix by schedule) or Final; at least one grade required per row.",
+              "constraint": {},
+              "required": true
+            },
+            "credits": {
+              "type": "text",
+              "expects": "Credits per term or Final credits; at least one credit required per row when applicable.",
+              "constraint": {},
+              "required": true
+            },
+            "credits_not_applicable": {
+              "type": "enum",
+              "expects": "Mark when credits do not apply for this row.",
+              "constraint": {},
+              "options": [
+                "Credits not applicable"
+              ],
+              "required": false
+            }
+          },
+          "add_other_transcript": {
+            "type": "enum",
+            "expects": "Action gateway: choosing 'Add courses from another transcript' reveals an additional transcript block for courses on a different schedule or grading scale, or from another high school transcript. Repeatable up to the transcript limit.",
+            "constraint": {},
+            "options": [
+              "Add courses from another transcript"
+            ],
+            "required": false,
+            "reveals": "education.courses_and_grades.transcript (one additional transcript block per invocation, up to the limit)"
+          }
+        },
+        "grading_scale_grade_options": {
+          "expects": "Letter and status grades available in the C&G grid when grading scale is letter-based (verbatim lbl set in applicant SPA).",
+          "options": [
+            "A+",
+            "A",
+            "A-",
+            "B+",
+            "B",
+            "B-",
+            "C+",
+            "C",
+            "C-",
+            "D+",
+            "D",
+            "D-",
+            "F",
+            "Pass - (Pass/Fail)",
+            "Fail - (Pass/Fail)",
+            "Incomplete",
+            "Withdrawn",
+            "Withdrawn - Failed",
+            "No Grade",
+            "S - Satisfactory",
+            "U - Unsatisfactory",
+            "Medical Excuse"
+          ]
+        },
+        "validation": {
+          "transcript_header_required": [
+            "School Name",
+            "School Year",
+            "Grading Scale",
+            "Schedule"
+          ],
+          "course_row_required": [
+            "Subject",
+            "Course Name",
+            "Course Level",
+            "at least one grade",
+            "at least one credit"
+          ],
+          "full_year_xor_other_terms": "You may not select both Full Year and other terms"
+        },
+        "limits": {
+          "max_transcripts_message": "You have reached the maximum number of transcripts allowed.",
+          "max_courses_per_transcript_message": "You have reached the maximum number of courses allowed for this transcript."
+        }
+      }
+    },
+    "honors": {
+      "expects": "Education-section academic honors (grades 9–12 or international equivalent). The subsection is optional: list honors related to academic achievement beginning in ninth grade. Each entry is one honor; the Honor field carries the award name and any brief context because there is no separate description field.",
+      "section_intro": "The items in this section are optional. List any honors you have received related to your academic achievements beginning with the ninth grade or international equivalent.",
+      "fill_model": "progressive_disclosure",
+      "fill_model_note": "The live Honors subsection is optional and has no Yes/No gateway: leaving every row empty closes the section with no honors reported (no gateway answer is required to skip it). Entry rows are added on demand (Add another honor) up to a maximum of 5; rows beyond the first are revealed by the applicant rather than shown all at once. Within a row the three fields (Honor title, grade level, level of recognition) are flat and shown together — no field reveals a follow-up.",
+      "max_entries": 5,
+      "ordering": {
+        "expects": "List honors by importance to the academic narrative (prestige and relevance), not chronology. When more than five exist, omit the least prestigious or most redundant with an activity line."
+      },
+      "entries": {
+        "expects": "Ordered list of up to five honor entries. The list starts empty; each row is added on demand. Selecting/entering nothing leaves the section empty, which is valid (optional section).",
+        "disclosure": {
+          "initial_rows": 0,
+          "add_action_label": "Add another honor",
+          "max_rows": 5,
+          "gateway": null,
+          "note": "No row shells until the applicant adds an honor; empty list is valid (optional section)."
+        },
+        "entry": {
+          "_fill_order": [
+            "title",
+            "grade_level",
+            "recognition_level"
+          ],
+          "title": {
+            "type": "text",
+            "expects": "Honor or award title (form label: Honor). One honor per entry; include brief selective context in this field only (no separate description). Do not duplicate an activity-line title; when more than five honors exist, compress with award name plus year or scope in this cap.",
+            "constraint": {
+              "max_chars": 100
+            },
+            "required": true
+          },
+          "grade_level": {
+            "type": "multiselect",
+            "expects": "Grade level(s) when the honor was received (form header: Grade level or post-graduate). Select all that apply.",
+            "constraint": {},
+            "options": [
+              "9",
+              "10",
+              "11",
+              "12",
+              "Post-graduate"
+            ],
+            "required": true
+          },
+          "recognition_level": {
+            "type": "multiselect",
+            "expects": "Level(s) of recognition for the honor (form header: Level(s) of recognition). Select all that apply; use the highest defensible level.",
+            "constraint": {},
+            "options": [
+              "School",
+              "State or regional",
+              "National",
+              "International"
+            ],
+            "required": true
+          }
+        }
+      }
+    },
+    "activities": {
+      "expects": "Extracurricular involvements, work, and responsibilities outside the classroom across grades 9–12 and post-graduate. Up to ten entries, ordered by importance to the applicant. The Aug 2025 cycle adds a separate Responsibilities and circumstances checklist on this section (distinct from Writing → Challenges and circumstances).",
+      "section_intro": "Reporting activities can help colleges better understand your life outside of the classroom. Examples of activities might include clubs, extracurriculars, family responsibilities, hobbies, work, or volunteering. List your activities in the order of their importance to you.",
+      "fill_model": "progressive_disclosure",
+      "fill_model_note": "The live Activities section is not a flat form; fields appear conditionally. A gateway yes/no governs whether any entry rows exist; each entry row is added on demand; within a row the activity_type selection precedes and gates the remaining per-entry fields.",
+      "_section_fill_order": [
+        "gateway.has_activities_to_report",
+        "entries",
+        "responsibilities_and_circumstances"
+      ],
+      "limits": {
+        "max_entries_message": "You have reached the maximum number of activities allowed."
+      },
+      "add_entry": {
+        "type": "action",
+        "label": "Add activity",
+        "expects": "Reveals the next activity entry block until max_entries when gateway.has_activities_to_report is Yes.",
+        "conditional_on": {
+          "field": "activities.gateway.has_activities_to_report",
+          "operator": "equals",
+          "value": "Yes"
+        },
+        "constraint": {
+          "max_invocations": 10
+        }
+      },
+      "gateway": {
+        "has_activities_to_report": {
+          "type": "enum",
+          "expects": "Gateway: whether the applicant has any activities to report. Selecting No closes the section with no entry rows; selecting Yes reveals the activity-entry list.",
+          "constraint": {},
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "required": true,
+          "reveals": {
+            "Yes": [
+              "entries"
+            ],
+            "No": []
+          }
+        }
+      },
+      "max_entries": 10,
+      "entries": {
+        "expects": "Ordered list of up to ten activity entries, revealed only when has_activities_to_report = Yes. Each entry is added on demand (Add activity); rows beyond the first are revealed by the applicant rather than shown all at once.",
+        "conditional_on": {
+          "field": "activities.gateway.has_activities_to_report",
+          "operator": "equals",
+          "value": "Yes"
+        },
+        "disclosure": {
+          "initial_rows": 0,
+          "add_action_label": "Add activity",
+          "max_rows": 10,
+          "note": "First row appears when the applicant adds an activity after selecting Yes on the gateway."
+        },
+        "entry": {
+          "_fill_order": [
+            "activity_type",
+            "position_leadership",
+            "organization",
+            "description",
+            "grade_levels",
+            "timing",
+            "hours_per_week",
+            "weeks_per_year",
+            "continue_in_college"
+          ],
+          "activity_type": {
+            "type": "enum",
+            "expects": "First field selected for an entry; gates the remaining per-entry fields. Choose the most specific fit, or Other Club/Activity when none apply.",
+            "constraint": {},
+            "options": [
+              "Academic",
+              "Art",
+              "Athletics: Club",
+              "Athletics: JV/Varsity",
+              "Career-Oriented",
+              "Community Service (Volunteer)",
+              "Computer/Technology",
+              "Cultural",
+              "Dance",
+              "Debate/Speech",
+              "Environmental",
+              "Family Responsibilities",
+              "Foreign Exchange",
+              "Journalism/Publication",
+              "Junior R.O.T.C.",
+              "Music: Instrumental",
+              "Music: Vocal",
+              "Religious",
+              "Research",
+              "Robotics",
+              "School Spirit",
+              "Science/Math",
+              "Student Govt./Politics",
+              "Theater/Drama",
+              "Work (Paid)",
+              "Other Club/Activity"
+            ],
+            "required": true,
+            "reveals_on_any_selection": [
+              "position_leadership",
+              "organization",
+              "description",
+              "grade_levels",
+              "timing",
+              "hours_per_week",
+              "weeks_per_year",
+              "continue_in_college"
+            ],
+            "guidance_on_selection": {
+              "Other Club/Activity": "When no listed type fits, select Other Club/Activity and specify the activity in the Position/Leadership field (no additional field is revealed)."
+            }
+          },
+          "position_leadership": {
+            "type": "text",
+            "expects": "Position or leadership description for the activity (may be left blank if none). When activity_type is Other Club/Activity, used to specify the activity.",
+            "constraint": {
+              "max_chars": 50
+            },
+            "conditional_on": {
+              "field": "activity_type",
+              "equals": "any"
+            },
+            "required": false
+          },
+          "organization": {
+            "type": "text",
+            "expects": "Organization, program, employer, or activity name.",
+            "constraint": {
+              "max_chars": 100
+            },
+            "conditional_on": {
+              "field": "activity_type",
+              "equals": "any"
+            },
+            "required": false
+          },
+          "description": {
+            "type": "text",
+            "expects": "Description of the activity, including accomplishments and any recognition received.",
+            "constraint": {
+              "max_chars": 150
+            },
+            "conditional_on": {
+              "field": "activity_type",
+              "equals": "any"
+            },
+            "required": true
+          },
+          "grade_levels": {
+            "type": "multiselect",
+            "expects": "Grade level(s) of participation; select all that apply.",
+            "constraint": {},
+            "options": [
+              "9",
+              "10",
+              "11",
+              "12",
+              "Post-graduate"
+            ],
+            "conditional_on": {
+              "field": "activity_type",
+              "equals": "any"
+            },
+            "required": true
+          },
+          "timing": {
+            "type": "multiselect",
+            "expects": "Season(s) of participation during the school year.",
+            "constraint": {},
+            "options": [
+              "During school year",
+              "During school break",
+              "All year"
+            ],
+            "conditional_on": {
+              "field": "activity_type",
+              "equals": "any"
+            },
+            "required": true
+          },
+          "hours_per_week": {
+            "type": "number",
+            "expects": "Average hours per week spent on the activity during the portions of the year it occurs.",
+            "constraint": {
+              "min": 0,
+              "max": 168,
+              "integer": true
+            },
+            "conditional_on": {
+              "field": "activity_type",
+              "equals": "any"
+            },
+            "required": true
+          },
+          "weeks_per_year": {
+            "type": "number",
+            "expects": "Average number of weeks per year the activity occurs.",
+            "constraint": {
+              "min": 0,
+              "max": 52,
+              "integer": true
+            },
+            "conditional_on": {
+              "field": "activity_type",
+              "equals": "any"
+            },
+            "required": true
+          },
+          "continue_in_college": {
+            "type": "enum",
+            "expects": "Whether the applicant plans to continue a similar activity in college.",
+            "constraint": {},
+            "options": [
+              "Yes",
+              "No"
+            ],
+            "conditional_on": {
+              "field": "activity_type",
+              "equals": "any"
+            },
+            "required": false
+          }
+        }
+      },
+      "responsibilities_and_circumstances": {
+        "expects": "Aug 2025 checklist on the Activities section for ongoing family or household responsibilities that affect academics or activities. Distinct from the Writing section’s 250-word Challenges and circumstances response. Shown in the Activities section regardless of gateway or entry count; multiselect is optional.",
+        "always_visible": true,
+        "section_intro": "Sometimes academics and activities are impacted by family responsibilities or other circumstances. Sharing this information with colleges can help them better understand the context of your life. You may omit any information you already provided elsewhere in your Common App.",
+        "prompt": "Please select which responsibilities you spend significant time on regularly:",
+        "responsibility_types": {
+          "type": "multiselect",
+          "expects": "Regular family or household responsibilities that take significant time. Selecting an item records the responsibility; no per-item follow-up field is revealed.",
+          "constraint": {},
+          "options": [
+            "Assisting family or household members with tasks such as doctor's appointments, bank visits, or essential errands",
+            "Farm work or unpaid work for a family business",
+            "Interpreting or translating for family or household members",
+            "Managing family or household finances, budget, or paying bills",
+            "Taking care of sick, disabled, and/or elderly members of my family or household",
+            "Taking care of younger family or household members",
+            "Taking care of my own child or children",
+            "Working at a paid job to contribute to my household income"
+          ],
+          "required": false
+        }
+      }
+    },
+    "personal_statement": {
+      "expects": "Common App Writing section (first-year), modeled as it is actually filled: a required Personal Essay (select a prompt, then complete the revealed essay textbox); an optional Challenges and circumstances item whose Yes gateway reveals a description box; and an optional Additional information box. Reveal relationships are expressed via conditional_on (a field is shown only when its trigger holds) and reveals (an answer that unlocks downstream fields).",
+      "fill_model": "progressive_disclosure",
+      "scope": "first_year_default",
+      "_section_fill_order": [
+        "essay",
+        "challenges_and_circumstances",
+        "additional_information"
+      ],
+      "essay": {
+        "prompt_choice": {
+          "type": "enum",
+          "expects": "Select one of seven Personal Essay prompts. The essay response textbox is shown/enabled once a prompt is selected. Prompt wording is unchanged for 2025–2026 per the Common App announcement.",
+          "constraint": {},
+          "options": [
+            "Some students have a background, identity, interest, or talent that is so meaningful they believe their application would be incomplete without it. If this sounds like you, then please share your story.",
+            "The lessons we take from obstacles we encounter can be fundamental to later success. Recount a time when you faced a challenge, setback, or failure. How did it affect you, and what did you learn from the experience?",
+            "Reflect on a time when you questioned or challenged a belief or idea. What prompted your thinking? What was the outcome?",
+            "Reflect on something that someone has done for you that has made you happy or thankful in a surprising way. How has this gratitude affected or motivated you?",
+            "Discuss an accomplishment, event, or realization that sparked a period of personal growth and a new understanding of yourself or others.",
+            "Describe a topic, idea, or concept you find so engaging that it makes you lose all track of time. Why does it captivate you? What or who do you turn to when you want to learn more?",
+            "Share an essay on any topic of your choice. It can be one you've already written, one that responds to a different prompt, or one of your own design."
+          ],
+          "required": true,
+          "reveals": [
+            {
+              "field": "personal_statement.essay.response",
+              "when": {
+                "operator": "answered"
+              }
+            }
+          ]
+        },
+        "response": {
+          "type": "longform",
+          "expects": "Personal Essay body for the chosen prompt; what you want colleges to know apart from courses, grades, and test scores. The form enforces a 250-word minimum and a 650-word maximum.",
+          "constraint": {
+            "min_words": 250,
+            "max_words": 650
+          },
+          "required": true,
+          "conditional_on": {
+            "field": "personal_statement.essay.prompt_choice",
+            "operator": "answered"
+          }
+        }
+      },
+      "challenges_and_circumstances": {
+        "expects": "Optional question within the Writing section’s Additional-information area (effective Aug 1, 2025), replacing the former Community disruption question. The form shows context copy and example impact types (access to a safe and quiet study space; reliable technology and internet; community disruption; discrimination; family disruptions; family or other obligations; housing instability, displacement, or homelessness; military deployment or activation; natural disasters; physical health and mental well-being; war, conflict, or other hardships), then a Yes/No gateway whose Yes answer reveals the description box.",
+        "will_share": {
+          "type": "enum",
+          "expects": "Gateway: Would you like to share any details about challenges or other circumstances you've experienced?",
+          "constraint": {},
+          "options": [
+            "Yes",
+            "No"
+          ],
+          "required": true,
+          "reveals": [
+            {
+              "field": "personal_statement.challenges_and_circumstances.description",
+              "when": {
+                "operator": "equals",
+                "value": "Yes"
+              }
+            }
+          ]
+        },
+        "description": {
+          "type": "longform",
+          "expects": "Please describe the challenges or circumstances and how they have impacted you. (First-year: 250 words max; transfer: 1250 characters max.)",
+          "constraint": {
+            "max_words": 250,
+            "variants": {
+              "transfer": {
+                "max_chars": 1250
+              }
+            }
+          },
+          "required": true,
+          "conditional_on": {
+            "field": "personal_statement.challenges_and_circumstances.will_share",
+            "operator": "equals",
+            "value": "Yes"
+          }
+        }
+      },
+      "additional_information": {
+        "type": "longform",
+        "expects": "Optional Additional-information response for information not captured elsewhere; not a second personal essay. First-year limit reduced from 650 words to 300 words max effective Aug 1, 2025 (transfer applicants: 1500 characters max, reduced from 3500).",
+        "constraint": {
+          "max_words": 300,
+          "variants": {
+            "transfer": {
+              "max_chars": 1500
+            }
+          }
+        },
+        "required": false
+      }
+    }
+  }
+}

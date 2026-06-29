@@ -1,0 +1,2042 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%;background:#f6efe0}
+input,textarea,select{font-family:inherit}
+::placeholder{color:#a59b88}
+@keyframes dotB{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+@keyframes msgGrow{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
+@keyframes consIn{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+@keyframes rollDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@keyframes expIn{from{opacity:0;transform:scale(.99)}to{opacity:1;transform:none}}
+</style>
+</helmet>
+
+<div style="height:100vh;display:flex;flex-direction:column;background:#f6efe0;font-family:'Space Grotesk',sans-serif;color:#2e2a24;overflow:hidden">
+
+  <input type="file" multiple ref="{{ fileRef }}" onChange="{{ onFiles }}" style="display:none" />
+
+  <div style="display:flex;align-items:center;justify-content:space-between;height:54px;padding:0 22px;border-bottom:1px solid rgba(60,50,30,.1);flex-shrink:0;background:#fbf5e9">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:9px;height:9px;border-radius:50%;background:#d9962a;box-shadow:0 0 12px rgba(217,150,42,.7)"></div>
+      <div style="font-weight:600;font-size:15px;letter-spacing:.14em">FIELD</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a8170;letter-spacing:.03em;margin-left:4px">application workspace · {{ applicantName }}<sc-if value="{{ expOpen }}" hint-placeholder-val="{{ false }}"> · <span style="color:#c08a1e">experiment</span></sc-if></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:7px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a8170">
+      <span style="width:6px;height:6px;border-radius:50%;background:#3fa776;box-shadow:0 0 7px rgba(63,167,118,.6)"></span>{{ completionLabel }}
+    </div>
+  </div>
+
+  <div style="flex:1;display:flex;min-height:0;position:relative">
+
+    <div style="flex:1;position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 0%, #fffdf8, #f4ecdb 80%)">
+      <sc-if value="{{ expPreviewNavShow }}" hint-placeholder-val="{{ true }}">
+        <div style="{{ expPreviewNavWrapStyle }}">
+          <div style="{{ expPreviewNavStyle }}">
+            <div style="{{ expPreviewNavLabelStyle }}">{{ expPreviewNavLabel }}</div>
+            <div onClick="{{ expPreviewPrev }}" style="{{ expPreviewNavBtnStyle }}" style-hover="color:#2c7a55">↑</div>
+            <div style="{{ expPreviewNavCounterStyle }}">{{ expPreviewNavCounter }}</div>
+            <div onClick="{{ expPreviewNext }}" style="{{ expPreviewNavBtnStyle }}" style-hover="color:#2c7a55">↓</div>
+          </div>
+        </div>
+      </sc-if>
+      <div style="position:absolute;inset:0;overflow-y:auto;padding:26px 30px 150px">
+        <div style="max-width:760px;margin:0 auto">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.16em;color:#a59b88;margin-bottom:6px">COMMON APPLICATION · 2025–26</div>
+          <div style="font-size:13px;color:#8a8170;line-height:1.6;margin-bottom:24px;max-width:540px">Rolled for review. Collapse <b style="color:#3a342b">PROFILE</b>, <b style="color:#3a342b">EDUCATION</b>, etc. to scan faster; open a subsection and click <b style="color:#3a342b">Edit</b> to enter fill mode.</div>
+
+          <sc-if value="{{ expShowFramingStrip }}" hint-placeholder-val="{{ false }}">
+            <div id="exp-strategy-0" style="{{ expFramingWrapStyle }}">
+              <div style="font-size:13px;line-height:1.55;color:#2c7a55;font-weight:500">{{ expFramingPreview }}</div>
+            </div>
+          </sc-if>
+
+          <sc-for list="{{ strata }}" as="st" hint-placeholder-count="5">
+            <div style="margin:22px 0 10px">
+              <div onClick="{{ st.onToggle }}" style="display:flex;align-items:center;gap:11px;padding:10px 12px;margin:0 -12px;border-radius:12px;cursor:pointer;background:rgba(255,253,248,.6);border:1px solid rgba(60,50,30,.08)" style-hover="border-color:rgba(217,150,42,.35)">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;color:#2e2a24;font-weight:600;flex-shrink:0">{{ st.label }}</span>
+                <div style="flex:1;height:1px;background:rgba(60,50,30,.12)"></div>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#b0a692;flex-shrink:0">{{ st.meta }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#b0a692;flex-shrink:0;width:16px;text-align:center">{{ st.chevron }}</span>
+              </div>
+            </div>
+
+            <sc-if value="{{ st.open }}" hint-placeholder-val="{{ false }}">
+            <sc-for list="{{ st.cats }}" as="cat" hint-placeholder-count="3">
+              <div style="{{ cat.sectionWrapStyle }}">
+                <div style="{{ cat.headerStyle }}">
+                  <div onClick="{{ cat.onToggle }}" style="display:flex;align-items:center;gap:10px;min-width:0;flex:1;cursor:pointer">
+                    <span style="{{ cat.dotStyle }}"></span>
+                    <span style="font-size:14px;font-weight:500;color:#2e2a24">{{ cat.label }}</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:7px;flex-shrink:0">
+                    <sc-if value="{{ cat.canApprove }}" hint-placeholder-val="{{ false }}">
+                      <div onClick="{{ cat.onApprove }}" style="padding:3px 8px;border-radius:7px;border:1px solid rgba(63,167,118,.45);background:rgba(63,167,118,.08);color:#2c7a55;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.06em;cursor:pointer">✓</div>
+                    </sc-if>
+                    <span style="{{ cat.statusStyle }}">{{ cat.statusLabel }}</span>
+                    <sc-if value="{{ cat.showHeaderEdit }}" hint-placeholder-val="{{ true }}">
+                      <div onClick="{{ cat.onEdit }}" style="padding:4px 9px;border-radius:7px;border:1px solid rgba(60,50,30,.14);background:#fff;color:#3a342b;font-size:11px;font-weight:500;cursor:pointer" style-hover="border-color:#d9962a">Edit</div>
+                    </sc-if>
+                    <sc-if value="{{ cat.proseModuleEditing }}" hint-placeholder-val="{{ false }}">
+                      <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.08em;color:#c08a1e">editing</span>
+                    </sc-if>
+                    <sc-if value="{{ cat.editing }}" hint-placeholder-val="{{ false }}">
+                      <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.08em;color:#c08a1e">editing</span>
+                    </sc-if>
+                    <span onClick="{{ cat.onToggle }}" style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#b0a692;cursor:pointer;padding:2px 4px">{{ cat.chevron }}</span>
+                  </div>
+                </div>
+
+                <sc-if value="{{ cat.open }}" hint-placeholder-val="{{ false }}">
+                  <div style="margin-top:-1px;border:1px solid rgba(60,50,30,.12);border-top:none;border-radius:0 0 11px 11px;background:#fffdf8;padding:8px 14px 10px;animation:rollDown .26s ease">
+                    <sc-if value="{{ cat.isUnitCat }}" hint-placeholder-val="{{ false }}">
+                      <sc-if value="{{ cat.displayMode }}" hint-placeholder-val="{{ true }}">
+                        <sc-if value="{{ cat.gatewayCompact }}" hint-placeholder-val="{{ false }}">
+                          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8a8170;margin-bottom:10px">{{ cat.gatewayCompact }}</div>
+                        </sc-if>
+                        <sc-for list="{{ cat.units }}" as="u" hint-placeholder-count="2">
+                          <sc-if value="{{ u.displayStructured }}" hint-placeholder-val="{{ true }}">
+                          <div style="margin-bottom:10px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.9);border:1px solid rgba(60,50,30,.08)">
+                            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px">
+                              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;color:#8a8170">{{ u.indexLabel }}</div>
+                              <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+                                <span style="{{ u.unitStatusStyle }}">{{ u.unitStatus }}</span>
+                                <div onClick="{{ u.onEdit }}" style="padding:4px 9px;border-radius:7px;border:1px solid rgba(60,50,30,.14);background:#fff;font-size:11px;font-weight:500;color:#3a342b;cursor:pointer" style-hover="border-color:#d9962a">Edit</div>
+                              </div>
+                            </div>
+                            <sc-for list="{{ u.displayRows }}" as="row" hint-placeholder-count="4">
+                              <div id="{{ row.anchorId }}" style="{{ row.rowWrapStyle }}">
+                                <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.08em;color:#a59b88;margin-bottom:2px">{{ row.label }}</div>
+                                <sc-if value="{{ row.isLong }}" hint-placeholder-val="{{ false }}">
+                                  <div style="{{ row.valueStyle }}">{{ row.value }}</div>
+                                </sc-if>
+                                <sc-if value="{{ row.isShort }}" hint-placeholder-val="{{ true }}">
+                                  <div style="{{ row.valueStyle }}">{{ row.value }}</div>
+                                </sc-if>
+                                <sc-if value="{{ row.showLimit }}" hint-placeholder-val="{{ false }}">
+                                  <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#b0a692;margin-top:2px">{{ row.limitLabel }}</div>
+                                </sc-if>
+                              </div>
+                            </sc-for>
+                          </div>
+                          </sc-if>
+                        </sc-for>
+                        <sc-if value="{{ cat.canAddUnit }}" hint-placeholder-val="{{ false }}">
+                          <div onClick="{{ cat.onAddUnit }}" style="margin-top:10px;padding:8px 12px;border-radius:10px;border:1px dashed rgba(217,150,42,.5);background:rgba(217,150,42,.05);color:#c08a1e;font-size:12px;font-weight:500;text-align:center;cursor:pointer">{{ cat.addUnitLabel }}</div>
+                        </sc-if>
+                        <sc-if value="{{ cat.atMaxUnits }}" hint-placeholder-val="{{ false }}">
+                          <div style="margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#b0a692;text-align:center">{{ cat.maxUnitsMessage }}</div>
+                        </sc-if>
+                        <div style="display:flex;justify-content:flex-end;margin-top:8px">
+                          <sc-if value="{{ cat.canApprove }}" hint-placeholder-val="{{ false }}">
+                            <div onClick="{{ cat.onApprove }}" style="padding:5px 10px;border-radius:7px;border:1px solid rgba(63,167,118,.5);background:rgba(63,167,118,.1);color:#2c7a55;font-size:11px;font-weight:500;cursor:pointer">Approve ✓</div>
+                          </sc-if>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{ cat.fillMode }}" hint-placeholder-val="{{ false }}">
+                      <sc-if value="{{ cat.showGateway }}" hint-placeholder-val="{{ false }}">
+                        <div style="display:flex;gap:14px;padding:9px 0 14px;border-bottom:1px solid rgba(60,50,30,.08);margin-bottom:12px">
+                          <div style="width:150px;flex-shrink:0;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;color:#a59b88;padding-top:5px">Activities to report?</div>
+                          <div style="flex:1">
+                            <sc-if value="{{ cat.gatewayEdit }}" hint-placeholder-val="{{ true }}">
+                              <select value="{{ cat.gatewayValue }}" onChange="{{ cat.onGateway }}" style="width:100%;padding:9px 11px;border:1px solid rgba(60,50,30,.2);border-radius:9px;font-size:13.5px;color:#2e2a24;outline:none;background:#fff">
+                                <option value="">—</option><option value="Yes">Yes</option><option value="No">No</option>
+                              </select>
+                            </sc-if>
+                          </div>
+                        </div>
+                      </sc-if>
+                      <sc-for list="{{ cat.units }}" as="u" hint-placeholder-count="2">
+                        <sc-if value="{{ u.editing }}" hint-placeholder-val="{{ false }}">
+                        <div style="margin-bottom:14px;padding:14px 14px 12px;border:1px solid rgba(217,150,42,.35);border-radius:12px;background:#fff;box-shadow:0 0 0 3px rgba(217,150,42,.08)">
+                          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:10px">
+                            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;color:#c08a1e">{{ u.indexLabel }} · editing</div>
+                          </div>
+                          <sc-for list="{{ u.fields }}" as="f" hint-placeholder-count="2">
+                            <div style="display:flex;gap:14px;padding:8px 0;border-bottom:1px solid rgba(60,50,30,.05)">
+                              <div style="width:140px;flex-shrink:0;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.06em;color:#a59b88;padding-top:5px">{{ f.label }}</div>
+                              <div style="flex:1;min-width:0">
+                                <sc-if value="{{ f.editText }}" hint-placeholder-val="{{ true }}"><input value="{{ f.editValue }}" onInput="{{ f.onInput }}" placeholder="{{ f.ph }}" style="width:100%;padding:8px 10px;border:1px solid rgba(60,50,30,.2);border-radius:9px;font-size:13px;color:#2e2a24;outline:none;background:#fff" /></sc-if>
+                                <sc-if value="{{ f.editLong }}" hint-placeholder-val="{{ false }}"><textarea value="{{ f.editValue }}" onInput="{{ f.onInput }}" placeholder="{{ f.ph }}" style="width:100%;min-height:72px;resize:vertical;padding:9px 11px;border:1px solid rgba(60,50,30,.2);border-radius:9px;font-size:13px;line-height:1.5;color:#2e2a24;outline:none;background:#fff"></textarea></sc-if>
+                                <sc-if value="{{ f.editEnum }}" hint-placeholder-val="{{ false }}">
+                                  <select value="{{ f.editValue }}" onChange="{{ f.onInput }}" style="width:100%;padding:8px 10px;border:1px solid rgba(60,50,30,.2);border-radius:9px;font-size:13px;color:#2e2a24;outline:none;background:#fff">
+                                    <option value="">—</option><sc-for list="{{ f.options }}" as="o" hint-placeholder-count="0"><option value="{{ o }}">{{ o }}</option></sc-for>
+                                  </select>
+                                </sc-if>
+                                <sc-if value="{{ f.showLimit }}" hint-placeholder-val="{{ false }}">
+                                  <div style="{{ f.limitStyle }}">{{ f.limitLabel }}</div>
+                                </sc-if>
+                              </div>
+                            </div>
+                          </sc-for>
+                          <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:10px;flex-wrap:wrap">
+                            <div onClick="{{ u.onRemove }}" style="padding:6px 10px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#c0392b;cursor:pointer">remove</div>
+                            <div onClick="{{ u.onDiscard }}" style="padding:6px 10px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8a8170;cursor:pointer">discard</div>
+                            <div onClick="{{ u.onConfirm }}" style="padding:7px 16px;border-radius:9px;background:#d9962a;color:#3a2700;font-size:12.5px;font-weight:600;cursor:pointer">Confirm</div>
+                          </div>
+                        </div>
+                        </sc-if>
+                      </sc-for>
+                      </sc-if>
+                    </sc-if>
+                    <sc-if value="{{ cat.isFieldCat }}" hint-placeholder-val="{{ true }}">
+                    <sc-if value="{{ cat.isProseArchitecture }}" hint-placeholder-val="{{ false }}">
+                        <div style="font-size:11.5px;line-height:1.45;color:#8a8170;margin-bottom:10px;font-style:italic">{{ cat.proseServe }}</div>
+                        <sc-for list="{{ cat.proseModules }}" as="pm" hint-placeholder-count="5">
+                          <div id="{{ pm.anchorId }}" style="{{ pm.cardStyle }}">
+                            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px">
+                              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;color:#2e2a24;font-weight:600">{{ pm.title }}</div>
+                              <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+                                <span style="{{ pm.wordCountStyle }}">{{ pm.wordLabel }}</span>
+                                <sc-if value="{{ pm.showEditBtn }}" hint-placeholder-val="{{ true }}">
+                                  <div onClick="{{ pm.onEdit }}" style="padding:4px 9px;border-radius:7px;border:1px solid rgba(60,50,30,.14);background:#fff;font-size:11px;font-weight:500;color:#3a342b;cursor:pointer" style-hover="border-color:#d9962a">Edit</div>
+                                </sc-if>
+                              </div>
+                            </div>
+                            <sc-for list="{{ pm.metaFields }}" as="mf" hint-placeholder-count="1">
+                              <div style="margin-bottom:10px">
+                                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;color:#a59b88;margin-bottom:6px">{{ mf.label }}</div>
+                                <select value="{{ mf.editValue }}" onChange="{{ mf.onInput }}" style="width:100%;padding:9px 11px;border:1px solid rgba(60,50,30,.2);border-radius:9px;font-size:13px;color:#2e2a24;outline:none;background:#fff">
+                                  <option value="">—</option>
+                                  <sc-for list="{{ mf.options }}" as="o" hint-placeholder-count="0"><option value="{{ o }}">{{ o }}</option></sc-for>
+                                </select>
+                              </div>
+                            </sc-for>
+                            <div style="margin-bottom:7px">
+                              <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.12em;color:#c08a1e;margin-bottom:3px">TELOS</div>
+                              <sc-if value="{{ pm.readOnly }}" hint-placeholder-val="{{ true }}">
+                                <div style="font-size:12px;line-height:1.5;color:#5a5246">{{ pm.telos }}</div>
+                              </sc-if>
+                              <sc-if value="{{ pm.editing }}" hint-placeholder-val="{{ false }}">
+                                <textarea value="{{ pm.telos }}" onInput="{{ pm.onTelos }}" style="width:100%;min-height:56px;resize:vertical;padding:8px 10px;border:1px solid rgba(60,50,30,.18);border-radius:8px;font-size:12px;line-height:1.5;color:#2e2a24;outline:none;background:#fff"></textarea>
+                              </sc-if>
+                            </div>
+                            <div style="margin-bottom:7px">
+                              <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.12em;color:#c08a1e;margin-bottom:3px">FUNCTIONALITY</div>
+                              <sc-if value="{{ pm.readOnly }}" hint-placeholder-val="{{ true }}">
+                                <div style="font-size:12px;line-height:1.5;color:#5a5246">{{ pm.functionality }}</div>
+                              </sc-if>
+                              <sc-if value="{{ pm.editing }}" hint-placeholder-val="{{ false }}">
+                                <textarea value="{{ pm.functionality }}" onInput="{{ pm.onFunctionality }}" style="width:100%;min-height:56px;resize:vertical;padding:8px 10px;border:1px solid rgba(60,50,30,.18);border-radius:8px;font-size:12px;line-height:1.5;color:#2e2a24;outline:none;background:#fff"></textarea>
+                              </sc-if>
+                            </div>
+                            <div>
+                              <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.12em;color:#c08a1e;margin-bottom:3px">PIVOTAL PERTINENT CONTENT</div>
+                              <sc-if value="{{ pm.readOnly }}" hint-placeholder-val="{{ true }}">
+                                <div style="{{ pm.pivotalStyle }}">{{ pm.pivotal }}</div>
+                              </sc-if>
+                              <sc-if value="{{ pm.editing }}" hint-placeholder-val="{{ false }}">
+                                <textarea value="{{ pm.pivotal }}" onInput="{{ pm.onPivotal }}" style="width:100%;min-height:56px;resize:vertical;padding:8px 10px;border:1px solid rgba(60,50,30,.18);border-radius:8px;font-size:12px;line-height:1.5;color:#2e2a24;outline:none;background:#fff"></textarea>
+                              </sc-if>
+                            </div>
+                            <sc-if value="{{ pm.editing }}" hint-placeholder-val="{{ false }}">
+                              <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:10px;flex-wrap:wrap">
+                                <div onClick="{{ pm.onDiscard }}" style="padding:6px 10px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8a8170;cursor:pointer">discard</div>
+                                <div onClick="{{ pm.onConfirm }}" style="padding:7px 16px;border-radius:9px;background:#d9962a;color:#3a2700;font-size:12.5px;font-weight:600;cursor:pointer">Confirm</div>
+                              </div>
+                            </sc-if>
+                          </div>
+                        </sc-for>
+                        <sc-if value="{{ cat.showProseStatus }}" hint-placeholder-val="{{ true }}">
+                        <div style="display:flex;flex-wrap:gap:5px;margin-top:2px">
+                          <sc-for list="{{ cat.proseStatus }}" as="ps" hint-placeholder-count="2">
+                            <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.04em;color:#8a8170;background:rgba(60,50,30,.06);padding:3px 8px;border-radius:999px">{{ ps.label }}</span>
+                          </sc-for>
+                        </div>
+                        </sc-if>
+                    </sc-if>
+                    <sc-if value="{{ cat.displayMode }}" hint-placeholder-val="{{ true }}">
+                      <sc-if value="{{ cat.isCompactField }}" hint-placeholder-val="{{ true }}">
+                      <div id="{{ cat.compactAnchorId }}" style="{{ cat.compactSummaryStyle }}">{{ cat.compactSummary }}</div>
+                      </sc-if>
+                    </sc-if>
+                    <sc-if value="{{ cat.editing }}" hint-placeholder-val="{{ false }}">
+                    <sc-if value="{{ cat.isFieldGridEdit }}" hint-placeholder-val="{{ true }}">
+                    <sc-for list="{{ cat.fields }}" as="f" hint-placeholder-count="2">
+                      <div style="display:flex;gap:14px;padding:9px 0;border-bottom:1px solid rgba(60,50,30,.06)">
+                        <div style="width:150px;flex-shrink:0;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;color:#a59b88;padding-top:5px">{{ f.label }}</div>
+                        <div style="flex:1;min-width:0">
+                          <sc-if value="{{ f.review }}" hint-placeholder-val="{{ false }}">
+                            <div style="{{ f.displayStyle }}">{{ f.display }}</div>
+                          </sc-if>
+                          <sc-if value="{{ f.editText }}" hint-placeholder-val="{{ false }}">
+                            <input value="{{ f.editValue }}" onInput="{{ f.onInput }}" placeholder="{{ f.ph }}" style="width:100%;padding:9px 11px;border:1px solid rgba(60,50,30,.2);border-radius:9px;font-size:13.5px;color:#2e2a24;outline:none;background:#fff" />
+                          </sc-if>
+                          <sc-if value="{{ f.editLong }}" hint-placeholder-val="{{ false }}">
+                            <textarea value="{{ f.editValue }}" onInput="{{ f.onInput }}" placeholder="{{ f.ph }}" style="width:100%;min-height:84px;resize:vertical;padding:10px 12px;border:1px solid rgba(60,50,30,.2);border-radius:9px;font-size:13.5px;line-height:1.5;color:#2e2a24;outline:none;background:#fff"></textarea>
+                          </sc-if>
+                          <sc-if value="{{ f.editEnum }}" hint-placeholder-val="{{ false }}">
+                            <select value="{{ f.editValue }}" onChange="{{ f.onInput }}" style="width:100%;padding:9px 11px;border:1px solid rgba(60,50,30,.2);border-radius:9px;font-size:13.5px;color:#2e2a24;outline:none;background:#fff">
+                              <option value="">—</option>
+                              <sc-for list="{{ f.options }}" as="o" hint-placeholder-count="0"><option value="{{ o }}">{{ o }}</option></sc-for>
+                            </select>
+                          </sc-if>
+                        </div>
+                      </div>
+                    </sc-for>
+                    </sc-if>
+
+                    <sc-if value="{{ cat.showCatEditActions }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;align-items:center;justify-content:flex-end;gap:9px;margin-top:14px">
+                      <sc-if value="{{ cat.canApprove }}" hint-placeholder-val="{{ false }}">
+                        <div onClick="{{ cat.onApprove }}" style="padding:8px 14px;border-radius:9px;border:1px solid rgba(63,167,118,.5);background:rgba(63,167,118,.1);color:#2c7a55;font-size:12.5px;font-weight:500;cursor:pointer">Approve ✓</div>
+                      </sc-if>
+                      <div onClick="{{ cat.onDiscard }}" style="padding:8px 14px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a8170;cursor:pointer">discard</div>
+                      <div onClick="{{ cat.onConfirm }}" style="padding:8px 18px;border-radius:9px;background:#d9962a;color:#3a2700;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 5px 16px -6px rgba(217,150,42,.8)">Confirm &amp; save</div>
+                    </div>
+                    </sc-if>
+                    </sc-if>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+            </sc-if>
+          </sc-for>
+        </div>
+      </div>
+
+      <sc-if value="{{ showBottomPanel }}" hint-placeholder-val="{{ true }}">
+      <div style="{{ panelStyle }}">
+        <div style="{{ conversationStyle }}">
+          <div style="{{ drawerInnerStyle }}">
+            <div onPointerDown="{{ onHandleDown }}" style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px 6px;cursor:ns-resize;flex-shrink:0">
+              <div style="width:34px;height:4px;border-radius:2px;background:rgba(60,50,30,.2)"></div>
+              <div style="display:flex;align-items:center;gap:13px">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8a8170;letter-spacing:.05em">{{ drawerLabel }}</span>
+                <div onClick="{{ collapse }}" style="cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a8170" style-hover="color:#2e2a24">collapse ▾</div>
+              </div>
+            </div>
+            <div ref="{{ msgsRef }}" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:9px;padding:12px 14px">
+              <sc-if value="{{ chatEmpty }}" hint-placeholder-val="{{ true }}">
+                <div style="margin:auto;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#b0a692;line-height:1.7;padding:10px">Ask about any part of the application,<br>or select text to explain.</div>
+              </sc-if>
+              <sc-for list="{{ messages }}" as="m" hint-placeholder-count="0">
+                <div style="{{ m.rowStyle }}"><div style="{{ m.bubbleStyle }}">{{ m.text }}</div></div>
+              </sc-for>
+              <sc-if value="{{ typing }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;justify-content:flex-start"><div style="display:flex;gap:4px;padding:11px 14px;background:#fffdf8;border:1px solid rgba(60,50,30,.1);border-radius:14px 14px 14px 4px"><span style="width:5px;height:5px;border-radius:50%;background:#b8ae9a;display:inline-block;animation:dotB 1.1s infinite"></span><span style="width:5px;height:5px;border-radius:50%;background:#b8ae9a;display:inline-block;animation:dotB 1.1s infinite .15s"></span><span style="width:5px;height:5px;border-radius:50%;background:#b8ae9a;display:inline-block;animation:dotB 1.1s infinite .3s"></span></div></div>
+              </sc-if>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;padding:10px 12px;border-top:1px solid rgba(60,50,30,.08);flex-shrink:0">
+              <div style="display:flex;align-items:center;gap:9px">
+                <input value="{{ input }}" onInput="{{ onInput }}" onKeyDown="{{ onKey }}" placeholder="{{ inputPlaceholder }}" style="flex:1;min-width:0;background:transparent;border:none;outline:none;color:#2e2a24;font-size:14px" />
+                <div onClick="{{ send }}" style="width:34px;height:34px;flex-shrink:0;border-radius:11px;background:#d9962a;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 14px -4px rgba(217,150,42,.7)"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 12V3.2M3.6 7 7.5 3.1 11.4 7" stroke="#3a2700" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <sc-if value="{{ hasChips }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:9px 11px;background:rgba(217,150,42,.1);border:1px solid rgba(217,150,42,.32);border-radius:12px">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.16em;color:#c08a1e;margin-bottom:7px">SELECTED · EXPLAINING</div>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+                    <sc-for list="{{ explainChips }}" as="c" hint-placeholder-count="0">
+                      <div style="display:flex;align-items:center;gap:6px;padding:5px 7px 5px 11px;border-radius:999px;background:#fff;border:1px solid rgba(217,150,42,.4)"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#3a2700">&ldquo;{{ c.abbr }}&rdquo;</span><span onClick="{{ c.onRemove }}" style="cursor:pointer;color:#a07a1e;font-size:14px;line-height:1">&times;</span></div>
+                    </sc-for>
+                    <div onClick="{{ addMoreSelect }}" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:999px;background:#fff;border:1px dashed rgba(217,150,42,.55);color:#c08a1e;font-size:16px;line-height:1;cursor:pointer">+</div>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;padding:9px 11px">
+          <div onClick="{{ uploadFiles }}" style="display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:9px;background:#fff;border:1px solid rgba(60,50,30,.13);color:#4a443a;font-size:12.5px;font-weight:500;cursor:pointer;white-space:nowrap" style-hover="background:#f6efe0;border-color:rgba(60,50,30,.22)"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M7 9.5v-8M3.8 4.7 7 1.5l3.2 3.2M2 12.2h10" stroke="#d9962a" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Drop stories</div>
+          <div onClick="{{ startExplain }}" style="{{ explainBtnStyle }}"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.6" stroke="#d9962a" stroke-width="1.2"/><path d="M7 6.2v3.4M7 4.2h.01" stroke="#d9962a" stroke-width="1.3" stroke-linecap="round"/></svg>Explain</div>
+          <div onClick="{{ toggleChat }}" style="{{ chatBtnStyle }}"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 3h10v7H6l-3 2.2V10H2z" stroke="#d9962a" stroke-width="1.2" stroke-linejoin="round"/></svg>Chat</div>
+          <div onClick="{{ openExperiment }}" style="{{ experimentBtnStyle }}"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2v10" stroke="#d9962a" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="7" r="5.6" stroke="#d9962a" stroke-width="1.1"/></svg>Experiment</div>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ showSelConfirm }}" hint-placeholder-val="{{ false }}">
+        <div onMouseDown="{{ confirmExplain }}" style="{{ selConfirmStyle }}">+ Explain this</div>
+      </sc-if>
+      <sc-if value="{{ explainHint }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;bottom:92px;left:50%;transform:translateX(-50%);z-index:9;background:#2e2a24;color:#fbf5e9;padding:9px 15px;border-radius:12px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.03em;box-shadow:0 16px 44px -16px rgba(0,0,0,.55)">Select any text to explain it</div>
+      </sc-if>
+    </div>
+
+    <sc-if value="{{ showOrchestrationPanel }}" hint-placeholder-val="{{ true }}">
+    <div style="width:336px;flex-shrink:0;border-left:1px solid rgba(60,50,30,.1);background:#fbf6ec;display:flex;flex-direction:column;min-height:0">
+      <div style="flex:1;overflow-y:auto;padding:17px 18px;border-bottom:1px solid rgba(60,50,30,.1)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.18em;color:#8a8170">ORCHESTRATION</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;color:#b0a692">strategy</div>
+        </div>
+        <div style="font-size:15px;font-weight:600;color:#2e2a24;line-height:1.3;margin-bottom:4px">{{ applicantName }}</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#c08a1e;margin-bottom:15px">{{ applicantTag }}</div>
+        <sc-for list="{{ strategy }}" as="s" hint-placeholder-count="4">
+          <div style="display:flex;gap:9px;align-items:flex-start;margin-bottom:13px"><span style="color:#d9962a;line-height:1.5;flex-shrink:0">›</span><span style="font-size:13px;line-height:1.55;color:#4a443a">{{ s }}</span></div>
+        </sc-for>
+      </div>
+
+      <div style="flex-shrink:0;padding:16px 18px 20px;max-height:46%;overflow-y:auto">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.18em;color:#8a8170">TO DO</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#3a2700;background:#d9962a;border-radius:10px;padding:1px 8px;font-weight:500">{{ todoCount }}</div>
+        </div>
+        <sc-for list="{{ todosShown }}" as="t" hint-placeholder-count="3">
+          <div onClick="{{ t.onClick }}" style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid rgba(60,50,30,.07);cursor:pointer" style-hover="opacity:.7">
+            <span style="{{ t.badgeStyle }}">{{ t.badge }}</span>
+            <span style="font-size:13px;line-height:1.45;color:#3a342b">{{ t.label }}</span>
+          </div>
+        </sc-for>
+        <sc-if value="{{ hasMoreTodos }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ toggleTodos }}" style="margin-top:11px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#c08a1e;cursor:pointer;text-decoration:underline;text-underline-offset:3px">{{ todoToggleLabel }}</div>
+        </sc-if>
+        <sc-if value="{{ allDone }}" hint-placeholder-val="{{ false }}">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#3fa776;padding:6px 0">✓ Everything reviewed &amp; complete.</div>
+        </sc-if>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ expOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="{{ expPanelStyle }}">
+      <div style="flex-shrink:0;padding:14px 16px 10px;border-bottom:1px solid rgba(60,50,30,.1);background:#faf6ec">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px">
+          <div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;color:#2e2a24">EXPERIMENT</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#a59b88;margin-top:3px">{{ expContextName }}</div>
+          </div>
+          <div onClick="{{ closeExperiment }}" style="cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8a8170;padding:4px 6px" style-hover="color:#2e2a24">✕ close</div>
+        </div>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:14px 16px 12px;min-height:0">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;color:#a59b88;margin-bottom:10px">Application stays on the left · try changes here</div>
+        <sc-if value="{{ expIsHunch }}" hint-placeholder-val="{{ true }}">
+          <div style="font-size:10px;font-family:'IBM Plex Mono',monospace;letter-spacing:.14em;color:#c08a1e;margin-bottom:10px">START WITH A HUNCH</div>
+          <div style="font-size:18px;font-weight:600;line-height:1.35;margin-bottom:8px">What do you wish were different?</div>
+          <div style="font-size:12.5px;color:#8a8170;line-height:1.55;margin-bottom:14px">Half-formed is fine. Clarify, transmute — nothing commits until you approve.</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <sc-for list="{{ expHunchChips }}" as="h" hint-placeholder-count="4"><div onClick="{{ h.onClick }}" style="padding:6px 10px;border-radius:999px;border:1px solid rgba(60,50,30,.14);background:#fff;color:#5a5246;font-size:11.5px;cursor:pointer" style-hover="border-color:#d9962a">{{ h.label }}</div></sc-for>
+          </div>
+          <div style="margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#c08a1e">type below ↓</div>
+        </sc-if>
+        <sc-if value="{{ expIsClarify }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:10px;font-family:'IBM Plex Mono',monospace;letter-spacing:.14em;color:#c08a1e;margin-bottom:8px">CLARIFY · {{ expClarifyLabel }}</div>
+          <div style="font-size:17px;font-weight:600;line-height:1.35;margin-bottom:10px">{{ expQuestion }}</div>
+          <div style="padding:10px 12px;background:#f4eee1;border-radius:10px;border-left:2px solid #d9962a;font-size:12px;color:#6f675a;line-height:1.5;margin-bottom:12px">{{ expScaffold }}</div>
+          <div style="display:flex;flex-direction:column;gap:7px">
+            <sc-for list="{{ expOptions }}" as="o" hint-placeholder-count="4"><div onClick="{{ o.onClick }}" style="{{ o.style }}">{{ o.label }}</div></sc-for>
+          </div>
+          <div onClick="{{ expBack }}" style="margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8a8170;cursor:pointer">← back</div>
+        </sc-if>
+        <sc-if value="{{ expIsTransmutePhase }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:10px;font-family:'IBM Plex Mono',monospace;letter-spacing:.14em;color:#c08a1e;margin-bottom:6px">TRANSMUTE · select a pair · edit actualized · enrich when needed</div>
+          <div style="font-size:16px;font-weight:600;line-height:1.35;margin-bottom:8px">{{ expBundlesTitle }}</div>
+          <sc-if value="{{ expRefineFocus }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;color:#c08a1e;margin-bottom:12px;padding:8px 10px;background:#fff;border-radius:10px;border:1px solid rgba(217,150,42,.28)">REFINE · scroll for other pairs · enrich on each card</div>
+          </sc-if>
+          <sc-if value="{{ expRefineFocusNot }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+            <div style="font-size:11.5px;color:#8a8170;line-height:1.5;flex:1;min-width:140px">Selected pair is editable immediately. Use Refine with FIELD to enrich (append), not replace.</div>
+            <div onClick="{{ expChooseAll }}" style="{{ expChooseAllStyle }}">{{ expChooseAllLabel }}</div>
+          </div>
+          </sc-if>
+          <sc-for list="{{ expBundles }}" as="b" hint-placeholder-count="3">
+            <div onClick="{{ b.onClick }}" style="{{ b.style }}">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#c08a1e">{{ b.label }}</span>
+                <span style="{{ b.tickStyle }}">{{ b.tick }}</span>
+              </div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#b0a692;margin-bottom:10px">{{ b.locate }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;color:#a59b88;margin-bottom:4px">ORIGINAL</div>
+              <div style="font-size:11px;color:#6f675a;line-height:1.5;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(60,50,30,.08)">{{ b.original }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;color:#2c7a55;margin-bottom:4px">ACTUALIZED</div>
+              <sc-if value="{{ b.isActive }}" hint-placeholder-val="{{ false }}">
+                <textarea value="{{ b.transmuted }}" onInput="{{ b.onActualizedInput }}" onClick="{{ expStopProp }}" onMouseDown="{{ expStopProp }}" style="width:100%;min-height:72px;box-sizing:border-box;font-size:12px;color:#2c7a55;line-height:1.5;font-weight:500;margin-bottom:6px;padding:10px 11px;border-radius:10px;border:1px solid rgba(63,167,118,.35);background:rgba(255,255,255,.85);resize:vertical;outline:none;font-family:inherit"></textarea>
+                <div style="font-size:10px;color:#8a8170;line-height:1.45;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(63,167,118,.12)">Live on the left as you edit · final commit is Approve</div>
+              </sc-if>
+              <sc-if value="{{ b.showActualizedReadOnly }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:12px;color:#2c7a55;line-height:1.5;font-weight:500;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(63,167,118,.15)">{{ b.transmuted }}</div>
+              </sc-if>
+              <sc-if value="{{ b.showRefineBtn }}" hint-placeholder-val="{{ false }}">
+                <div onClick="{{ b.onRefine }}" style="margin-bottom:12px;padding:9px 12px;border-radius:10px;border:1px dashed rgba(217,150,42,.45);background:rgba(217,150,42,.06);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.06em;color:#9a6b12;cursor:pointer;text-align:center" style-hover="background:rgba(217,150,42,.12)">Refine with FIELD — enrich this pair</div>
+              </sc-if>
+              <sc-if value="{{ b.isRefining }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-bottom:12px;padding:12px;border-radius:12px;background:#fff;border:1px solid rgba(217,150,42,.28)">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;color:#c08a1e;margin-bottom:8px">ENRICH WITH FIELD</div>
+                  <div style="font-size:10.5px;color:#8a8170;line-height:1.45;margin-bottom:8px">Your note is woven into the actualized text — it adds, it does not replace.</div>
+                  <div style="display:flex;align-items:flex-end;gap:7px">
+                    <textarea value="{{ b.refineInput }}" onInput="{{ b.onRefineInput }}" onKeyDown="{{ b.onRefineKey }}" onClick="{{ expStopProp }}" placeholder="e.g. soften the tone, add why senior year matters…" style="flex:1;min-height:52px;max-height:120px;box-sizing:border-box;padding:8px 10px;border-radius:10px;border:1px solid rgba(60,50,30,.14);font-size:12px;line-height:1.45;resize:vertical;outline:none;font-family:inherit;color:#2e2a24"></textarea>
+                    <div onClick="{{ b.onRefineSend }}" style="width:34px;height:34px;flex-shrink:0;border-radius:9px;background:#d9962a;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="14" height="14" viewBox="0 0 15 15" fill="none"><path d="M7.5 12V3.2M3.6 7 7.5 3.1 11.4 7" stroke="#3a2700" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  </div>
+                </div>
+              </sc-if>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;color:#a59b88;margin-bottom:4px">WHY THIS SHIFT</div>
+              <div style="font-size:11px;color:#5a5246;line-height:1.55">{{ b.whyShift }}</div>
+            </div>
+          </sc-for>
+          <sc-if value="{{ expHasChosen }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:8px;flex-wrap:wrap;padding-top:12px;border-top:1px solid rgba(60,50,30,.1)">
+              <div onClick="{{ expClearProjections }}" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a8170;cursor:pointer">clear previews</div>
+              <div onClick="{{ expApprove }}" style="padding:9px 16px;border-radius:10px;background:#d9962a;color:#3a2700;font-size:12.5px;font-weight:600;cursor:pointer">Approve ✓</div>
+            </div>
+          </sc-if>
+          <div onClick="{{ expBack }}" style="margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8a8170;cursor:pointer">← back</div>
+        </sc-if>
+      </div>
+      <sc-if value="{{ expShowSteerBar }}" hint-placeholder-val="{{ false }}">
+      <div style="flex-shrink:0;padding:12px 14px 16px;border-top:1px solid rgba(60,50,30,.1);background:#faf6ec">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#a59b88;margin-bottom:6px">{{ expSteerScaffold }}</div>
+        <div style="display:flex;align-items:center;gap:7px;background:#fff;border:1px solid rgba(60,50,30,.14);border-radius:12px;padding:6px 7px 6px 12px">
+          <input value="{{ expSteerInput }}" onInput="{{ expSetSteer }}" onKeyDown="{{ expSteerKey }}" placeholder="{{ expSteerPlaceholder }}" style="flex:1;min-width:0;background:transparent;border:none;outline:none;color:#2e2a24;font-size:13px" />
+          <div onClick="{{ expSteerSend }}" style="width:30px;height:30px;flex-shrink:0;border-radius:9px;background:#d9962a;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="14" height="14" viewBox="0 0 15 15" fill="none"><path d="M7.5 12V3.2M3.6 7 7.5 3.1 11.4 7" stroke="#3a2700" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </div>
+      </div>
+      </sc-if>
+    </div>
+    </sc-if>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  _mid = 0;
+  _uid = 0;
+  state = {
+    data: this.buildData(),
+    openCats: this.initialOpenCats(),
+    openStrata: this.initialOpenStrata(),
+    editCat: null, draft: null,
+    editUnit: null, unitDraft: null, gatewayDraft: null,
+    editProseModule: null, proseModuleDraft: null, proseCatMetaDraft: null,
+    approved: {}, showAllTodos: false,
+    chatOpen: false, drawerHeight: 280, input: '', messages: [], typing: false,
+    explainMode: false, selRect: null, selText: '', explainChips: [],
+    exp: null, experimentFraming: null,
+  };
+  msgsRef = React.createRef();
+  fileRef = React.createRef();
+  _replies = ['Good question — here\u2019s the read on that.', 'Noted. I\u2019d frame it like this.', 'That part is doing real work; keep it.', 'Makes sense — small tightening would help.'];
+
+  initialOpenCats() {
+    const o = {};
+    this.schema().forEach(st => st.cats.forEach(c => { o[c.id] = true; }));
+    return o;
+  }
+  initialOpenStrata() {
+    const o = {};
+    this.schema().forEach(st => { o[st.id] = true; });
+    return o;
+  }
+
+  _truncate(s, n) {
+    s = String(s || '').trim();
+    if (!s) return '';
+    return s.length > n ? s.slice(0, n).trim() + '\u2026' : s;
+  }
+  _compactHonor(u) {
+    return [u.title, u.grade_level ? 'gr. ' + u.grade_level : '', u.recognition_level].filter(Boolean).join(' · ') || 'Empty honor';
+  }
+  _compactActivity(u) {
+    const head = [u.activity_type, u.position].filter(Boolean).join(', ');
+    const tail = u.organization ? ' @ ' + u.organization : '';
+    return (head + tail) || 'Empty activity';
+  }
+  _wordCount(text) {
+    const t = String(text || '').trim();
+    return t ? t.split(/\s+/).filter(Boolean).length : 0;
+  }
+
+  _charLen(s) { return String(s || '').length; }
+  _clampUnitValue(f, v) {
+    v = String(v ?? '');
+    if (f.maxChars != null) v = v.slice(0, f.maxChars);
+    if (f.maxNum != null) {
+      const digits = v.replace(/[^\d]/g, '');
+      if (!digits) return '';
+      let n = parseInt(digits, 10);
+      if (Number.isNaN(n)) return '';
+      n = Math.min(f.maxNum, Math.max(f.minNum ?? 0, n));
+      return String(n);
+    }
+    return v;
+  }
+  _fieldLimitLabel(f, v) {
+    v = String(v ?? '');
+    if (f.maxChars != null) return this._charLen(v) + '/' + f.maxChars + ' characters';
+    if (f.maxNum != null) return (f.minNum ?? 0) + '–' + f.maxNum + (f.k === 'hours_per_week' ? ' hrs/wk' : f.k === 'weeks_per_year' ? ' wks/yr' : '');
+    return '';
+  }
+  _moduleWordCount(m) {
+    return this._wordCount([m.telos, m.functionality, m.pivotal].filter(Boolean).join(' '));
+  }
+  _proseWordTotal(o) {
+    if (o.modules && o.modules.length) {
+      return o.modules.reduce((n, m) => n + this._moduleWordCount(m), 0);
+    }
+    return this._wordCount(o.response || o.description || o.text || '');
+  }
+  _mergeStoredProseModules(defaults, stored) {
+    if (!stored || !stored.length) return defaults;
+    const byId = Object.fromEntries(stored.map(m => [m.id, m]));
+    return defaults.map(d => {
+      const s = byId[d.id];
+      if (!s) return d;
+      return {
+        ...d,
+        title: s.title || d.title,
+        telos: s.telos != null && String(s.telos).trim() ? s.telos : d.telos,
+        functionality: s.functionality != null && String(s.functionality).trim() ? s.functionality : d.functionality,
+        pivotal: s.pivotal != null && String(s.pivotal).trim() ? s.pivotal : d.pivotal,
+      };
+    });
+  }
+  _trimToWordBudget(text, maxWords) {
+    const parts = String(text || '').trim().split(/\s+/).filter(Boolean);
+    if (parts.length <= maxWords) return text;
+    return parts.slice(0, maxWords).join(' ');
+  }
+  _clampProseModule(m, part, value, maxWords) {
+    const next = { ...m, [part]: value };
+    let combined = this._moduleWordCount(next);
+    if (combined <= maxWords) return next;
+    let trimmed = value;
+    while (trimmed.length && this._moduleWordCount({ ...m, [part]: trimmed }) > maxWords) {
+      trimmed = this._trimToWordBudget(trimmed, Math.max(0, this._wordCount(trimmed) - 1));
+    }
+    return { ...m, [part]: trimmed };
+  }
+
+  _expPreviewValueStyle(isPreview, isFocus) {
+    const base = { fontSize: '12.5px', lineHeight: 1.5, whiteSpace: 'pre-wrap' };
+    if (!isPreview) return { ...base, color: '#3a342b', lineHeight: 1.45, whiteSpace: 'normal' };
+    return {
+      ...base,
+      color: '#2c7a55',
+      fontWeight: isFocus ? 600 : 500,
+      lineHeight: 1.45,
+      whiteSpace: 'normal',
+    };
+  }
+  _expSectionFocus(catId, focusKey) {
+    return !!(focusKey && (focusKey === catId || focusKey.startsWith(catId + '.')));
+  }
+  _expSectionWrapStyle(catId, focusKey) {
+    const on = this._expSectionFocus(catId, focusKey);
+    return {
+      marginBottom: '6px',
+      borderRadius: '14px',
+      padding: on ? '3px' : '0',
+      boxShadow: on ? '0 0 0 1px rgba(63,167,118,.38)' : 'none',
+      background: on ? 'rgba(63,167,118,.045)' : 'transparent',
+    };
+  }
+  _expPreviewRowWrap() {
+    return {
+      padding: '5px 0',
+      borderBottom: '1px solid rgba(60,50,30,.05)',
+    };
+  }
+  _expProjectionNavList(exp, data) {
+    if (!exp) return [];
+    const ctx = this._expContext();
+    const ebs = this._expBundles(ctx, exp, data);
+    return (exp.chosen || []).map(i => {
+      const b = ebs[i];
+      if (!b) return null;
+      return {
+        targetKey: b.targetKey,
+        anchorId: b.targetKey === 'strategy.0' ? 'exp-strategy-0' : (b.anchorId || 'exp-' + b.targetKey.replace(/\./g, '-')),
+        locate: b.locate,
+        bundleIndex: i,
+        stId: b.stId,
+        catId: b.catId,
+      };
+    }).filter(Boolean);
+  }
+  _expPreviewFocusKey(exp, data) {
+    const list = this._expProjectionNavList(exp, data);
+    if (!list.length) return null;
+    const fi = Math.min(Math.max(0, exp.previewFocus || 0), list.length - 1);
+    return list[fi].targetKey;
+  }
+  _unitDisplayRows(unit, fields, catId, expPreviewMap, focusKey) {
+    expPreviewMap = expPreviewMap || {};
+    focusKey = focusKey || null;
+    return fields.map(f => {
+      const v = String(unit[f.k] || '').trim();
+      const isLong = f.type === 'long';
+      const limitLabel = this._fieldLimitLabel(f, v);
+      const previewKey = catId + '.' + unit.id + '.' + f.k;
+      const prev = expPreviewMap[previewKey];
+      const displayVal = prev ? String(prev.transmuted || '').trim() : (v || '—');
+      const anchorId = 'exp-' + previewKey.replace(/\./g, '-');
+      const showLong = isLong && displayVal && displayVal !== '—';
+      const isPreview = !!prev;
+      const isFocus = isPreview && focusKey === previewKey;
+      return {
+        id: f.k,
+        label: f.label,
+        value: displayVal,
+        isLong: showLong,
+        isShort: !showLong,
+        showLimit: !!(f.maxChars != null || f.maxNum != null) && !prev,
+        limitLabel,
+        anchorId,
+        valueStyle: this._expPreviewValueStyle(isPreview, isFocus),
+        rowWrapStyle: this._expPreviewRowWrap(),
+      };
+    });
+  }
+
+  _proseSkeleton(c, data) {
+    const o = data[c.id] || {};
+    const mod = (id, title, telos, functionality, pivotal) => ({ id, title, telos, functionality, pivotal });
+    if (c.id === 'essay') {
+      const promptHead = o.prompt ? String(o.prompt).split('\u00b7')[0].trim() : null;
+      const promptLabel = o.prompt ? String(o.prompt).trim() : 'not chosen';
+      const words = this._proseWordTotal(o);
+      const draftHint = words ? 'Draft on file (' + words + ' words) — edit modules below in the same structure.' : 'No draft yet — fill each module (~150 words max per module).';
+      const out = {
+        serve: 'Personal statement as five ~150-word modules (telos · functionality · pivotal content). ' + draftHint,
+        modules: [
+          mod('m1', '1 · Prompt alignment',
+            'Anchor the entire statement to one Common App invitation so every later module answers the same reader question.',
+            'Locks prompt choice (currently: ' + promptLabel + ') and defines success: what the admissions reader should believe about the applicant that activities cannot carry.',
+            'Pivotal: the explicit contract between prompt and narrative job — e.g. gratitude is not a list of thanks but proof of how recognition changed behavior or belonging.'),
+          mod('m2', '2 · Sensory entry beat',
+            'Pull the reader into a single lived moment before any explanation or achievement language.',
+            'Functions as hook and credibility: scene, object, or sensation that only this applicant would notice; no thesis sentence in paragraph one.',
+            'Pivotal: the robot-that-moved breath, the hospital hallway light, the solder smoke — one image that foreshadows the throughline without naming it.'),
+          mod('m3', '3 · Inner stake',
+            'Make clear what emotionally or intellectually matters — why the scene is not decorative.',
+            'Bridges hook to identity: names the question, fear, or hunger the applicant keeps returning to; stays personal, not argumentative.',
+            'Pivotal: the private reason building systems feels like listening — vulnerability that CV lines cannot hold.'),
+          mod('m4', '4 · Builder throughline braid',
+            'Integrate maker/engineer identity with the inner stake so the application reads as one person, not two files.',
+            'Shows pattern across contexts (robotics, data-viz, community repair) as choices, not accumulation; orchestration uses this module to counterbalance activity density.',
+            'Pivotal: one explicit link between technical habit and human motive — how fixing things for others became how this applicant feels real.'),
+          mod('m5', '5 · Reader landing',
+            'Leave a single aftertaste: character, perspective, or ethic the reader remembers after closing the tab.',
+            'Closes without new facts or brag lists; echoes opening image or prompt obligation; ~650-word total budget across modules when drafted.',
+            'Pivotal: the last image or sentence that makes an officer want to advocate — not summary, but resonance.'),
+        ],
+        status: [
+          promptHead ? 'Prompt · ' + promptHead : 'Prompt · not chosen',
+          words ? words + ' words in draft' : 'Draft · empty',
+          words >= 250 ? 'Length · meets 250-word floor' : (words ? 'Length · under 250-word floor' : null),
+        ].filter(Boolean),
+      };
+      out.modules = this._mergeStoredProseModules(out.modules, o.modules);
+      return out;
+    }
+    if (c.id === 'challenges') {
+      const share = String(o.share || '').trim();
+      const words = this._proseWordTotal(o);
+      const out = {
+        serve: 'Writing-section adversity response as four ~150-word modules — factual context, not a second personal essay.',
+        modules: [
+          mod('m1', '1 · Disclosure gateway',
+            'Respect the applicant\u2019s choice to report or withhold adversity affecting academics.',
+            'Yes/No gate controls whether downstream modules apply; No is a complete, valid state with no narrative obligation.',
+            'Pivotal: explicit gateway answer (' + (share || 'unanswered') + ') — colleges read silence as intentional, not missing data.'),
+          mod('m2', '2 · Impact frame',
+            'State what happened in plain, bounded language without rhetorical flourish.',
+            'Separates event from identity; names timeframe, scope, and who/what was affected; avoids duplicating essay imagery.',
+            'Pivotal: the fact pattern an counselor could corroborate — illness, move, family role change, etc.'),
+          mod('m3', '3 · Academic intersection',
+            'Show how circumstances touched grades, course load, testing, or school engagement.',
+            'Answers the reader\u2019s implicit question: \u201cDid this explain a dip or shift?\u201d Links to transcript, not to character essay.',
+            'Pivotal: specific terms, semesters, or supports (504, tutoring, reduced load) when relevant.'),
+          mod('m4', '4 · Agency & forward shape',
+            'Describe how the applicant navigated constraints and what changed in priorities or trajectory.',
+            'Provides context, not pity; ends on present stability or plan, within 250-word cap when drafted.',
+            'Pivotal: one sentence of forward agency — what they do differently now because of the experience.'),
+        ],
+        status: [
+          share ? 'Gateway · ' + share : 'Gateway · unanswered',
+          share === 'No' ? 'Body · skipped by design' : (words ? words + ' words drafted' : 'Body · empty'),
+          share === 'Yes' && words ? 'Cap · 250 words (Common App)' : null,
+        ].filter(Boolean),
+      };
+      out.modules = this._mergeStoredProseModules(out.modules, o.modules);
+      return out;
+    }
+    if (c.id === 'additional') {
+      const words = this._proseWordTotal(o);
+      const out = {
+        serve: 'Additional information as three ~150-word modules — net-new facts only.',
+        modules: [
+          mod('m1', '1 · Scope & telos',
+            'Clarify why this optional field exists for this applicant right now.',
+            'Flags anomalies (gap year, grading system, name change) that no other section carries; reader should know why they are reading extra text.',
+            'Pivotal: the one-sentence reason additional context is necessary — not a second essay prompt.'),
+          mod('m2', '2 · Functional delivery',
+            'Deliver only information that changes how colleges interpret the rest of the file.',
+            'Short, scannable facts; no narrative arc; respects officer time; may reference documents or school policies.',
+            'Pivotal: the specific fact (COVID term, homeschool transition, award clarification) that prevents misread elsewhere.'),
+          mod('m3', '3 · Non-overlap guard',
+            'Ensure zero repetition of essay, challenges, activities, or counselor letter themes.',
+            'Functions as deduplication layer — if it appears elsewhere, it does not belong here.',
+            'Pivotal: explicit check: \u201cNot stated in PS / activities / challenges\u201d before save.'),
+        ],
+        status: [words ? words + ' words drafted' : 'Empty · valid if nothing to add'],
+      };
+      out.modules = this._mergeStoredProseModules(out.modules, o.modules);
+      return out;
+    }
+    if (c.id === 'responsibilities') {
+      const raw = String(o.items || '').trim();
+      const lines = raw ? raw.split(/\s*[·\n]\s*/).filter(Boolean) : [];
+      const out = {
+        serve: 'Activities circumstances checklist as three ~150-word modules — household load, not narrative.',
+        modules: [
+          mod('m1', '1 · Flag taxonomy',
+            'Name each responsibility type the form allows (care, paid work, farming, etc.).',
+            'Multiselect semantics: equal weight, no ranking; each flag is one category of time or duty affecting school.',
+            'Pivotal: which flags apply (' + (lines.length ? lines.length + ' selected' : 'none yet') + ') and what each means in this household.'),
+          mod('m2', '2 · Academic load context',
+            'Explain how responsibilities intersect with homework, attendance, or course choices.',
+            'Functional for officers comparing rigor to context; stays factual; no 250-word essay voice.',
+            'Pivotal: hours, seasons, or tradeoffs (e.g. paid work weekends → fewer clubs) when known.'),
+          mod('m3', '3 · Distinction from Writing',
+            'Keep this module separate from the challenges/circumstances essay.',
+            'Checklist + brief context here; bounded narrative there — prevents duplicate hardship stories.',
+            'Pivotal: cross-reference rule — if it needs story, it belongs in Writing; if it needs labels, it stays here.'),
+        ],
+        status: [lines.length ? lines.length + ' circumstance line(s) captured' : 'None selected · optional'],
+      };
+      out.modules = this._mergeStoredProseModules(out.modules, o.modules);
+      return out;
+    }
+    const fallback = { serve: 'Long-form module.', modules: [mod('m1', 'Body', 'Purpose of this prose block.', 'How it behaves in the application.', 'Key content to capture in Edit.')], status: [] };
+    fallback.modules = this._mergeStoredProseModules(fallback.modules, o.modules);
+    return fallback;
+  }
+
+  _mapProseModules(modules, catId, catDef, expPreviewMap, focusKey) {
+    expPreviewMap = expPreviewMap || {};
+    focusKey = focusKey || null;
+    const maxW = 150;
+    const ep = this.state.editProseModule;
+    const draftingCat = ep && ep.catId === catId;
+    const draft = this.state.proseModuleDraft || {};
+    const metaDraft = this.state.proseCatMetaDraft || {};
+    const enumField = (k) => (catDef && catDef.fields ? catDef.fields.find(f => f.k === k && f.type === 'enum') : null);
+    return (modules || []).map(m => {
+      const uEditing = draftingCat && ep.modId === m.id;
+      const src = uEditing ? draft : m;
+      const wc = this._moduleWordCount(src);
+      let metaFields = [];
+      if (uEditing && catId === 'essay' && m.id === 'm1') {
+        const pf = enumField('prompt');
+        if (pf) metaFields = [{ id: 'prompt', label: pf.label, options: pf.options || [], editValue: metaDraft.prompt || '', onInput: (e) => this.setProseCatMeta('prompt', e.target.value) }];
+      }
+      if (uEditing && catId === 'challenges' && m.id === 'm1') {
+        const sf = enumField('share');
+        if (sf) metaFields = [{ id: 'share', label: sf.label, options: sf.options || [], editValue: metaDraft.share || '', onInput: (e) => this.setProseCatMeta('share', e.target.value) }];
+      }
+      const pivotalKey = catId + '.' + m.id + '.pivotal';
+      const pivPrev = expPreviewMap[pivotalKey];
+      const pivotalDisplay = pivPrev ? String(pivPrev.transmuted || '').trim() : (src.pivotal || '');
+      const pivPreview = !!pivPrev;
+      const pivFocus = pivPreview && focusKey === pivotalKey;
+      return {
+        id: m.id,
+        anchorId: 'exp-' + pivotalKey.replace(/\./g, '-'),
+        title: m.title,
+        telos: src.telos || '',
+        functionality: src.functionality || '',
+        pivotal: pivotalDisplay,
+        pivotalStyle: this._expPreviewValueStyle(pivPreview, pivFocus),
+        editing: uEditing,
+        readOnly: !uEditing,
+        showEditBtn: !uEditing && !draftingCat,
+        metaFields,
+        cardStyle: uEditing
+          ? { marginBottom: '12px', padding: '12px 12px 10px', borderRadius: '10px', border: '1px solid rgba(217,150,42,.35)', background: '#fff', boxShadow: '0 0 0 3px rgba(217,150,42,.08)' }
+          : { marginBottom: '12px', padding: '10px 12px', borderRadius: '10px', border: '1px solid rgba(60,50,30,.07)', background: 'rgba(255,255,255,.75)' },
+        wordLabel: wc + '/' + maxW + ' words',
+        wordOver: wc > maxW,
+        wordCountStyle: { fontFamily: "'IBM Plex Mono',monospace", fontSize: '8.5px', letterSpacing: '.06em', color: wc > maxW ? '#c0392b' : '#b0a692' },
+        onEdit: () => this.startProseModuleEdit(catId, m.id),
+        onConfirm: () => this.confirmProseModuleEdit(catId, m.id),
+        onDiscard: this.discardProseModuleEdit,
+        onTelos: (e) => this.setProseModulePart('telos', e.target.value),
+        onFunctionality: (e) => this.setProseModulePart('functionality', e.target.value),
+        onPivotal: (e) => this.setProseModulePart('pivotal', e.target.value),
+      };
+    });
+  }
+
+  _syncProseLegacyFields(block, catId) {
+    const modules = block.modules || [];
+    if (catId === 'essay') {
+      block.response = modules.map(m => [m.telos, m.functionality, m.pivotal].filter(Boolean).join('\n\n')).filter(Boolean).join('\n\n');
+    }
+    if (catId === 'challenges') {
+      block.description = modules.map(m => m.pivotal).filter(Boolean).join(' ');
+    }
+    if (catId === 'additional') {
+      block.text = modules.map(m => m.pivotal).filter(Boolean).join('\n\n');
+    }
+    if (catId === 'responsibilities') {
+      block.items = modules.map(m => m.pivotal).filter(Boolean).join(' · ');
+    }
+  }
+
+  _compactFieldCat(c, data) {
+    const o = data[c.id] || {};
+    if (c.proseModule) return '';
+    if (c.id === 'legal_name') {
+      const n = [o.first, o.middle, o.last].filter(Boolean).join(' ').trim();
+      return o.preferred ? n + ' · goes by ' + o.preferred : (n || 'Name not set');
+    }
+    if (c.id === 'courses_now' || c.id === 'courses_senior') {
+      return this._truncate(o.list, 140) || 'No courses listed';
+    }
+    const parts = c.fields.map(f => {
+      const v = String(o[f.k] || '').trim();
+      if (!v) return f.required ? '[' + f.label + ' missing]' : null;
+      if (f.type === 'long') return this._truncate(v, 80);
+      return v;
+    }).filter(Boolean);
+    return parts.join(' · ') || 'Nothing entered yet';
+  }
+
+  honorUnitFields() {
+    return [
+      { k: 'title', label: 'Honor', type: 'text', required: true, maxChars: 100 },
+      { k: 'grade_level', label: 'Grade level(s)', type: 'text', required: true, ph: 'e.g. 11 or 9, 10, 11' },
+      { k: 'recognition_level', label: 'Level of recognition', type: 'enum', required: true, options: ['School', 'State or regional', 'National', 'International'] },
+    ];
+  }
+
+  activityTypeOptions() {
+    return ['Academic', 'Art', 'Athletics: Club', 'Athletics: JV/Varsity', 'Career-Oriented', 'Community Service (Volunteer)', 'Computer/Technology', 'Cultural', 'Dance', 'Debate/Speech', 'Environmental', 'Family Responsibilities', 'Foreign Exchange', 'Journalism/Publication', 'Junior R.O.T.C.', 'Music: Instrumental', 'Music: Vocal', 'Religious', 'Research', 'Robotics', 'School Spirit', 'Science/Math', 'Student Govt./Politics', 'Theater/Drama', 'Work (Paid)', 'Other Club/Activity'];
+  }
+
+  activityUnitFields() {
+    return [
+      { k: 'activity_type', label: 'Activity type', type: 'enum', required: true, options: this.activityTypeOptions() },
+      { k: 'position', label: 'Position / leadership', type: 'text', maxChars: 50 },
+      { k: 'organization', label: 'Organization name', type: 'text', maxChars: 100 },
+      { k: 'description', label: 'Description', type: 'long', required: true, maxChars: 150 },
+      { k: 'grade_levels', label: 'Participation grade levels', type: 'text', required: true, ph: 'e.g. 9, 10, 11, 12' },
+      { k: 'timing', label: 'Timing', type: 'enum', required: true, options: ['During school year', 'During school break', 'All year'] },
+      { k: 'hours_per_week', label: 'Hours / week', type: 'text', required: true, minNum: 0, maxNum: 168 },
+      { k: 'weeks_per_year', label: 'Weeks / year', type: 'text', required: true, minNum: 0, maxNum: 52 },
+      { k: 'continue_in_college', label: 'Continue in college?', type: 'enum', required: true, options: ['Yes', 'No'] },
+    ];
+  }
+
+  schema() {
+    const LV = ['Regular/Standard', 'Honors', 'Advanced Placement (AP)', 'Dual Enrollment', 'IB'];
+    return [
+      { id: 'profile', label: 'PROFILE', cats: [
+        { id: 'legal_name', label: 'Legal name', fields: [{ k: 'first', label: 'First', type: 'text', required: true }, { k: 'last', label: 'Last', type: 'text', required: true }, { k: 'middle', label: 'Middle', type: 'text' }, { k: 'preferred', label: 'Goes by', type: 'text' }] },
+        { id: 'dob', label: 'Date of birth', fields: [{ k: 'dob', label: 'DOB', type: 'text', required: true }] },
+        { id: 'address', label: 'Permanent address', fields: [{ k: 'address', label: 'Address', type: 'text', required: true }] },
+        { id: 'citizenship', label: 'Citizenship', fields: [{ k: 'status', label: 'Status', type: 'enum', required: true, options: ['U.S. citizen or U.S. National', 'U.S. dual citizen', 'U.S. resident', 'Citizen of a non-U.S. country'] }, { k: 'ssn', label: 'SSN', type: 'text' }] },
+        { id: 'sexgender', label: 'Sex & gender', fields: [{ k: 'legal_sex', label: 'Legal sex', type: 'enum', required: true, options: ['female', 'male', 'X or another legal sex'] }, { k: 'gender', label: 'Gender', type: 'multi', options: ['Female', 'Male', 'Nonbinary'] }, { k: 'pronouns', label: 'Pronouns', type: 'multi', options: ['He/Him', 'She/Her', 'They/Them'] }] },
+        { id: 'race', label: 'Race & ethnicity', fields: [{ k: 'hispanic', label: 'Hispanic/Latino', type: 'enum', options: ['Yes', 'No'] }, { k: 'races', label: 'Race', type: 'multi', options: ['American Indian or Alaska Native', 'Asian', 'Black or African American', 'Native Hawaiian or Other Pacific Islander', 'White'] }] },
+        { id: 'firstgen', label: 'First-generation', fields: [{ k: 'parents_degree', label: 'Parent BA+', type: 'enum', options: ['Yes', 'No'] }] },
+      ] },
+      { id: 'education', label: 'EDUCATION', cats: [
+        { id: 'school', label: 'Current secondary school', fields: [{ k: 'name', label: 'School', type: 'text', required: true }, { k: 'type', label: 'Type', type: 'enum', required: true, options: ['Public', 'Charter', 'Religious', 'Home school', 'Independent'] }, { k: 'city', label: 'City', type: 'text', required: true }, { k: 'grad', label: 'Graduation', type: 'text', required: true }] },
+        { id: 'grades', label: 'Grades & rank', fields: [{ k: 'gpa', label: 'Cumulative GPA', type: 'text', required: true }, { k: 'scale', label: 'Scale', type: 'text' }, { k: 'weighting', label: 'Weighting', type: 'enum', options: ['Weighted', 'Unweighted'] }, { k: 'rank_method', label: 'Rank method', type: 'enum', options: ['Exact', 'Quartile', 'Decile', 'Quintile', 'none'] }, { k: 'rank', label: 'Rank', type: 'text' }] },
+        { id: 'courses_now', label: 'Current-year courses', fields: [{ k: 'list', label: 'Courses', type: 'long', required: true }] },
+        { id: 'courses_senior', label: 'Senior-year courses', fields: [{ k: 'list', label: 'Planned', type: 'long', required: true }] },
+        { id: 'future_plans', label: 'Future plans', fields: [{ k: 'career', label: 'Career interest', type: 'text' }, { k: 'degree', label: 'Highest degree', type: 'enum', options: ["Bachelor's", "Master's", 'Doctorate', 'Professional'] }] },
+      ] },
+      { id: 'honors', label: 'HONORS', cats: [
+        { id: 'honors', label: 'Academic honors', unitKind: 'honor', maxUnits: 5, addLabel: 'Add honor', unitFields: this.honorUnitFields() },
+      ] },
+      { id: 'activities', label: 'ACTIVITIES', cats: [
+        { id: 'activities', label: 'Activities', unitKind: 'activity', maxUnits: 10, addLabel: 'Add activity', gatewayKey: 'has_activities', unitFields: this.activityUnitFields() },
+        { id: 'responsibilities', label: 'Responsibilities & circumstances', proseModule: true, fields: [{ k: 'items', label: 'Responsibilities', type: 'long' }] },
+      ] },
+      { id: 'personal', label: 'PERSONAL STATEMENT', cats: [
+        { id: 'essay', label: 'Personal essay', proseModule: true, fields: [{ k: 'prompt', label: 'Prompt', type: 'enum', required: true, options: ['1 · Background or identity', '2 · Lessons from a setback', '3 · Challenging a belief', '4 · Gratitude', '5 · Growth & realization', '6 · A topic you lose time in', '7 · Topic of your choice'] }, { k: 'response', label: 'Essay', type: 'long', required: true, minWords: 250 }] },
+        { id: 'challenges', label: 'Challenges & circumstances', proseModule: true, fields: [{ k: 'share', label: 'Share?', type: 'enum', options: ['Yes', 'No'] }, { k: 'description', label: 'Description', type: 'long' }] },
+        { id: 'additional', label: 'Additional information', proseModule: true, fields: [{ k: 'text', label: 'Notes', type: 'long' }] },
+      ] },
+    ];
+  }
+  reviewNeeded() { return { grades: true, activities: true }; }
+
+  buildData() {
+    return {
+      legal_name: { first: 'Maya', last: 'Okonkwo', middle: 'R.', preferred: '' },
+      dob: { dob: 'March 14, 2008' },
+      address: { address: '1420 Linden Ave, Columbus, OH 43201' },
+      citizenship: { status: 'U.S. citizen or U.S. National', ssn: '' },
+      sexgender: { legal_sex: 'female', gender: 'Female', pronouns: 'She/Her' },
+      race: { hispanic: 'No', races: 'Black or African American' },
+      firstgen: { parents_degree: 'No' },
+      school: { name: 'Columbus Alternative High School', type: 'Public', city: 'Columbus, OH', grad: 'May 2026' },
+      grades: { gpa: '3.92', scale: '4.0', weighting: 'Weighted', rank_method: 'Decile', rank: 'Top 10%' },
+      courses_now: { list: 'AP Calculus BC · AP Physics C · AP Literature · Spanish IV · Robotics Engineering' },
+      courses_senior: { list: '' },
+      future_plans: { career: '', degree: "Bachelor's" },
+      honors: { units: [
+        { id: 'h1', title: 'National Merit Semifinalist', grade_level: '11', recognition_level: 'National' },
+        { id: 'h2', title: 'State Science Fair, 1st in Engineering', grade_level: '11', recognition_level: 'State or regional' },
+        { id: 'h3', title: 'AP Scholar with Distinction', grade_level: '11', recognition_level: 'National' },
+      ] },
+      activities: {
+        has_activities: 'Yes',
+        units: [
+          { id: 'a1', activity_type: 'Robotics', position: 'Captain', organization: 'CAHS Robotics Team', description: 'Lead design and build; qualified for worlds twice.', grade_levels: '9, 10, 11, 12', timing: 'During school year', hours_per_week: '15', weeks_per_year: '40', continue_in_college: 'Yes' },
+          { id: 'a2', activity_type: 'Community Service (Volunteer)', position: 'Data viz lead', organization: 'Regional hospital', description: 'Built dashboards for patient-flow bottlenecks.', grade_levels: '10, 11, 12', timing: 'All year', hours_per_week: '4', weeks_per_year: '45', continue_in_college: 'Yes' },
+          { id: 'a3', activity_type: 'Debate/Speech', position: 'Varsity member', organization: 'Policy debate', description: 'State semifinalist; research-heavy cases.', grade_levels: '9, 10, 11', timing: 'During school year', hours_per_week: '8', weeks_per_year: '30', continue_in_college: 'No' },
+          { id: 'a4', activity_type: 'Work (Paid)', position: 'Pharmacy assistant', organization: 'Family pharmacy', description: 'Evening shifts; inventory and customer care.', grade_levels: '11, 12', timing: 'All year', hours_per_week: '10', weeks_per_year: '48', continue_in_college: 'No' },
+        ],
+      },
+      responsibilities: { items: 'Taking care of younger family members · Working a paid job to contribute to household income' },
+      essay: { prompt: '6 · A topic you lose time in', response: 'The first time a robot I built actually moved, I forgot to breathe. I keep chasing that feeling — the moment a system finally listens.' },
+      challenges: { share: 'Yes', description: 'After my father\u2019s injury I took on evening shifts at our pharmacy and helped manage the household, which reshaped how I budget my time and attention.' },
+      additional: { text: '' },
+    };
+  }
+
+  componentDidMount() {
+    this._onUp = () => {
+      if (!this.state.explainMode) return;
+      const sel = window.getSelection ? window.getSelection() : null;
+      const txt = sel ? sel.toString().trim() : '';
+      if (txt && sel.rangeCount) { this._lastSel = txt; const r = sel.getRangeAt(0).getBoundingClientRect(); if (r && r.width) { this.setState({ selText: txt, selRect: { top: r.bottom, left: r.left + r.width / 2 } }); return; } }
+      this.setState({ selRect: null, selText: '' });
+    };
+    document.addEventListener('mouseup', this._onUp);
+    try {
+      const qs = new URLSearchParams(window.location.search);
+      if (qs.get('experiment') === '1' && !this.state.exp) {
+        qs.delete('experiment');
+        const next = window.location.pathname + (qs.toString() ? '?' + qs.toString() : '') + window.location.hash;
+        window.history.replaceState(null, '', next);
+        this.openExperiment();
+      }
+    } catch (_) { /* ignore */ }
+  }
+  componentWillUnmount() { clearTimeout(this._t); if (this._onUp) document.removeEventListener('mouseup', this._onUp); }
+  componentDidUpdate() { const el = this.msgsRef.current; if (el && this.state.chatOpen) el.scrollTop = el.scrollHeight; }
+
+  _flat() { const out = []; this.schema().forEach(st => st.cats.forEach(c => out.push({ st, c }))); return out; }
+  _missing(f, v) {
+    v = (v == null ? '' : String(v)).trim();
+    if (f.required && !v) return true;
+    if (f.maxChars != null && this._charLen(v) > f.maxChars) return true;
+    if (f.maxNum != null && v) {
+      const n = parseInt(v, 10);
+      if (Number.isNaN(n) || n > f.maxNum || n < (f.minNum ?? 0)) return true;
+    }
+    if (f.minWords && v && v.split(/\s+/).filter(Boolean).length < f.minWords) return true;
+    return false;
+  }
+  _unitHasAny(unit, fields) { return fields.some(f => String(unit[f.k] || '').trim()); }
+  _unitIncomplete(unit, fields) {
+    if (!this._unitHasAny(unit, fields)) return false;
+    return fields.some(f => this._missing(f, unit[f.k]));
+  }
+  _catIncomplete(c, data) {
+    if (c.unitKind) {
+      const block = data[c.id] || {};
+      if (c.gatewayKey) {
+        const gw = String(block[c.gatewayKey] || '').trim();
+        if (!gw) return true;
+        if (gw === 'No') return false;
+        const units = block.units || [];
+        if (!units.length) return true;
+        return units.some(u => this._unitIncomplete(u, c.unitFields));
+      }
+      const units = block.units || [];
+      return units.some(u => this._unitIncomplete(u, c.unitFields));
+    }
+    if (c.proseModule && c.id === 'essay') {
+      const o = data[c.id] || {};
+      if (this._missing({ required: true }, o.prompt)) return true;
+      if (this._proseWordTotal(o) < 250) return true;
+      return false;
+    }
+    if (c.proseModule && c.id === 'challenges') {
+      const o = data[c.id] || {};
+      const share = String(o.share || '').trim();
+      if (!share) return true;
+      if (share === 'No') return false;
+      if (this._proseWordTotal(o) > 250) return true;
+      return this._proseWordTotal(o) < 1;
+    }
+    return c.fields.some(f => this._missing(f, data[c.id] && data[c.id][f.k]));
+  }
+
+  toggleStratum = (id) => this.setState(s => ({ openStrata: { ...s.openStrata, [id]: !s.openStrata[id] } }));
+  toggleCat = (id) => this.setState(s => ({ openCats: { ...s.openCats, [id]: !s.openCats[id] } }));
+  openOnly = (id) => {
+    const found = this._flat().find(x => x.c.id === id);
+    this.setState(s => ({
+      openCats: { ...s.openCats, [id]: true },
+      openStrata: found ? { ...s.openStrata, [found.st.id]: true } : s.openStrata,
+    }));
+  };
+  startEdit = (id) => {
+    const found = this._flat().find(x => x.c.id === id);
+    if (found && found.c.proseModule) {
+      const sk = this._proseSkeleton(found.c, { [id]: this.state.data[id] || {} });
+      const mod = sk.modules[0];
+      if (mod) this.startProseModuleEdit(id, mod.id);
+      return;
+    }
+    this.setState(s => ({
+      editCat: id,
+      openCats: { ...s.openCats, [id]: true },
+      openStrata: found ? { ...s.openStrata, [found.st.id]: true } : s.openStrata,
+      draft: { ...(s.data[id] || {}) },
+      editUnit: null,
+      unitDraft: null,
+      editProseModule: null,
+      proseModuleDraft: null,
+      proseCatMetaDraft: null,
+    }));
+  };
+  startProseModuleEdit = (catId, modId) => {
+    const found = this._flat().find(x => x.c.id === catId);
+    if (!found) return;
+    const block = this.state.data[catId] || {};
+    const sk = this._proseSkeleton(found.c, { [catId]: block });
+    const mod = sk.modules.find(m => m.id === modId) || sk.modules[0];
+    if (!mod) return;
+    let proseCatMetaDraft = null;
+    if (catId === 'essay' && mod.id === 'm1') proseCatMetaDraft = { prompt: block.prompt || '' };
+    if (catId === 'challenges' && mod.id === 'm1') proseCatMetaDraft = { share: block.share || '' };
+    this.setState(s => {
+      const openCats = { ...s.openCats, [catId]: true };
+      if (found.c.proseModule && found.st.id === 'personal') {
+        found.st.cats.forEach(c => { if (c.id !== catId) openCats[c.id] = false; });
+      }
+      return {
+        editProseModule: { catId, modId: mod.id },
+        proseModuleDraft: { ...mod },
+        proseCatMetaDraft,
+        editCat: null,
+        draft: null,
+        editUnit: null,
+        unitDraft: null,
+        openCats,
+        openStrata: { ...s.openStrata, [found.st.id]: true },
+      };
+    });
+  };
+  discardProseModuleEdit = () => this.setState({ editProseModule: null, proseModuleDraft: null, proseCatMetaDraft: null });
+  confirmProseModuleEdit = (catId, modId) => {
+    this.setState(s => {
+      const found = this._flat().find(x => x.c.id === catId);
+      if (!found || !s.proseModuleDraft) return null;
+      const block = { ...(s.data[catId] || {}) };
+      const sk = this._proseSkeleton(found.c, { [catId]: block });
+      const modules = sk.modules.map(d => {
+        if (d.id === modId) return { ...d, ...s.proseModuleDraft, id: modId };
+        const stored = (block.modules || []).find(x => x.id === d.id);
+        return stored ? { ...d, ...stored, title: stored.title || d.title } : d;
+      });
+      block.modules = modules;
+      if (s.proseCatMetaDraft) {
+        if (catId === 'essay' && s.proseCatMetaDraft.prompt != null) block.prompt = s.proseCatMetaDraft.prompt;
+        if (catId === 'challenges' && s.proseCatMetaDraft.share != null) block.share = s.proseCatMetaDraft.share;
+      }
+      this._syncProseLegacyFields(block, catId);
+      return {
+        data: { ...s.data, [catId]: block },
+        editProseModule: null,
+        proseModuleDraft: null,
+        proseCatMetaDraft: null,
+      };
+    });
+  };
+  discardEdit = () => this.setState({ editCat: null, draft: null, gatewayDraft: null });
+  confirmEdit = (id) => this.setState(s => {
+    const draft = { ...s.draft };
+    if (draft.modules) this._syncProseLegacyFields(draft, id);
+    return { data: { ...s.data, [id]: draft }, editCat: null, draft: null, approved: { ...s.approved, [id]: true } };
+  });
+  setField = (k, v) => this.setState(s => ({ draft: { ...s.draft, [k]: v } }));
+  setProseCatMeta = (k, v) => this.setState(s => ({ proseCatMetaDraft: { ...(s.proseCatMetaDraft || {}), [k]: v } }));
+  setProseModulePart = (part, value) => {
+    this.setState(s => {
+      if (!s.editProseModule || !s.proseModuleDraft) return null;
+      const next = this._clampProseModule(s.proseModuleDraft, part, value, 150);
+      return { proseModuleDraft: next };
+    });
+  };
+  approveCat = (id) => this.setState(s => ({ approved: { ...s.approved, [id]: true } }));
+  toggleTodos = () => this.setState(s => ({ showAllTodos: !s.showAllTodos }));
+
+  startUnitEdit = (catId, unitId) => {
+    const found = this._flat().find(x => x.c.id === catId);
+    const block = this.state.data[catId] || {};
+    const unit = (block.units || []).find(u => u.id === unitId) || {};
+    this.setState(s => ({
+      editUnit: { catId, unitId },
+      unitDraft: { ...unit },
+      gatewayDraft: block.has_activities != null ? block.has_activities : null,
+      openCats: { ...s.openCats, [catId]: true },
+      openStrata: found ? { ...s.openStrata, [found.st.id]: true } : s.openStrata,
+      editCat: null,
+      draft: null,
+      editProseModule: null,
+      proseModuleDraft: null,
+      proseCatMetaDraft: null,
+    }));
+  };
+  discardUnitEdit = () => this.setState({ editUnit: null, unitDraft: null, gatewayDraft: null });
+  setUnitField = (k, v) => {
+    this.setState(s => {
+      const eu = s.editUnit;
+      if (!eu) return null;
+      const found = this._flat().find(x => x.c.id === eu.catId);
+      const f = found && found.c.unitFields ? found.c.unitFields.find(x => x.k === k) : null;
+      if (f) v = this._clampUnitValue(f, v);
+      return { unitDraft: { ...s.unitDraft, [k]: v } };
+    });
+  };
+  setGatewayDraft = (v) => this.setState({ gatewayDraft: v });
+  confirmUnitEdit = (catId, unitId) => {
+    this.setState(s => {
+      const block = { ...(s.data[catId] || {}) };
+      const units = (block.units || []).map(u => u.id === unitId ? { ...s.unitDraft, id: unitId } : u);
+      if (s.gatewayDraft != null && block.has_activities !== undefined) block.has_activities = s.gatewayDraft;
+      return {
+        data: { ...s.data, [catId]: { ...block, units } },
+        editUnit: null,
+        unitDraft: null,
+        gatewayDraft: null,
+        approved: { ...s.approved, [catId]: true },
+      };
+    });
+  };
+  removeUnit = (catId, unitId) => {
+    this.setState(s => {
+      const block = { ...(s.data[catId] || {}) };
+      block.units = (block.units || []).filter(u => u.id !== unitId);
+      return {
+        data: { ...s.data, [catId]: block },
+        editUnit: s.editUnit && s.editUnit.unitId === unitId ? null : s.editUnit,
+        unitDraft: s.editUnit && s.editUnit.unitId === unitId ? null : s.unitDraft,
+      };
+    });
+  };
+  addUnit = (catId) => {
+    const found = this._flat().find(x => x.c.id === catId);
+    if (!found) return;
+    const cat = found.c;
+    const block = this.state.data[catId] || {};
+    const units = block.units || [];
+    if (units.length >= cat.maxUnits) return;
+    const id = 'u' + (++this._uid);
+    const blank = { id };
+    cat.unitFields.forEach(f => { blank[f.k] = ''; });
+    const nextBlock = { ...block, units: [...units, blank] };
+    if (cat.gatewayKey && nextBlock[cat.gatewayKey] !== 'Yes') nextBlock[cat.gatewayKey] = 'Yes';
+    this.setState(s => ({
+      data: { ...s.data, [catId]: nextBlock },
+      openCats: { ...s.openCats, [catId]: true },
+      openStrata: found ? { ...s.openStrata, [found.st.id]: true } : s.openStrata,
+      editUnit: { catId, unitId: id },
+      unitDraft: { ...blank },
+      gatewayDraft: nextBlock[cat.gatewayKey] != null ? nextBlock[cat.gatewayKey] : null,
+    }));
+  };
+
+  _expContext() {
+    const data = this.state.data;
+    const ln = data.legal_name || {};
+    const name = ((ln.first || '') + ' ' + (ln.last || '')).trim() || 'Applicant';
+    const statement = this.state.experimentFraming || (data.essay && data.essay.response) || 'Application narrative in progress.';
+    return { name, statement };
+  }
+  _profileOrigFields() {
+    const data = this.state.data;
+    const lines = [];
+    const push = (label, obj, fields) => {
+      if (!obj) return;
+      const parts = fields.map(f => f.label + ': ' + (obj[f.k] || '—')).join('\n');
+      lines.push({ id: label, label, value: parts });
+    };
+    this._flat().forEach(({ c }) => {
+      if (c.unitKind === 'honor') {
+        const units = (data[c.id] && data[c.id].units) || [];
+        lines.push({ id: c.id, label: c.label.toUpperCase(), value: units.length ? units.map((u, i) => (i + 1) + '. ' + [u.title, u.grade_level, u.recognition_level].filter(Boolean).join(' · ')).join('\n') : '— none listed —' });
+      } else if (c.unitKind === 'activity') {
+        const block = data[c.id] || {};
+        const units = block.units || [];
+        const head = 'Report activities: ' + (block.has_activities || '—');
+        const body = units.map((u, i) => (i + 1) + '. ' + [u.activity_type, u.position, u.organization].filter(Boolean).join(' — ')).join('\n');
+        lines.push({ id: c.id, label: c.label.toUpperCase(), value: head + (body ? '\n' + body : '') });
+      } else if (c.fields) {
+        push(c.label.toUpperCase(), data[c.id], c.fields);
+      }
+    });
+    return lines;
+  }
+  _expQuestions() {
+    return [
+      { id: 'q1', q: 'What\u2019s pulling at you?', scaffold: 'Name the itch, even vaguely \u2014 saying it out loud is already the first transmutation.', options: ['Something feels missing', 'Something feels off', 'I want a bolder version', 'A whole new angle'] },
+      { id: 'q2', q: 'Where should the change land?', scaffold: 'Point at the part of the application you want to bend.', options: ['Profile & identity', 'Education & rigor', 'Honors & activities', 'Personal statement'] },
+      { id: 'q3', q: 'How far do you want to push?', scaffold: 'This sets how wild the options get.', options: ['A gentle nudge', 'A real shift', 'Reimagine it'] },
+    ];
+  }
+  _expProsePart(data, catId, modId, part) {
+    const c = { id: catId, proseModule: true, fields: [] };
+    const sk = this._proseSkeleton(c, { [catId]: data[catId] || {} });
+    const mod = (sk.modules || []).find(m => m.id === modId);
+    return mod ? String(mod[part] || '').trim() : '';
+  }
+  _expStrategyLine() {
+    return this.state.experimentFraming || 'Throughline: a builder who turns community need into working systems. Every section should ladder up to that.';
+  }
+  _expVariantText(label, original, ctx, slotKey) {
+    const o = String(original || '').trim();
+    if (o === '—') return this._expVariantText(label, '', ctx, slotKey);
+    const snippet = o.length > 72 ? o.slice(0, 72).trim() + '\u2026' : o;
+    if (label === 'YOUR STEER') return (ctx.steer || o).trim();
+    if (slotKey === 'courses_senior.list' && !o) {
+      if (label === 'SHARPER') return 'AP Physics C · AP Statistics · Robotics capstone · Multivariable calc (DE)';
+      if (label === 'WARMER') return 'Senior year keeps the hands-on thread: robotics lab + hospital project continuation';
+      if (label === 'BOLDER') return 'Full STEM push: AP Physics C, AP Stats, DE multivariable, robotics research block';
+    }
+    if (label === 'SHARPER') return snippet ? (snippet + ' — tighter, no duplicate beats.') : 'One throughline — tighter, no duplicate beats.';
+    if (label === 'WARMER') return snippet ? ('Less r\u00e9sum\u00e9, more human: ' + snippet) : ('Who ' + ctx.name + ' is when the build stops — less list, more breath.');
+    if (label === 'BOLDER') return snippet ? (snippet + ' — the claim only a believer would sign.') : (ctx.name + '\'s stake — the claim only a believer would sign.');
+    return o || 'Revised read.';
+  }
+  _expWhyShift(label, locate, hunch) {
+    const loc = locate || 'this field';
+    const lead = (hunch || '').trim() ? 'Answers your hunch by ' : '';
+    if (label === 'SHARPER') return lead + 'tightening overlap so ' + loc + ' reads as intentional, not repetitive.';
+    if (label === 'WARMER') return lead + 'softening list-tone so ' + loc + ' sounds like a person, not a résumé line.';
+    if (label === 'BOLDER') return lead + 'making the stake explicit — why ' + loc + ' matters to the throughline.';
+    if (label === 'YOUR STEER') return lead + 'using your exact wording on ' + loc + '.';
+    return lead + 'reframing ' + loc + ' toward the experiment.';
+  }
+  _expEnrichActualized(base, instruction) {
+    const b = String(base || '').trim();
+    const ins = String(instruction || '').trim();
+    if (!ins) return b;
+    if (!b) return ins;
+    if (ins.includes('\n')) return b + '\n\n' + ins;
+    const glue = /[.!?]$/.test(b) ? ' ' : '. ';
+    const tail = ins.charAt(0).toLowerCase() + ins.slice(1);
+    return b + glue + tail + (/[.!?]$/.test(tail) ? '' : '.');
+  }
+  _expBundleTransmuted(exp, data, bundleIndex) {
+    const ctx = this._expContext();
+    const ebs = this._expBundles(ctx, exp, data);
+    const b = ebs[bundleIndex];
+    return b ? String(b.transmuted || '').trim() : '';
+  }
+  _expTargetSlots(data, exp) {
+    const ctx = this._expContext();
+    const q2 = (exp && exp.answers && exp.answers.q2) || '';
+    const slot = (key, catId, stId, locate, readOriginal) => ({
+      key, catId, stId, anchorId: 'exp-' + key.replace(/\./g, '-'), locate, readOriginal,
+    });
+    const activityDesc = (unitId, idx, label) => slot(
+      'activities.' + unitId + '.description',
+      'activities', 'activities',
+      'Activities · ' + label + ' · Description',
+      (d) => {
+        const u = ((d.activities && d.activities.units) || []).find(x => x.id === unitId);
+        return (u && u.description) || '';
+      },
+    );
+    const essayPivotal = (modId, title) => slot(
+      'essay.' + modId + '.pivotal',
+      'essay', 'personal',
+      'Personal essay · ' + title + ' · Pivotal',
+      (d) => this._expProsePart(d, 'essay', modId, 'pivotal'),
+    );
+    const honorTitle = (unitId, title) => slot(
+      'honors.' + unitId + '.title',
+      'honors', 'honors',
+      'Honors · ' + title,
+      (d) => {
+        const u = ((d.honors && d.honors.units) || []).find(x => x.id === unitId);
+        return (u && u.title) || '';
+      },
+    );
+    const fieldLong = (catId, stId, fieldKey, locate) => slot(
+      catId + '.' + fieldKey,
+      catId, stId, locate,
+      (d) => String((d[catId] && d[catId][fieldKey]) || '').trim(),
+    );
+    const strategySlot = () => slot(
+      'strategy.0',
+      null, null,
+      'Orchestration · throughline',
+      () => this._expStrategyLine(),
+    );
+    if (q2 === 'Profile & identity') {
+      return [
+        fieldLong('future_plans', 'education', 'career', 'Education · Future plans · Career'),
+        fieldLong('firstgen', 'profile', 'parents_degree', 'Profile · First-generation'),
+        strategySlot(),
+      ];
+    }
+    if (q2 === 'Education & rigor') {
+      return [
+        fieldLong('courses_senior', 'education', 'list', 'Education · Senior-year courses'),
+        fieldLong('courses_now', 'education', 'list', 'Education · Current-year courses'),
+        fieldLong('grades', 'education', 'gpa', 'Education · Grades & rank · GPA'),
+      ];
+    }
+    if (q2 === 'Honors & activities') {
+      return [
+        activityDesc('a1', 0, 'Robotics'),
+        activityDesc('a2', 1, 'Hospital data-viz'),
+        honorTitle('h1', 'National Merit'),
+      ];
+    }
+    if (q2 === 'Personal statement') {
+      return [
+        essayPivotal('m2', 'Module 2'),
+        essayPivotal('m4', 'Module 4'),
+        strategySlot(),
+      ];
+    }
+    return [
+      activityDesc('a1', 0, 'Robotics'),
+      essayPivotal('m3', 'Module 3'),
+      strategySlot(),
+    ];
+  }
+  _expBundles(ctx, exp, data) {
+    data = data || this.state.data;
+    const labels = ['SHARPER', 'WARMER', 'BOLDER'];
+    const slots = this._expTargetSlots(data, exp);
+    const steer = exp && (exp.steer || '').trim();
+    const hunch = exp && (exp.hunch || '').trim();
+    let list = slots.slice(0, 3).map((sl, i) => {
+      const raw = sl.readOriginal(data);
+      const original = raw || (sl.key === 'strategy.0' ? (ctx.statement || '—') : '—');
+      const transmuted = this._expVariantText(labels[i], original === '—' ? '' : original, { ...ctx, steer, hunch }, sl.key);
+      return {
+        id: 'b' + (i + 1),
+        label: labels[i],
+        targetKey: sl.key,
+        catId: sl.catId,
+        stId: sl.stId,
+        anchorId: sl.anchorId,
+        locate: sl.locate,
+        original,
+        transmuted,
+      };
+    });
+    if (exp && exp.answers && exp.answers.q3 === 'A gentle nudge') list = list.slice(0, 2);
+    if (steer) {
+      const sl = slots[0];
+      const raw = sl.readOriginal(data);
+      const original = raw || (sl.key === 'strategy.0' ? (ctx.statement || '—') : '—');
+      list = [{
+        id: 'bsteer',
+        label: 'YOUR STEER',
+        targetKey: sl.key,
+        catId: sl.catId,
+        stId: sl.stId,
+        anchorId: sl.anchorId,
+        locate: sl.locate,
+        original,
+        transmuted: steer,
+      }].concat(list);
+    }
+    const overrides = (exp && exp.bundleOverrides) || {};
+    return list.map((b, i) => {
+      const ov = overrides[i];
+      if (ov == null || ov === '') return b;
+      return { ...b, transmuted: ov, refined: true };
+    });
+  }
+  _expRouteToTarget(bundle) {
+    if (!bundle) return;
+    const patch = {};
+    if (bundle.stId) patch.openStrata = { ...this.state.openStrata, [bundle.stId]: true };
+    if (bundle.catId) patch.openCats = { ...this.state.openCats, [bundle.catId]: true };
+    const anchor = bundle.anchorId || (bundle.catId ? 'exp-anchor-' + bundle.catId : null);
+    this.setState(patch, () => {
+      requestAnimationFrame(() => {
+        const el = anchor ? document.getElementById(anchor) : null;
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    });
+  }
+  _expApplyBundle(data, bundle) {
+    const key = bundle.targetKey;
+    const val = bundle.transmuted;
+    if (key === 'strategy.0') return { experimentFraming: val };
+    const parts = key.split('.');
+    if (parts[0] === 'essay' && parts.length === 3) {
+      const modId = parts[1];
+      const field = parts[2];
+      const block = { ...(data.essay || {}), modules: [...((data.essay && data.essay.modules) || [])] };
+      const sk = this._proseSkeleton({ id: 'essay', proseModule: true, fields: [] }, { essay: block });
+      let mods = sk.modules.map(m => (m.id === modId ? { ...m, [field]: val } : m));
+      block.modules = mods;
+      this._syncProseLegacyFields(block, 'essay');
+      return { data: { ...data, essay: block } };
+    }
+    if (parts[0] === 'activities' && parts.length === 3) {
+      const unitId = parts[1];
+      const field = parts[2];
+      const block = {
+        ...data.activities,
+        units: (data.activities.units || []).map(u => (u.id === unitId ? { ...u, [field]: val } : u)),
+      };
+      return { data: { ...data, activities: block } };
+    }
+    if (parts[0] === 'honors' && parts.length === 3) {
+      const unitId = parts[1];
+      const field = parts[2];
+      const block = {
+        ...data.honors,
+        units: (data.honors.units || []).map(u => (u.id === unitId ? { ...u, [field]: val } : u)),
+      };
+      return { data: { ...data, honors: block } };
+    }
+    if (parts.length === 2) {
+      const catId = parts[0];
+      const field = parts[1];
+      return { data: { ...data, [catId]: { ...(data[catId] || {}), [field]: val } } };
+    }
+    return {};
+  }
+  _expPreviewMap(exp, data) {
+    const map = {};
+    if (!exp) return map;
+    const ctx = this._expContext();
+    const ebs = this._expBundles(ctx, exp, data);
+    (exp.chosen || []).forEach(i => {
+      const b = ebs[i];
+      if (b && b.targetKey) {
+        map[b.targetKey] = {
+          original: b.original,
+          transmuted: b.transmuted,
+          locate: b.locate,
+          label: b.label,
+        };
+      }
+    });
+    return map;
+  }
+  openExperiment = () => this.setState(s => {
+    if (s.exp) return { exp: null };
+    return {
+      exp: { step: 'hunch', hunch: '', clarifyIdx: 0, answers: {}, chosen: [], previewFocus: 0, activeBundle: null, refineMode: false, refineInputs: {}, bundleOverrides: {}, steerInput: '', steer: '' },
+      chatOpen: false,
+      explainMode: false,
+      explainChips: [],
+      selRect: null,
+      selText: '',
+    };
+  });
+  closeExperiment = () => this.setState({ exp: null });
+  expSetHunchChip = (t) => this.setState(s => ({ exp: { ...s.exp, steerInput: t } }));
+  expSetSteer = (e) => this.setState(s => ({ exp: { ...s.exp, steerInput: e.target.value } }));
+  expSetRefineInputFor = (i, e) => {
+    const val = e.target.value;
+    this.setState(s => {
+      const cur = s.exp.chosen || [];
+      const chosen = cur.indexOf(i) >= 0 ? cur : [...cur, i];
+      return {
+        exp: {
+          ...s.exp,
+          refineInputs: { ...(s.exp.refineInputs || {}), [i]: val },
+          activeBundle: i,
+          chosen,
+        },
+      };
+    });
+  };
+  expStopProp = (e) => { if (e && e.stopPropagation) e.stopPropagation(); };
+  expSteerKey = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.expSteerSend(); } };
+  expRefineSend = (i) => {
+    const ex = this.state.exp;
+    const text = String((ex.refineInputs && ex.refineInputs[i]) || '').trim();
+    if (!text || ex.step !== 'bundles') return;
+    const current = this._expBundleTransmuted(ex, this.state.data, i);
+    const enriched = this._expEnrichActualized(current, text);
+    const cur = ex.chosen || [];
+    const chosen = cur.indexOf(i) >= 0 ? cur : [...cur, i];
+    const refineInputs = { ...(ex.refineInputs || {}), [i]: '' };
+    this.setState(s => ({
+      exp: {
+        ...s.exp,
+        refineMode: true,
+        bundleOverrides: { ...(s.exp.bundleOverrides || {}), [i]: enriched },
+        refineInputs,
+        chosen,
+        activeBundle: i,
+      },
+    }), () => this._expRouteToActiveBundle(i));
+  };
+  expSteerSend = () => {
+    const ex = this.state.exp; const text = (ex.steerInput || '').trim(); if (!text) return;
+    if (ex.step === 'hunch') { this.setState(s => ({ exp: { ...s.exp, hunch: text, steerInput: '', step: 'clarify' } })); return; }
+    const next = { ...ex, steer: text, steerInput: '' };
+    if (ex.step === 'clarify') next.step = 'bundles';
+    this.setState({ exp: next }, () => {
+      const ctx = this._expContext();
+      const ebs = this._expBundles(ctx, this.state.exp, this.state.data);
+      const idx = (this.state.exp.chosen || [])[this.state.exp.chosen.length - 1];
+      if (ebs[idx]) this._expRouteToTarget(ebs[idx]);
+    });
+  };
+  expEnterRefine = (i) => {
+    this.setState(s => {
+      const cur = s.exp.chosen || [];
+      const chosen = cur.indexOf(i) >= 0 ? cur : [...cur, i];
+      return { exp: { ...s.exp, refineMode: true, activeBundle: i, chosen } };
+    }, () => this._expRouteToActiveBundle(i));
+  };
+  expSetActualized = (i, e) => {
+    const val = e.target.value;
+    this.setState(s => {
+      const cur = s.exp.chosen || [];
+      const chosen = cur.indexOf(i) >= 0 ? cur : [...cur, i];
+      return {
+        exp: {
+          ...s.exp,
+          bundleOverrides: { ...(s.exp.bundleOverrides || {}), [i]: val },
+          activeBundle: i,
+          chosen,
+        },
+      };
+    });
+  };
+  _expRouteToActiveBundle(bundleIndex) {
+    const list = this._expProjectionNavList(this.state.exp, this.state.data);
+    const navIdx = list.findIndex(x => x.bundleIndex === bundleIndex);
+    if (navIdx < 0) return;
+    this.setState(s => ({ exp: { ...s.exp, previewFocus: navIdx } }), () => this._expRouteToTarget(list[navIdx]));
+  }
+  expAnswer = (qid, opt, isLast) => this.setState(s => { const e = { ...s.exp, answers: { ...s.exp.answers, [qid]: opt } }; if (isLast) { e.step = 'bundles'; e.chosen = []; e.previewFocus = 0; e.activeBundle = null; e.refineMode = false; e.refineInputs = {}; e.bundleOverrides = {}; } else e.clarifyIdx = s.exp.clarifyIdx + 1; return { exp: e }; });
+  expChoose = (i) => {
+    const ex = this.state.exp;
+    const ctx = this._expContext();
+    const ebs = this._expBundles(ctx, ex, this.state.data);
+    const b = ebs[i];
+    if (!b) return;
+    this.setState(s => {
+      const cur = s.exp.chosen || [];
+      const has = cur.indexOf(i) >= 0;
+      const wasActive = s.exp.activeBundle === i;
+      let chosen = cur;
+      if (!has) chosen = [...cur, i];
+      else if (wasActive) chosen = cur.filter(x => x !== i);
+      return { exp: { ...s.exp, chosen, activeBundle: i, step: 'bundles' } };
+    }, () => this._expRouteToActiveBundle(i));
+  };
+  expChooseAll = () => {
+    const ctx = this._expContext();
+    const ebs = this._expBundles(ctx, this.state.exp, this.state.data);
+    const allIdx = ebs.map((_, idx) => idx);
+    this.setState(s => {
+      const cur = s.exp.chosen || [];
+      const selectAll = cur.length < allIdx.length;
+      const chosen = selectAll ? allIdx : [];
+      return { exp: { ...s.exp, chosen, previewFocus: 0, activeBundle: chosen.length ? chosen[0] : null, refineMode: false, refineInputs: {}, step: 'bundles' } };
+    }, () => {
+      const list = this._expProjectionNavList(this.state.exp, this.state.data);
+      if (list[0]) this._expRouteToTarget(list[0]);
+    });
+  };
+  expPreviewPrev = () => {
+    const list = this._expProjectionNavList(this.state.exp, this.state.data);
+    if (!list.length) return;
+    const cur = this.state.exp.previewFocus || 0;
+    const next = cur <= 0 ? list.length - 1 : cur - 1;
+    const bi = list[next].bundleIndex;
+    this.setState(s => ({ exp: { ...s.exp, previewFocus: next, activeBundle: bi } }), () => this._expRouteToTarget(list[next]));
+  };
+  expPreviewNext = () => {
+    const list = this._expProjectionNavList(this.state.exp, this.state.data);
+    if (!list.length) return;
+    const cur = this.state.exp.previewFocus || 0;
+    const next = cur >= list.length - 1 ? 0 : cur + 1;
+    const bi = list[next].bundleIndex;
+    this.setState(s => ({ exp: { ...s.exp, previewFocus: next, activeBundle: bi } }), () => this._expRouteToTarget(list[next]));
+  };
+  expBack = () => this.setState(s => {
+    const e = { ...s.exp };
+    if (e.step === 'bundles' && e.refineMode) {
+      e.refineMode = false;
+      e.refineInputs = {};
+      return { exp: e };
+    }
+    if (e.step === 'bundles' && (e.chosen || []).length) { e.chosen = []; e.activeBundle = null; e.refineMode = false; e.refineInputs = {}; return { exp: e }; }
+    if (e.step === 'clarify') { if (e.clarifyIdx > 0) e.clarifyIdx--; else e.step = 'hunch'; }
+    else if (e.step === 'bundles') { e.step = 'clarify'; e.clarifyIdx = 2; }
+    return { exp: e };
+  });
+  expClearProjections = () => this.setState(s => ({ exp: { ...s.exp, chosen: [], previewFocus: 0, activeBundle: null, refineMode: false, refineInputs: {}, step: 'bundles' } }));
+  expDiscard = () => this.setState({ exp: null });
+  expApprove = () => {
+    const e = this.state.exp;
+    const ctx = this._expContext();
+    const bundles = this._expBundles(ctx, e, this.state.data);
+    const picks = (e.chosen || []).map(i => bundles[i]).filter(Boolean);
+    if (!picks.length) return;
+    let data = { ...this.state.data };
+    let experimentFraming = this.state.experimentFraming;
+    picks.forEach(b => {
+      const res = this._expApplyBundle(data, b);
+      if (res.data) data = res.data;
+      if (res.experimentFraming != null) experimentFraming = res.experimentFraming;
+    });
+    this._mid++;
+    this.setState(s => ({
+      data,
+      experimentFraming,
+      exp: null,
+      messages: [...s.messages, { id: 'm' + this._mid, role: 'assistant', text: 'Experiment applied to ' + picks.length + ' location' + (picks.length > 1 ? 's' : '') + ' — review on the workspace.' }],
+    }));
+  };
+
+  _mapUnitFields(unit, fields, editing) {
+    const draft = this.state.unitDraft || {};
+    return fields.map(f => {
+      const raw = unit[f.k] || '';
+      const editVal = editing ? (draft[f.k] || '') : raw;
+      const limitLabel = this._fieldLimitLabel(f, editVal);
+      return {
+        id: unit.id + '.' + f.k, label: f.label, options: f.options || [],
+        review: false,
+        editText: editing && f.type === 'text', editLong: editing && f.type === 'long', editEnum: editing && f.type === 'enum',
+        editValue: editVal, ph: f.ph || f.label, onInput: (ev) => this.setUnitField(f.k, ev.target.value),
+        showLimit: editing && !!limitLabel,
+        limitLabel,
+        limitOver: !!(f.maxChars && this._charLen(editVal) >= f.maxChars),
+        limitStyle: { fontFamily: "'IBM Plex Mono',monospace", fontSize: '9px', color: (f.maxChars && this._charLen(editVal) >= f.maxChars) ? '#c0392b' : '#b0a692', marginTop: '4px', textAlign: 'right' },
+      };
+    });
+  }
+
+  onInput = e => this.setState({ input: e.target.value });
+  onKey = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.send(); } };
+  send = () => {
+    const chips = this.state.explainChips || []; const text = this.state.input.trim();
+    if (!chips.length && !text) { this.setState({ chatOpen: true }); return; }
+    this._mid++;
+    const label = chips.length ? 'Explain ' + chips.map(c => '\u201C' + c.abbr + '\u201D').join(', ') + (text ? ' \u2014 ' + text : '') : text;
+    const um = { id: 'm' + this._mid, role: 'user', text: label };
+    this.setState(s => ({ messages: [...s.messages, um], input: '', typing: true }));
+    clearTimeout(this._t);
+    this._t = setTimeout(() => { this._mid++; const r = this._replies[(this._mid) % this._replies.length]; this.setState(s => ({ messages: [...s.messages, { id: 'm' + this._mid, role: 'assistant', text: r }], typing: false })); }, 800);
+  };
+  toggleChat = () => this.setState(s => ({ chatOpen: !s.chatOpen }));
+  collapse = () => this.setState({ chatOpen: false });
+  onHandleDown = (e) => { e.preventDefault(); const sy = e.clientY, sh = this.state.drawerHeight; const mv = (ev) => { let h = sh + (sy - ev.clientY); h = Math.max(170, Math.min(440, h)); this.setState({ drawerHeight: h }); }; const up = () => { window.removeEventListener('pointermove', mv); window.removeEventListener('pointerup', up); }; window.addEventListener('pointermove', mv); window.addEventListener('pointerup', up); };
+  uploadFiles = () => { if (this.fileRef.current) this.fileRef.current.click(); };
+  onFiles = (e) => { const files = Array.from(e.target.files || []).slice(0, 3); e.target.value = ''; if (!files.length) return; this._mid++; const um = { id: 'm' + this._mid, role: 'user', text: 'Dropped ' + files.length + ' stor' + (files.length > 1 ? 'ies' : 'y') + ': ' + files.map(f => f.name).join(', ') }; this.setState(s => ({ messages: [...s.messages, um], chatOpen: true, typing: true })); clearTimeout(this._t); this._t = setTimeout(() => { this._mid++; this.setState(s => ({ messages: [...s.messages, { id: 'm' + this._mid, role: 'assistant', text: 'Read them. I can fold the strongest details into your activities or essay — say the word.' }], typing: false })); }, 950); };
+
+  startExplain = () => this.setState(s => ({ explainMode: !s.explainMode, selRect: null, selText: '' }));
+  confirmExplain = (e) => { if (e && e.preventDefault) e.preventDefault(); const sel = ((window.getSelection && window.getSelection().toString().trim()) || this.state.selText || this._lastSel || ''); if (!sel) return; const abbr = sel.length > 26 ? sel.slice(0, 26).trim() + '\u2026' : sel; this._mid++; const chip = { id: 'x' + this._mid, full: sel, abbr }; if (window.getSelection) window.getSelection().removeAllRanges(); this._lastSel = ''; this.setState(st => ({ explainChips: [...st.explainChips, chip], selRect: null, selText: '', chatOpen: true })); };
+  removeChip = (id) => this.setState(st => ({ explainChips: st.explainChips.filter(c => c.id !== id) }));
+  addMoreSelect = () => this.setState({ explainMode: true, selRect: null, selText: '' });
+
+  renderVals() {
+    const data = this.state.data, openCats = this.state.openCats || {}, openStrata = this.state.openStrata || {}, editCat = this.state.editCat, approved = this.state.approved, rn = this.reviewNeeded();
+    const editUnit = this.state.editUnit;
+    const editProseModule = this.state.editProseModule;
+    const expPreviewMap = this._expPreviewMap(this.state.exp, data);
+    const expPreviewFocusKey = this._expPreviewFocusKey(this.state.exp, data);
+    const expNavList = this.state.exp ? this._expProjectionNavList(this.state.exp, data) : [];
+    let expPreviewNavShow = expNavList.length > 0;
+    let expPreviewNavCounter = '1/1';
+    if (expNavList.length) {
+      const navIdx = Math.min(Math.max(0, (this.state.exp && this.state.exp.previewFocus) || 0), expNavList.length - 1);
+      expPreviewNavCounter = (navIdx + 1) + '/' + expNavList.length;
+    }
+    const expPreviewNavWrapStyle = { position: 'absolute', top: '14px', right: '16px', zIndex: 8, pointerEvents: 'auto' };
+    const expPreviewNavStyle = { display: 'inline-flex', alignItems: 'center', gap: '2px', padding: '2px 6px 2px 8px', borderRadius: '999px', border: '1px solid rgba(60,50,30,.16)', background: 'rgba(255,253,248,.96)', boxShadow: '0 2px 8px rgba(60,50,30,.08)' };
+    const expPreviewNavLabelStyle = { fontFamily: "'IBM Plex Mono',monospace", fontSize: '9px', letterSpacing: '.06em', color: '#8a8170', paddingRight: '4px', textTransform: 'lowercase' };
+    const expPreviewNavLabel = 'changes';
+    const expPreviewNavBtnStyle = { width: '22px', height: '22px', flexShrink: 0, borderRadius: '6px', border: 'none', background: 'transparent', color: '#8a8170', fontSize: '11px', lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontFamily: "'IBM Plex Mono',monospace" };
+    const expPreviewNavCounterStyle = { fontFamily: "'IBM Plex Mono',monospace", fontSize: '10px', fontWeight: 600, color: '#2c7a55', padding: '0 6px', minWidth: '34px', textAlign: 'center', letterSpacing: '.02em' };
+    const expFramingWrapStyle = expPreviewFocusKey === 'strategy.0'
+      ? { marginBottom: '18px', maxWidth: '540px', padding: '8px 10px', borderRadius: '12px', boxShadow: '0 0 0 1px rgba(63,167,118,.38)', background: 'rgba(63,167,118,.045)' }
+      : { marginBottom: '18px', maxWidth: '540px' };
+    const strata = this.schema().map(st => {
+      let done = 0, total = 0;
+      st.cats.forEach(c => { total++; if (!this._catIncomplete(c, data)) done++; });
+      const proseFocusId = editProseModule && st.id === 'personal' && st.cats.some(c => c.id === editProseModule.catId && c.proseModule) ? editProseModule.catId : null;
+      const catSource = proseFocusId ? st.cats.filter(c => c.id === proseFocusId) : st.cats;
+      const cats = catSource.map(c => {
+        const inc = this._catIncomplete(c, data);
+        const isOpen = !!openCats[c.id];
+        const isUnitCat = !!c.unitKind;
+        const editing = !isUnitCat && editCat === c.id;
+        const proseModuleEditing = !!(editProseModule && editProseModule.catId === c.id);
+        const canApprove = !inc && rn[c.id] && !approved[c.id] && !editing && !proseModuleEditing && !(editUnit && editUnit.catId === c.id);
+        const statusLabel = inc ? 'incomplete' : (rn[c.id] && !approved[c.id] ? 'review' : 'complete');
+        const statusColor = inc ? '#c0392b' : (rn[c.id] && !approved[c.id] ? '#c08a1e' : '#3fa776');
+
+        let fields = [];
+        let units = [];
+        if (isUnitCat) {
+          const block = data[c.id] || {};
+          const rawUnits = block.units || [];
+          const catFillMode = !!(editUnit && editUnit.catId === c.id);
+          const catDisplayMode = !catFillMode;
+          const gwEditing = catFillMode && c.gatewayKey;
+          const gatewayVal = catFillMode ? (this.state.gatewayDraft || '') : (block[c.gatewayKey] || '');
+          rawUnits.forEach((u, idx) => {
+            const uEditing = editUnit && editUnit.catId === c.id && editUnit.unitId === u.id;
+            const uInc = this._unitIncomplete(u, c.unitFields);
+            const uStarted = this._unitHasAny(u, c.unitFields);
+            const uStatus = !uStarted ? 'empty' : (uInc ? 'incomplete' : 'ready');
+            const uColor = uStatus === 'ready' ? '#3fa776' : (uStatus === 'incomplete' ? '#c0392b' : '#b0a692');
+            units.push({
+              id: u.id,
+              indexLabel: (c.unitKind === 'honor' ? 'HONOR' : 'ACTIVITY') + ' ' + (idx + 1),
+              compactLine: c.unitKind === 'honor' ? this._compactHonor(u) : this._compactActivity(u),
+              displayStructured: catDisplayMode && !uEditing,
+              displayRows: this._unitDisplayRows(u, c.unitFields, c.id, expPreviewMap, expPreviewFocusKey),
+              unitStatus: uStatus,
+              unitStatusStyle: { fontFamily: "'IBM Plex Mono',monospace", fontSize: '9px', letterSpacing: '.08em', color: uColor, textTransform: 'uppercase' },
+              fields: this._mapUnitFields(u, c.unitFields, uEditing),
+              editing: uEditing,
+              onEdit: () => this.startUnitEdit(c.id, u.id),
+              onConfirm: () => this.confirmUnitEdit(c.id, u.id),
+              onDiscard: this.discardUnitEdit,
+              onRemove: () => this.removeUnit(c.id, u.id),
+            });
+          });
+          const showUnits = !c.gatewayKey || block[c.gatewayKey] === 'Yes' || catFillMode;
+          const gwCompact = c.gatewayKey && catDisplayMode;
+          return {
+            id: c.id, label: c.label, open: isOpen, editing: false, canApprove,
+            sectionWrapStyle: this._expSectionWrapStyle(c.id, expPreviewFocusKey),
+            isUnitCat: true, isFieldCat: false,
+            displayMode: catDisplayMode, fillMode: catFillMode,
+            showGateway: !!c.gatewayKey && catFillMode,
+            gatewayEdit: gwEditing,
+            gatewayCompact: gwCompact ? ('Report activities: ' + (block[c.gatewayKey] || '—') + (rawUnits.length ? ' · ' + rawUnits.length + ' listed' : '')) : '',
+            gatewayValue: gatewayVal,
+            onGateway: (e) => this.setGatewayDraft(e.target.value),
+            units: showUnits ? units : [],
+            canAddUnit: catDisplayMode && rawUnits.length < c.maxUnits && (!c.gatewayKey || block[c.gatewayKey] === 'Yes' || (block[c.gatewayKey] === 'No' && rawUnits.length === 0)),
+            atMaxUnits: catDisplayMode && showUnits && rawUnits.length >= c.maxUnits,
+            maxUnitsMessage: 'Maximum ' + c.maxUnits + ' ' + (c.unitKind === 'honor' ? 'honors' : 'activities') + ' reached.',
+            addUnitLabel: c.addLabel + ' (' + rawUnits.length + '/' + c.maxUnits + ')',
+            onAddUnit: () => this.addUnit(c.id),
+            chevron: isOpen ? '▴' : '▾', statusLabel,
+            statusStyle: { fontFamily: "'IBM Plex Mono',monospace", fontSize: '9.5px', letterSpacing: '.1em', color: statusColor, background: (statusColor === '#3fa776' ? 'rgba(63,167,118,.12)' : statusColor === '#c0392b' ? 'rgba(192,57,43,.1)' : 'rgba(217,150,42,.13)'), padding: '2px 8px', borderRadius: '999px', textTransform: 'uppercase' },
+            dotStyle: { width: '7px', height: '7px', borderRadius: '50%', flexShrink: 0, background: statusColor },
+            headerStyle: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', padding: '10px 14px', background: '#fffdf8', border: '1px solid rgba(60,50,30,.12)', borderRadius: isOpen ? '13px 13px 0 0' : '13px', cursor: 'pointer', boxShadow: '0 1px 0 rgba(60,50,30,.03)' },
+            fields: [], onToggle: () => this.toggleCat(c.id), onEdit: () => {}, onConfirm: () => {}, onDiscard: () => {}, onApprove: () => this.approveCat(c.id),
+            showHeaderEdit: false,
+          };
+        }
+
+        fields = c.fields.map(f => {
+          const raw = (data[c.id] && data[c.id][f.k]) || '';
+          const editVal = editing ? ((this.state.draft || {})[f.k] || '') : raw;
+          return {
+            id: c.id + '.' + f.k, label: f.label, options: f.options || [],
+            review: false,
+            editText: editing && f.type === 'text', editLong: editing && f.type === 'long', editEnum: editing && f.type === 'enum', editMulti: editing && f.type === 'multi',
+            editValue: editVal, ph: f.label, onInput: (e) => this.setField(f.k, e.target.value),
+          };
+        });
+        const isProse = !!c.proseModule;
+        const sk = isProse ? this._proseSkeleton(c, { [c.id]: data[c.id] || {} }) : null;
+        const fieldProjKey = Object.keys(expPreviewMap).find(k => k.startsWith(c.id + '.'));
+        const fieldProj = fieldProjKey ? expPreviewMap[fieldProjKey] : null;
+        let compactSummary = this._compactFieldCat(c, data);
+        if (fieldProj && fieldProj.transmuted) {
+          compactSummary = c.id === 'courses_now' || c.id === 'courses_senior'
+            ? fieldProj.transmuted
+            : this._truncate(fieldProj.transmuted, 140);
+        }
+        const compactPreview = !!fieldProj;
+        const compactFocus = !!(fieldProjKey && fieldProjKey === expPreviewFocusKey);
+        const compactSummaryStyle = { fontSize: '13px', lineHeight: 1.45, ...this._expPreviewValueStyle(compactPreview, compactFocus) };
+        return {
+          id: c.id, label: c.label, open: isOpen, editing, displayMode: !editing && !proseModuleEditing, canApprove,
+          sectionWrapStyle: this._expSectionWrapStyle(c.id, expPreviewFocusKey),
+          isUnitCat: false, isFieldCat: true,
+          isProseArchitecture: isProse,
+          proseModuleEditing,
+          showProseStatus: isProse && !proseModuleEditing,
+          showCatEditActions: editing && !isProse,
+          isFieldGridEdit: editing && !isProse,
+          isCompactField: !isProse,
+          compactSummary,
+          compactSummaryStyle,
+          compactAnchorId: fieldProjKey ? 'exp-' + fieldProjKey.replace(/\./g, '-') : '',
+          proseServe: sk ? sk.serve : '',
+          proseModules: sk ? this._mapProseModules(sk.modules, c.id, c, expPreviewMap, expPreviewFocusKey) : [],
+          proseStatus: sk ? sk.status.map((label, i) => ({ id: 'ps' + i, label })) : [],
+          showHeaderEdit: !editing && !proseModuleEditing && !isProse,
+          chevron: isOpen ? '▴' : '▾', statusLabel,
+          statusStyle: { fontFamily: "'IBM Plex Mono',monospace", fontSize: '9.5px', letterSpacing: '.1em', color: statusColor, background: (statusColor === '#3fa776' ? 'rgba(63,167,118,.12)' : statusColor === '#c0392b' ? 'rgba(192,57,43,.1)' : 'rgba(217,150,42,.13)'), padding: '2px 8px', borderRadius: '999px', textTransform: 'uppercase' },
+          dotStyle: { width: '7px', height: '7px', borderRadius: '50%', flexShrink: 0, background: statusColor },
+          headerStyle: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', padding: '10px 14px', background: '#fffdf8', border: '1px solid rgba(60,50,30,.12)', borderRadius: isOpen ? '13px 13px 0 0' : '13px', cursor: 'pointer', boxShadow: '0 1px 0 rgba(60,50,30,.03)' },
+          fields, units: [], onToggle: () => this.toggleCat(c.id), onEdit: () => this.startEdit(c.id), onConfirm: () => this.confirmEdit(c.id), onDiscard: this.discardEdit, onApprove: () => this.approveCat(c.id),
+        };
+      });
+      const stOpen = !!openStrata[st.id];
+      return {
+        id: st.id, label: st.label, meta: done + '/' + total + ' ready',
+        open: stOpen, chevron: stOpen ? '▾' : '▸', onToggle: () => this.toggleStratum(st.id),
+        cats,
+      };
+    });
+
+    // todos
+    const todos = [];
+    this._flat().forEach(({ c }) => { if (this._catIncomplete(c, data)) todos.push({ id: 't_' + c.id, type: 'complete', label: 'Complete · ' + c.label, catId: c.id, badge: '!', color: '#c0392b' }); });
+    this._flat().forEach(({ c }) => { if (!this._catIncomplete(c, data) && rn[c.id] && !approved[c.id]) todos.push({ id: 'a_' + c.id, type: 'approve', label: 'Review & approve · ' + c.label, catId: c.id, badge: '✓', color: '#c08a1e' }); });
+    const todoV = todos.map(t => ({ id: t.id, label: t.label, badge: t.badge, badgeStyle: { fontFamily: "'IBM Plex Mono',monospace", fontSize: '11px', fontWeight: 600, color: t.color, flexShrink: 0, width: '14px', textAlign: 'center' }, onClick: () => this.openOnly(t.catId) }));
+    const showAll = this.state.showAllTodos;
+    const todosShown = showAll ? todoV : todoV.slice(0, 3);
+
+    const open = this.state.chatOpen, dh = this.state.drawerHeight;
+    const panelStyle = { position: 'absolute', bottom: '24px', left: '50%', transform: 'translateX(-50%)', width: 'min(620px, calc(100% - 56px))', zIndex: 6, background: 'rgba(255,253,248,.82)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', border: '1px solid rgba(60,50,30,.13)', borderRadius: '26px', boxShadow: '0 24px 64px -28px rgba(90,70,20,.4), 0 0 0 1px rgba(255,255,255,.5)', display: 'flex', flexDirection: 'column', overflow: 'hidden' };
+    const conversationStyle = { height: open ? dh + 'px' : '0px', opacity: open ? 1 : 0, overflow: 'hidden', flexShrink: 0, transition: 'height .42s cubic-bezier(.22,.8,.2,1), opacity .3s ease' };
+    const messages = this.state.messages.map(m => ({ id: m.id, text: m.text, rowStyle: { display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' }, bubbleStyle: m.role === 'user' ? { maxWidth: '82%', padding: '9px 13px', borderRadius: '15px 15px 5px 15px', background: '#d9962a', color: '#3a2700', fontSize: '13.5px', lineHeight: 1.5, animation: 'msgGrow .3s ease both' } : { maxWidth: '85%', padding: '9px 13px', borderRadius: '15px 15px 15px 5px', background: '#fffdf8', color: '#3a342b', fontSize: '13.5px', lineHeight: 1.55, border: '1px solid rgba(60,50,30,.08)', animation: 'msgGrow .3s ease both' } }));
+    const chipsV = (this.state.explainChips || []).map(c => ({ id: c.id, abbr: c.abbr, onRemove: () => this.removeChip(c.id) }));
+    const _sc = this.state.selRect;
+    const btnBase = { display: 'flex', alignItems: 'center', gap: '6px', padding: '7px 10px', borderRadius: '9px', color: '#4a443a', fontSize: '12.5px', fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap' };
+    const exAct = this.state.explainMode;
+    const chAct = open && !this.state.explainMode && chipsV.length === 0;
+    const expAct = !!this.state.exp;
+
+    const exp = this.state.exp;
+    let expOpen = false, expContextName = '', expIsHunch = false, expIsClarify = false, expIsTransmutePhase = false, expHasChosen = false;
+    let expHunchChips = [], expClarifyLabel = '', expQuestion = '', expScaffold = '', expOptions = [];
+    let expBundlesTitle = '', expBundles = [];
+    let expSteerInput = '', expSteerScaffold = '', expSteerPlaceholder = '';
+    let expRefineFocus = false, expRefineFocusNot = false, expShowSteerBar = false;
+    let expFramingPreview = '', expShowFramingStrip = false;
+    let expChooseAllLabel = 'Preview all', expAllSelected = false;
+    const expChooseAllStyle = { fontFamily: "'IBM Plex Mono',monospace", fontSize: '10px', letterSpacing: '.06em', padding: '6px 10px', borderRadius: '8px', border: '1px solid rgba(60,50,30,.14)', background: '#fff', color: '#3a342b', cursor: 'pointer', flexShrink: 0 };
+    const expPanelStyle = { width: '400px', maxWidth: '42vw', minWidth: '300px', flexShrink: 0, borderLeft: '1px solid rgba(60,50,30,.1)', background: '#fbf6ec', display: 'flex', flexDirection: 'column', minHeight: 0, animation: 'consIn .28s ease' };
+    if (exp) {
+      expOpen = true;
+      const ctx = this._expContext();
+      expContextName = ctx.name + '\u2019s application';
+      expSteerInput = exp.steerInput || '';
+      expShowSteerBar = exp.step === 'hunch' || exp.step === 'clarify';
+      expRefineFocus = exp.step === 'bundles' && !!exp.refineMode;
+      const stepScaf = { hunch: ['TYPE YOUR HUNCH', 'e.g. activities feel repetitive…'], clarify: ['STEER IN YOUR OWN WORDS', 'or tell me where to take it…'] };
+      const steerStep = exp.step === 'clarify' ? 'clarify' : 'hunch';
+      if (expShowSteerBar) {
+        expSteerScaffold = (stepScaf[steerStep] || stepScaf.hunch)[0];
+        expSteerPlaceholder = (stepScaf[steerStep] || stepScaf.hunch)[1];
+      }
+      expIsHunch = exp.step === 'hunch'; expIsClarify = exp.step === 'clarify';
+      expIsTransmutePhase = exp.step === 'bundles';
+      expRefineFocusNot = expIsTransmutePhase && !expRefineFocus;
+      expHasChosen = (exp.chosen || []).length > 0;
+      expHunchChips = ['feels flatter than reality', 'activities too same-y', 'essay doesn\u2019t match rigor', 'wrong center of gravity'].map(t => ({ id: t, label: t, onClick: () => this.expSetHunchChip(t) }));
+      const qs = this._expQuestions();
+      if (expIsClarify) {
+        const qi = Math.min(exp.clarifyIdx, qs.length - 1); const q = qs[qi]; const isLast = qi === qs.length - 1;
+        expClarifyLabel = (qi + 1) + ' of ' + qs.length; expQuestion = q.q; expScaffold = q.scaffold;
+        expOptions = q.options.map(o => { const sel = exp.answers[q.id] === o; return { id: o, label: o, onClick: () => this.expAnswer(q.id, o, isLast), style: { padding: '13px 16px', borderRadius: '12px', border: sel ? '1.5px solid #d9962a' : '1px solid rgba(60,50,30,.14)', background: sel ? 'rgba(217,150,42,.12)' : '#fff', color: sel ? '#3a2700' : '#4a443a', fontSize: '14px', fontWeight: sel ? 600 : 400, cursor: 'pointer' } }; });
+      }
+      const ebs = this._expBundles(ctx, exp, data);
+      if (expIsTransmutePhase) {
+        const refineMode = !!exp.refineMode;
+        const hunchSet = (exp.hunch || '').trim();
+        expBundlesTitle = (hunchSet ? '\u201C' + exp.hunch + '\u201D \u2014 ' : '') + (refineMode ? 'refine pairs' : 'ways to transmute the application');
+        expAllSelected = (exp.chosen || []).length >= ebs.length;
+        expChooseAllLabel = expAllSelected ? 'Clear all' : 'Preview all';
+        expBundles = ebs.map((b, i) => {
+          const sel = (exp.chosen || []).indexOf(i) >= 0;
+          const activeCard = exp.activeBundle === i;
+          const refined = !!(exp.bundleOverrides && exp.bundleOverrides[i] != null && String(exp.bundleOverrides[i]).trim());
+          const tick = sel ? (refined ? '\u25cf live · edited' : '\u25cf live') : (activeCard ? '\u25ce selected' : '\u25cb');
+          const tickColor = sel ? '#2c7a55' : activeCard ? '#c08a1e' : '#c8bfa8';
+          const refineInput = (exp.refineInputs && exp.refineInputs[i]) || '';
+          return {
+            id: b.id, label: b.label, locate: b.locate, original: b.original, transmuted: b.transmuted,
+            whyShift: this._expWhyShift(b.label, b.locate, hunchSet),
+            bundleIndex: i,
+            refineInput,
+            isActive: refineMode || activeCard,
+            showActualizedReadOnly: !refineMode && !activeCard,
+            isRefining: refineMode,
+            showRefineBtn: !refineMode && activeCard,
+            onClick: () => this.expChoose(i),
+            onActualizedInput: (e) => this.expSetActualized(i, e),
+            onRefineInput: (e) => this.expSetRefineInputFor(i, e),
+            onRefineKey: (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.expRefineSend(i); } },
+            onRefineSend: (e) => { this.expStopProp(e); this.expRefineSend(i); },
+            onRefine: (e) => { this.expStopProp(e); this.expEnterRefine(i); },
+            tick,
+            tickStyle: { fontFamily: "'IBM Plex Mono',monospace", fontSize: '10px', color: tickColor },
+            style: {
+              textAlign: 'left', padding: '16px 18px', borderRadius: '14px', cursor: 'pointer', marginBottom: '12px',
+              border: activeCard ? '1.5px solid rgba(217,150,42,.55)' : sel ? '1.5px solid rgba(63,167,118,.45)' : '1px solid rgba(60,50,30,.12)',
+              background: activeCard ? 'rgba(217,150,42,.07)' : sel ? 'rgba(63,167,118,.07)' : '#fff',
+              boxShadow: activeCard ? '0 10px 28px -14px rgba(217,150,42,.35)' : sel ? '0 8px 24px -16px rgba(63,167,118,.4)' : 'none',
+            },
+          };
+        });
+      }
+      if (expPreviewMap['strategy.0']) {
+        expFramingPreview = expPreviewMap['strategy.0'].transmuted;
+        expShowFramingStrip = true;
+      }
+    }
+
+    const showBottomPanel = !expOpen;
+    const showOrchestrationPanel = !expOpen;
+
+    const totalCats = strata.reduce((a, s) => a + s.cats.length, 0);
+    const incCats = this._flat().filter(({ c }) => this._catIncomplete(c, data)).length;
+
+    return {
+      applicantName: 'Maya Okonkwo', applicantTag: 'the systems-builder',
+      completionLabel: (totalCats - incCats) + '/' + totalCats + ' sections ready',
+      strata,
+      strategy: [
+        expPreviewMap['strategy.0'] ? expPreviewMap['strategy.0'].transmuted : (this.state.experimentFraming || 'Throughline: a builder who turns community need into working systems. Every section should ladder up to that.'),
+        'Lead with Robotics and the hospital data-viz project; let honors corroborate rather than repeat the activity lines.',
+        'The essay should reveal the person behind the systems — let it breathe past the résumé.',
+        'Senior-year rigor is still blank; colleges read it closely. Fill it before anything else.',
+      ],
+      todoCount: todos.length, todosShown, hasMoreTodos: todos.length > 3, allDone: todos.length === 0,
+      todoToggleLabel: showAll ? 'show top 3' : 'see full list (' + todos.length + ')', toggleTodos: this.toggleTodos,
+      panelStyle, conversationStyle, drawerInnerStyle: { height: dh + 'px', display: 'flex', flexDirection: 'column' },
+      drawerLabel: (this.state.explainMode || chipsV.length) ? 'explaining' : 'conversation',
+      chatEmpty: this.state.messages.length === 0, messages, typing: this.state.typing,
+      input: this.state.input, inputPlaceholder: 'Ask about the application…',
+      onInput: this.onInput, onKey: this.onKey, send: this.send,
+      toggleChat: this.toggleChat, collapse: this.collapse, onHandleDown: this.onHandleDown, msgsRef: this.msgsRef,
+      uploadFiles: this.uploadFiles, onFiles: this.onFiles, fileRef: this.fileRef, startExplain: this.startExplain,
+      explainBtnStyle: { ...btnBase, background: exAct ? 'rgba(217,150,42,.16)' : '#fff', border: exAct ? '1px solid #d9962a' : '1px solid rgba(60,50,30,.13)' },
+      chatBtnStyle: { ...btnBase, background: chAct ? 'rgba(217,150,42,.16)' : '#fff', border: chAct ? '1px solid #d9962a' : '1px solid rgba(60,50,30,.13)' },
+      experimentBtnStyle: { ...btnBase, background: expAct ? 'rgba(217,150,42,.16)' : '#fff', border: expAct ? '1px solid #d9962a' : '1px solid rgba(60,50,30,.13)' },
+      hasChips: chipsV.length > 0, explainChips: chipsV, addMoreSelect: this.addMoreSelect,
+      showSelConfirm: this.state.explainMode && !!_sc, confirmExplain: this.confirmExplain,
+      selConfirmStyle: _sc ? { position: 'fixed', top: (_sc.top + 8) + 'px', left: _sc.left + 'px', transform: 'translateX(-50%)', zIndex: 60, background: '#2e2a24', color: '#fbf5e9', padding: '7px 13px', borderRadius: '10px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', boxShadow: '0 10px 30px -10px rgba(0,0,0,.5)', whiteSpace: 'nowrap' } : {},
+      explainHint: this.state.explainMode && !_sc && chipsV.length === 0 && !expOpen,
+      showBottomPanel, showOrchestrationPanel, expPanelStyle,
+      expShowFramingStrip, expFramingPreview, expFramingWrapStyle,
+      expPreviewNavShow, expPreviewNavWrapStyle, expPreviewNavStyle, expPreviewNavLabel, expPreviewNavLabelStyle, expPreviewNavCounter, expPreviewNavCounterStyle, expPreviewNavBtnStyle,
+      expChooseAllLabel, expChooseAllStyle,
+      expOpen, expContextName, expIsHunch, expIsClarify, expIsTransmutePhase, expHasChosen, expHunchChips, expClarifyLabel, expQuestion, expScaffold, expOptions, expBundlesTitle, expBundles,
+      expShowSteerBar, expRefineFocus, expRefineFocusNot,
+      expSteerInput, expSteerScaffold, expSteerPlaceholder,
+      openExperiment: this.openExperiment, closeExperiment: this.closeExperiment, expSetSteer: this.expSetSteer, expSteerKey: this.expSteerKey, expSteerSend: this.expSteerSend, expRefineSend: this.expRefineSend, expStopProp: this.expStopProp, expBack: this.expBack, expClearProjections: this.expClearProjections, expDiscard: this.expDiscard, expApprove: this.expApprove, expChooseAll: this.expChooseAll, expPreviewPrev: this.expPreviewPrev, expPreviewNext: this.expPreviewNext,
+    };
+  }
+}
+</script>
+</body>
+</html>
