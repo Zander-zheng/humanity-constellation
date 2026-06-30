@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<script src="./experiment-runtime.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%;background:#f6efe0}
+input,textarea{font-family:inherit}
+::placeholder{color:#a59b88}
+@keyframes dotB{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+@keyframes rollDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@keyframes expIn{from{opacity:0;transform:scale(.99)}to{opacity:1;transform:none}}
+@keyframes fieldDrift{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(10px,-8px,0) scale(1.03)}}
+/* ===== Phase rail (HUMANITY / INSTITUTE) ===== */
+@keyframes railTwinkle{0%,100%{opacity:1}50%{opacity:.5}}
+.phase-rail{position:relative;z-index:40;flex:0 0 auto;width:50px;display:flex;flex-direction:column;padding:13px 0;background:#efe6d3;border-right:1px solid rgba(60,50,30,.12);transition:width .22s cubic-bezier(.4,0,.2,1);overflow:hidden;cursor:pointer;outline:none}
+.phase-rail:focus-within{width:198px;box-shadow:16px 0 46px -26px rgba(60,50,30,.55);cursor:default}
+.rail-grip{align-self:flex-end;margin:-2px 17px 4px 0;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#b0a692;transition:transform .22s}
+.phase-rail:focus-within .rail-grip{transform:rotate(180deg)}
+.rail-top{display:flex;align-items:center;gap:11px;padding:0 0 13px 21px;border-bottom:1px solid rgba(60,50,30,.1)}
+.rail-dot{flex:0 0 auto;width:9px;height:9px;border-radius:50%;background:#d9962a;box-shadow:0 0 12px rgba(217,150,42,.7);animation:railTwinkle 3s ease-in-out infinite}
+.rail-label{opacity:0;transform:translateX(-4px);white-space:nowrap;transition:opacity .16s ease,transform .2s ease;font-family:'IBM Plex Mono',monospace}
+.phase-rail:hover .rail-label{opacity:1;transform:none}
+.rail-brand{font-family:'Space Grotesk',sans-serif;font-weight:600;letter-spacing:.14em;font-size:13px;color:#2e2a24}
+.rail-phases{display:flex;flex-direction:column;gap:5px;margin-top:14px}
+.rail-eyebrow{padding:0 0 7px 22px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.2em;color:#b0a692}
+.rail-item{display:flex;align-items:center;gap:14px;padding:11px 0 11px 19px;text-decoration:none;color:#8a8170;border-left:2px solid transparent;transition:background .15s,color .15s}
+.rail-item:hover{background:rgba(60,50,30,.06);color:#2e2a24}
+.rail-item--active{color:#2e2a24;border-left-color:#d9962a;background:rgba(217,150,42,.12)}
+.rail-ico{flex:0 0 22px;width:22px;height:22px;position:relative;display:flex;align-items:center;justify-content:center}
+.rail-name{font-size:11px;letter-spacing:.15em;font-weight:600}
+.rail-sub{display:block;margin-top:2px;font-size:8.5px;letter-spacing:.08em;color:#a59b88;font-weight:400}
+.rail-foot{margin-top:auto;padding:10px 0 0 22px;font-size:8.5px;letter-spacing:.16em;color:#b8af9b;border-top:1px solid rgba(60,50,30,.08)}
+.ico-hum i{position:absolute;width:4px;height:4px;border-radius:50%;background:currentColor}
+.ico-hum i:nth-child(1){top:2px;left:9px}.ico-hum i:nth-child(2){bottom:3px;left:2px}.ico-hum i:nth-child(3){bottom:4px;right:2px}
+.ico-hum::after{content:"";position:absolute;inset:0;background:linear-gradient(45deg,transparent 47%,currentColor 49%,currentColor 51%,transparent 53%),linear-gradient(-30deg,transparent 48%,currentColor 49.5%,currentColor 50.5%,transparent 52%);opacity:.28}
+.ico-inst{display:flex;align-items:flex-end;gap:2.5px}
+.ico-inst i{width:3px;background:currentColor;border-radius:1px}
+.ico-inst i:nth-child(1){height:11px}.ico-inst i:nth-child(2){height:16px}.ico-inst i:nth-child(3){height:13px}
+.ico-inst::before{content:"";position:absolute;top:2px;left:2px;right:2px;height:2px;background:currentColor;border-radius:1px}
+.ico-kernel::before{content:"";width:15px;height:15px;border-radius:50%;border:1.6px solid currentColor}
+.ico-kernel::after{content:"";position:absolute;top:50%;left:50%;width:4px;height:4px;border-radius:50%;background:currentColor;transform:translate(-50%,-50%)}
+</style>
+</helmet>
+
+<div style="height:100vh;display:flex;flex-direction:row;background:#f6efe0;font-family:'Space Grotesk',sans-serif;color:#2e2a24;overflow:hidden">
+  <input type="file" multiple ref="{{ fileRef }}" onChange="{{ onFiles }}" style="display:none" />
+
+  <nav class="phase-rail" aria-label="Phase" tabindex="0" title="Click to expand phases">
+    <div class="rail-grip">›</div>
+    <div class="rail-top"><div class="rail-dot"></div><div class="rail-label rail-brand">FIELD</div></div>
+    <div class="rail-eyebrow rail-label">PHASE</div>
+    <div class="rail-phases">
+      <a class="rail-item" href="./Determining%20Seed.dc.html">
+        <span class="rail-ico ico-kernel"></span>
+        <span class="rail-name">ONBOARDING<span class="rail-sub rail-label">negative-space kernel</span></span>
+      </a>
+      <a class="rail-item rail-item--active" href="./constellation%2Bexperiment.dc.html">
+        <span class="rail-ico ico-hum"><i></i><i></i><i></i></span>
+        <span class="rail-name">HUMANITY<span class="rail-sub rail-label">the constellation</span></span>
+      </a>
+      <a class="rail-item" href="./Institute%20Session.dc.html">
+        <span class="rail-ico ico-inst"><i></i><i></i><i></i></span>
+        <span class="rail-name">INSTITUTE<span class="rail-sub rail-label">applications</span></span>
+      </a>
+    </div>
+    <div class="rail-foot rail-label">enter a phase</div>
+  </nav>
+
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;height:100vh">
+
+  <div style="display:flex;align-items:center;justify-content:space-between;height:54px;padding:0 22px;border-bottom:1px solid rgba(60,50,30,.1);flex-shrink:0;background:#fbf5e9">
+    <div style="display:flex;align-items:center;gap:12px;min-width:0">
+      <div style="width:9px;height:9px;border-radius:50%;background:#d9962a;box-shadow:0 0 12px rgba(217,150,42,.7)"></div>
+      <div style="font-weight:600;font-size:15px;letter-spacing:.14em">FIELD</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a8170;letter-spacing:.03em;margin-left:4px;white-space:nowrap">the gestalt of a person · {{ personName }}</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-left:8px;padding-left:12px;border-left:1px solid rgba(60,50,30,.12);font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em;white-space:nowrap">
+        <div style="display:flex;align-items:center;gap:6px">
+          <a href="./constellation%2Bexperiment.dc.html" style="text-decoration:none;color:#8a8170;padding:5px 8px;border:1px solid rgba(60,50,30,.12);border-radius:999px;background:#fffdf8">CONSTELLATION</a>
+          <a href="./Gestalt.dc.html" style="text-decoration:none;color:#3a2700;padding:5px 8px;border:1px solid #d9962a;border-radius:999px;background:rgba(217,150,42,.18);font-weight:600">GESTALT</a>
+          <a href="./Application%20Workspace.dc.html?experiment=1" style="text-decoration:none;color:#8a8170;padding:5px 8px;border:1px solid rgba(60,50,30,.12);border-radius:999px;background:#fffdf8">WORKSPACE</a>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:7px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a8170;white-space:nowrap">
+      <span style="width:6px;height:6px;border-radius:50%;background:#3fa776;box-shadow:0 0 7px rgba(63,167,118,.6)"></span>{{ completionLabel }}
+    </div>
+  </div>
+
+  <div style="flex:1;display:flex;min-height:0;position:relative">
+    <div style="flex:1;position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 0%, #fffdf8, #f4ecdb 80%)">
+      <div style="position:absolute;inset:-8%;background:radial-gradient(circle at 32% 18%, rgba(217,150,42,.13), transparent 28%),radial-gradient(circle at 64% 46%, rgba(63,167,118,.09), transparent 30%),radial-gradient(circle at 50% 20%, rgba(255,253,248,.72), transparent 42%);pointer-events:none;animation:fieldDrift 14s ease-in-out infinite"></div>
+      <div onMouseUp="{{ onSelectText }}" style="position:absolute;inset:0;overflow-y:auto;padding:28px 30px 150px">
+        <div style="max-width:760px;margin:0 auto;position:relative;z-index:1">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.16em;color:#a59b88;margin-bottom:6px">GESTALT-LEVEL HUMANITY</div>
+          <div style="font-size:13px;color:#8a8170;line-height:1.6;margin-bottom:24px;max-width:570px">A parallel view beside the application workspace and constellation: not the file, not the stars, but the higher-emerging entity they reveal.</div>
+
+          <sc-for list="{{ topSections }}" as="sec" hint-placeholder-count="2">
+            <div id="{{ sec.anchorId }}" style="{{ sec.wrapStyle }}">
+              <div style="{{ sec.headerStyle }}">
+                <div style="display:flex;align-items:center;gap:10px;min-width:0;flex:1">
+                  <span style="{{ sec.dotStyle }}"></span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;color:#2e2a24;font-weight:600">{{ sec.label }}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:7px;flex-shrink:0">
+                  <span style="{{ sec.wordStyle }}">{{ sec.wordLabel }}</span>
+                  <sc-if value="{{ sec.readOnly }}" hint-placeholder-val="{{ true }}">
+                    <div onClick="{{ sec.onEdit }}" style="padding:4px 9px;border-radius:7px;border:1px solid rgba(60,50,30,.14);background:#fff;color:#3a342b;font-size:11px;font-weight:500;cursor:pointer" style-hover="border-color:#d9962a">Edit</div>
+                  </sc-if>
+                </div>
+              </div>
+              <div style="margin-top:-1px;border:1px solid rgba(60,50,30,.12);border-top:none;border-radius:0 0 12px 12px;background:#fffdf8;padding:14px 16px;animation:rollDown .26s ease">
+                <sc-if value="{{ sec.readOnly }}" hint-placeholder-val="{{ true }}">
+                  <div style="{{ sec.textStyle }}">{{ sec.text }}</div>
+                </sc-if>
+                <sc-if value="{{ sec.editing }}" hint-placeholder-val="{{ false }}">
+                  <textarea value="{{ sec.editValue }}" onInput="{{ sec.onInput }}" style="width:100%;min-height:120px;resize:vertical;padding:10px 12px;border:1px solid rgba(60,50,30,.2);border-radius:9px;font-size:13.5px;line-height:1.55;color:#2e2a24;outline:none;background:#fff"></textarea>
+                  <div style="display:flex;align-items:center;justify-content:flex-end;gap:9px;margin-top:12px">
+                    <div onClick="{{ sec.onDiscard }}" style="padding:7px 12px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8a8170;cursor:pointer">discard</div>
+                    <div onClick="{{ sec.onConfirm }}" style="padding:8px 18px;border-radius:9px;background:#d9962a;color:#3a2700;font-size:13px;font-weight:600;cursor:pointer">Confirm</div>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-for>
+
+          <div style="margin:28px 0 10px">
+            <div onClick="{{ toggleConstitution }}" style="display:flex;align-items:center;gap:11px;padding:10px 12px;margin:0 -12px;border-radius:12px;cursor:pointer;background:rgba(255,253,248,.64);border:1px solid rgba(60,50,30,.08)" style-hover="border-color:rgba(217,150,42,.35)">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;color:#2e2a24;font-weight:600;flex-shrink:0">CONSTITUTION</span>
+              <div style="flex:1;height:1px;background:rgba(60,50,30,.12)"></div>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#b0a692;flex-shrink:0">{{ constitutionMeta }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#b0a692;flex-shrink:0;width:16px;text-align:center">{{ constitutionChevron }}</span>
+            </div>
+          </div>
+
+          <sc-if value="{{ constitutionOpen }}" hint-placeholder-val="{{ true }}">
+            <sc-for list="{{ constitutionSections }}" as="sec" hint-placeholder-count="5">
+              <div id="{{ sec.anchorId }}" style="{{ sec.wrapStyle }}">
+                <div style="{{ sec.headerStyle }}">
+                  <div onClick="{{ sec.onToggle }}" style="display:flex;align-items:center;gap:10px;min-width:0;flex:1;cursor:pointer">
+                    <span style="{{ sec.dotStyle }}"></span>
+                    <span style="font-size:14px;font-weight:500;color:#2e2a24">{{ sec.label }}</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:7px;flex-shrink:0">
+                    <span style="{{ sec.wordStyle }}">{{ sec.wordLabel }}</span>
+                    <sc-if value="{{ sec.readOnly }}" hint-placeholder-val="{{ true }}">
+                      <div onClick="{{ sec.onEdit }}" style="padding:4px 9px;border-radius:7px;border:1px solid rgba(60,50,30,.14);background:#fff;color:#3a342b;font-size:11px;font-weight:500;cursor:pointer" style-hover="border-color:#d9962a">Edit</div>
+                    </sc-if>
+                    <span onClick="{{ sec.onToggle }}" style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#b0a692;cursor:pointer;padding:2px 4px">{{ sec.chevron }}</span>
+                  </div>
+                </div>
+                <sc-if value="{{ sec.open }}" hint-placeholder-val="{{ true }}">
+                  <div style="margin-top:-1px;border:1px solid rgba(60,50,30,.12);border-top:none;border-radius:0 0 11px 11px;background:#fffdf8;padding:12px 15px 14px;animation:rollDown .26s ease">
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;color:#c08a1e;margin-bottom:7px">{{ sec.kind }}</div>
+                    <sc-if value="{{ sec.readOnly }}" hint-placeholder-val="{{ true }}">
+                      <div style="{{ sec.textStyle }}">{{ sec.text }}</div>
+                    </sc-if>
+                    <sc-if value="{{ sec.editing }}" hint-placeholder-val="{{ false }}">
+                      <textarea value="{{ sec.editValue }}" onInput="{{ sec.onInput }}" style="width:100%;min-height:112px;resize:vertical;padding:10px 12px;border:1px solid rgba(60,50,30,.2);border-radius:9px;font-size:13px;line-height:1.55;color:#2e2a24;outline:none;background:#fff"></textarea>
+                      <div style="display:flex;align-items:center;justify-content:flex-end;gap:9px;margin-top:12px">
+                        <div onClick="{{ sec.onDiscard }}" style="padding:7px 12px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8a8170;cursor:pointer">discard</div>
+                        <div onClick="{{ sec.onConfirm }}" style="padding:8px 18px;border-radius:9px;background:#d9962a;color:#3a2700;font-size:13px;font-weight:600;cursor:pointer">Confirm</div>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </sc-if>
+        </div>
+      </div>
+
+      <div style="{{ panelStyle }}">
+        <div style="{{ conversationStyle }}">
+          <div style="{{ drawerInnerStyle }}">
+            <div onPointerDown="{{ onHandleDown }}" style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px 6px;cursor:ns-resize;flex-shrink:0">
+              <div style="width:34px;height:4px;border-radius:2px;background:rgba(60,50,30,.2)"></div>
+              <div style="display:flex;align-items:center;gap:13px">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8a8170;letter-spacing:.05em">{{ drawerLabel }}</span>
+                <div onClick="{{ collapse }}" style="cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a8170" style-hover="color:#2e2a24">collapse ▾</div>
+              </div>
+            </div>
+            <div ref="{{ msgsRef }}" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:9px;padding:12px 14px">
+              <sc-if value="{{ chatEmpty }}" hint-placeholder-val="{{ true }}">
+                <div style="margin:auto;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#b0a692;line-height:1.7;padding:10px">Ask about who this person is,<br>or select text to explain.</div>
+              </sc-if>
+              <sc-for list="{{ messages }}" as="m" hint-placeholder-count="0">
+                <div style="{{ m.rowStyle }}"><div style="{{ m.bubbleStyle }}">{{ m.text }}</div></div>
+              </sc-for>
+              <sc-if value="{{ typing }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;justify-content:flex-start"><div style="display:flex;gap:4px;padding:11px 14px;background:#fffdf8;border:1px solid rgba(60,50,30,.1);border-radius:14px 14px 14px 4px"><span style="width:5px;height:5px;border-radius:50%;background:#b8ae9a;display:inline-block;animation:dotB 1.1s infinite"></span><span style="width:5px;height:5px;border-radius:50%;background:#b8ae9a;display:inline-block;animation:dotB 1.1s infinite .15s"></span><span style="width:5px;height:5px;border-radius:50%;background:#b8ae9a;display:inline-block;animation:dotB 1.1s infinite .3s"></span></div></div>
+              </sc-if>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;padding:10px 12px;border-top:1px solid rgba(60,50,30,.08);flex-shrink:0">
+              <div style="display:flex;align-items:center;gap:9px">
+                <input value="{{ input }}" onInput="{{ onInput }}" onKeyDown="{{ onKey }}" placeholder="{{ inputPlaceholder }}" style="flex:1;min-width:0;background:transparent;border:none;outline:none;color:#2e2a24;font-size:14px" />
+                <div onClick="{{ send }}" style="width:34px;height:34px;flex-shrink:0;border-radius:11px;background:#d9962a;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 14px -4px rgba(217,150,42,.7)"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 12V3.2M3.6 7 7.5 3.1 11.4 7" stroke="#3a2700" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <sc-if value="{{ hasChips }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:9px 11px;background:rgba(217,150,42,.1);border:1px solid rgba(217,150,42,.32);border-radius:12px">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.16em;color:#c08a1e;margin-bottom:7px">SELECTED · EXPLAINING</div>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+                    <sc-for list="{{ explainChips }}" as="c" hint-placeholder-count="0">
+                      <div style="display:flex;align-items:center;gap:6px;padding:5px 7px 5px 11px;border-radius:999px;background:#fff;border:1px solid rgba(217,150,42,.4)"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#3a2700">&ldquo;{{ c.abbr }}&rdquo;</span><span onClick="{{ c.onRemove }}" style="cursor:pointer;color:#a07a1e;font-size:14px;line-height:1">&times;</span></div>
+                    </sc-for>
+                    <div onClick="{{ addMoreSelect }}" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:999px;background:#fff;border:1px dashed rgba(217,150,42,.55);color:#c08a1e;font-size:16px;line-height:1;cursor:pointer">+</div>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;padding:9px 11px">
+          <div onClick="{{ uploadFiles }}" style="display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:9px;background:#fff;border:1px solid rgba(60,50,30,.13);color:#4a443a;font-size:12.5px;font-weight:500;cursor:pointer;white-space:nowrap" style-hover="background:#f6efe0;border-color:rgba(60,50,30,.22)"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M7 9.5v-8M3.8 4.7 7 1.5l3.2 3.2M2 12.2h10" stroke="#d9962a" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Drop stories</div>
+          <div onClick="{{ startExplain }}" style="{{ explainBtnStyle }}"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.6" stroke="#d9962a" stroke-width="1.2"/><path d="M7 6.2v3.4M7 4.2h.01" stroke="#d9962a" stroke-width="1.3" stroke-linecap="round"/></svg>Explain</div>
+          <div onClick="{{ openExperiment }}" style="{{ experimentBtnStyle }}"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2v10" stroke="#d9962a" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="7" r="5.6" stroke="#d9962a" stroke-width="1.1"/></svg>Experiment</div>
+        </div>
+      </div>
+
+      <sc-if value="{{ showSelConfirm }}" hint-placeholder-val="{{ false }}">
+        <div onMouseDown="{{ confirmExplain }}" style="{{ selConfirmStyle }}">+ Explain this</div>
+      </sc-if>
+      <sc-if value="{{ explainHint }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;bottom:92px;left:50%;transform:translateX(-50%);z-index:9;background:#2e2a24;color:#fbf5e9;padding:9px 15px;border-radius:12px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.03em;box-shadow:0 16px 44px -16px rgba(0,0,0,.55)">Select any text to explain it</div>
+      </sc-if>
+    </div>
+
+    <div style="width:336px;flex-shrink:0;border-left:1px solid rgba(60,50,30,.1);background:#fbf6ec;display:flex;flex-direction:column;min-height:0">
+      <div style="padding:15px 18px 12px;border-bottom:1px solid rgba(60,50,30,.09);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+        <sc-if value="{{ rightPanelExperiment }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.18em;color:#2e2a24">EXPERIMENT</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#a59b88;margin-top:3px">{{ expContextName }}</div>
+          </div>
+          <div onClick="{{ closeExperiment }}" style="cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8a8170;padding:4px 2px" style-hover="color:#2e2a24">✕ close</div>
+        </sc-if>
+        <sc-if value="{{ rightPanelGestalt }}" hint-placeholder-val="{{ true }}">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.18em;color:#8a8170">GESTALT</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;color:#b0a692">higher-emerging entity</div>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{ rightPanelGestalt }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1;overflow-y:auto;padding:17px 18px 18px;min-height:0;border-bottom:1px solid rgba(60,50,30,.1)">
+          <div style="font-size:15px;font-weight:600;color:#2e2a24;line-height:1.3;margin-bottom:4px">{{ personName }}</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#c08a1e;margin-bottom:15px">{{ personTag }}</div>
+          <div style="font-size:12.5px;line-height:1.55;color:#6f675a;margin-bottom:16px">{{ gestaltFrame }}</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;color:#8a8170;margin-bottom:10px">NOTATION</div>
+          <sc-for list="{{ notation }}" as="n" hint-placeholder-count="4">
+            <div style="display:flex;gap:9px;align-items:flex-start;margin-bottom:13px"><span style="color:#d9962a;line-height:1.5;flex-shrink:0">›</span><span style="font-size:13px;line-height:1.55;color:#4a443a">{{ n }}</span></div>
+          </sc-for>
+          <div style="margin-top:18px;padding-top:15px;border-top:1px solid rgba(60,50,30,.09)">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;color:#8a8170;margin-bottom:10px">CIRCUMSTANTIAL</div>
+            <sc-for list="{{ circumstantial }}" as="c" hint-placeholder-count="3">
+              <div style="padding:10px 0;border-bottom:1px solid rgba(60,50,30,.07)">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#c08a1e;margin-bottom:4px">{{ c.label }}</div>
+                <div style="font-size:12.5px;color:#4a443a;line-height:1.5">{{ c.text }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="height:34%;min-height:188px;flex-shrink:0;padding:16px 18px 20px;overflow-y:auto">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.18em;color:#8a8170">TO DO</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#3a2700;background:#d9962a;border-radius:10px;padding:1px 8px;font-weight:500">{{ todoCount }}</div>
+          </div>
+          <sc-for list="{{ todosShown }}" as="t" hint-placeholder-count="4">
+            <div onClick="{{ t.onClick }}" style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid rgba(60,50,30,.07);cursor:pointer" style-hover="opacity:.7">
+              <span style="{{ t.badgeStyle }}">{{ t.badge }}</span>
+              <span style="font-size:13px;line-height:1.45;color:#3a342b">{{ t.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ rightPanelExperiment }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;overflow-y:auto;padding:14px 16px 12px;min-height:0">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;color:#a59b88;margin-bottom:10px">Gestalt stays on the left · try changes here</div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px">
+            <sc-for list="{{ expSteps }}" as="st" hint-placeholder-count="3"><div style="{{ st.style }}">{{ st.label }}</div></sc-for>
+          </div>
+          <sc-if value="{{ expIsHunch }}" hint-placeholder-val="{{ true }}">
+            <div style="font-size:10px;font-family:'IBM Plex Mono',monospace;letter-spacing:.14em;color:#c08a1e;margin-bottom:8px">START WITH A HUNCH</div>
+            <div style="font-size:17px;font-weight:600;line-height:1.35;margin-bottom:8px">What should feel more true?</div>
+            <div style="font-size:12px;color:#8a8170;line-height:1.55;margin-bottom:12px">Half-formed is fine. Clarify, transmute — nothing commits until you approve.</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <sc-for list="{{ expHunchChips }}" as="h" hint-placeholder-count="4"><div onClick="{{ h.onClick }}" style="padding:5px 10px;border-radius:999px;border:1px solid rgba(60,50,30,.14);background:#fff;color:#5a5246;font-size:11px;cursor:pointer" style-hover="border-color:#d9962a">{{ h.label }}</div></sc-for>
+            </div>
+            <div style="margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#c08a1e">type below ↓</div>
+          </sc-if>
+          <sc-if value="{{ expIsClarify }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:10px;font-family:'IBM Plex Mono',monospace;letter-spacing:.14em;color:#c08a1e;margin-bottom:8px">CLARIFY · {{ expClarifyLabel }}</div>
+            <div style="font-size:16px;font-weight:600;line-height:1.35;margin-bottom:8px">{{ expQuestion }}</div>
+            <div style="padding:9px 11px;background:#f4eee1;border-radius:10px;border-left:2px solid #d9962a;font-size:11.5px;color:#6f675a;line-height:1.5;margin-bottom:10px">{{ expScaffold }}</div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <sc-for list="{{ expOptions }}" as="o" hint-placeholder-count="4"><div onClick="{{ o.onClick }}" style="{{ o.style }}">{{ o.label }}</div></sc-for>
+            </div>
+            <div onClick="{{ expBack }}" style="margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8a8170;cursor:pointer">← back</div>
+          </sc-if>
+          <sc-if value="{{ expIsTransmutePhase }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:10px;font-family:'IBM Plex Mono',monospace;letter-spacing:.14em;color:#c08a1e;margin-bottom:6px">TRANSMUTE · select a pair · edit actualized</div>
+            <div style="font-size:15px;font-weight:600;line-height:1.35;margin-bottom:8px">{{ expBundlesTitle }}</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+              <div style="font-size:11px;color:#8a8170;line-height:1.5;flex:1;min-width:120px">Live on the left as you edit · Approve commits the chosen changes.</div>
+              <div onClick="{{ expChooseAll }}" style="{{ expChooseAllStyle }}">{{ expChooseAllLabel }}</div>
+            </div>
+            <sc-for list="{{ expBundles }}" as="b" hint-placeholder-count="3">
+              <div onClick="{{ b.onClick }}" style="{{ b.style }}">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:6px">
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#c08a1e">{{ b.label }}</span>
+                  <span style="{{ b.tickStyle }}">{{ b.tick }}</span>
+                </div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#b0a692;margin-bottom:8px">{{ b.locate }}</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;color:#a59b88;margin-bottom:3px">ORIGINAL</div>
+                <div style="font-size:11px;color:#6f675a;line-height:1.45;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(60,50,30,.08)">{{ b.original }}</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;color:#2c7a55;margin-bottom:3px">ACTUALIZED</div>
+                <textarea value="{{ b.transmuted }}" onInput="{{ b.onActualizedInput }}" onClick="{{ expStopProp }}" onMouseDown="{{ expStopProp }}" style="width:100%;min-height:72px;box-sizing:border-box;font-size:12px;color:#2c7a55;line-height:1.5;font-weight:500;margin-bottom:8px;padding:9px 10px;border-radius:10px;border:1px solid rgba(63,167,118,.35);background:rgba(255,255,255,.85);resize:vertical;outline:none;font-family:inherit"></textarea>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;color:#a59b88;margin-bottom:3px">WHY THIS SHIFT</div>
+                <div style="font-size:11px;color:#5a5246;line-height:1.5">{{ b.whyShift }}</div>
+              </div>
+            </sc-for>
+            <sc-if value="{{ expHasChosen }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:8px;flex-wrap:wrap;padding-top:12px;border-top:1px solid rgba(60,50,30,.1)">
+                <div onClick="{{ expClearProjections }}" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a8170;cursor:pointer">clear previews</div>
+                <div onClick="{{ expApprove }}" style="padding:9px 16px;border-radius:10px;background:#d9962a;color:#3a2700;font-size:12.5px;font-weight:600;cursor:pointer">Approve ✓</div>
+              </div>
+            </sc-if>
+            <div onClick="{{ expBack }}" style="margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8a8170;cursor:pointer">← back</div>
+          </sc-if>
+        </div>
+        <sc-if value="{{ expShowSteerBar }}" hint-placeholder-val="{{ false }}">
+          <div style="flex-shrink:0;padding:12px 14px 16px;border-top:1px solid rgba(60,50,30,.1);background:#faf6ec">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#a59b88;margin-bottom:6px">{{ expSteerScaffold }}</div>
+            <div style="display:flex;align-items:center;gap:7px;background:#fff;border:1px solid rgba(60,50,30,.14);border-radius:12px;padding:6px 7px 6px 12px">
+              <input value="{{ expSteerInput }}" onInput="{{ expSetSteer }}" onKeyDown="{{ expSteerKey }}" placeholder="{{ expSteerPlaceholder }}" style="flex:1;min-width:0;background:transparent;border:none;outline:none;color:#2e2a24;font-size:13px" />
+              <div onClick="{{ expSteerSend }}" style="width:30px;height:30px;flex-shrink:0;border-radius:9px;background:#d9962a;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="14" height="14" viewBox="0 0 15 15" fill="none"><path d="M7.5 12V3.2M3.6 7 7.5 3.1 11.4 7" stroke="#3a2700" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            </div>
+          </div>
+        </sc-if>
+      </sc-if>
+    </div>
+  </div>
+  </div>
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  _mid = 0;
+  state = {
+    data: this.buildData(),
+    editId: null,
+    draftText: '',
+    constitutionOpen: true,
+    openSections: { formatives: true, perception: true, temperament: true, relational: true, becoming: true },
+    chatOpen: false,
+    drawerHeight: 280,
+    input: '',
+    messages: [],
+    typing: false,
+    explainMode: false,
+    selRect: null,
+    selText: '',
+    explainChips: [],
+    exp: null,
+  };
+  msgsRef = React.createRef();
+  fileRef = React.createRef();
+  _replies = ['That read holds together — the person is clearer than the evidence alone.', 'I would keep the attribute, but make the circumstance more concrete.', 'This belongs in the constitution layer: durable, not merely situational.', 'The gestalt is strongest when the montage stays sensory and the judgement stays decisive.'];
+
+  buildData() {
+    return {
+      personName: 'Maya Okonkwo',
+      personTag: 'the systems-builder',
+      judgement: 'Maya presents as a systems-minded humanist: someone whose technical confidence is not separable from repair, translation, and responsibility. Her strongest admissions signal is not simply robotics or data visualization, but the repeated instinct to make hidden friction legible and workable for other people. She is most convincing when framed as a builder who treats complexity as a social obligation, and whose intellectual maturity appears through listening before intervention, especially when others are overwhelmed by the mess.',
+      montage: 'A soldering iron cools beside a half-open notebook. Hospital hallway light reflects on a laptop screen where messy patient patterns become colored pathways. In robotics meetings, Maya is the one kneeling beside the stalled chassis, asking quieter teammates what they noticed before naming the fix. At home, she translates forms, schedules, and small emergencies into workable sequences. Across rooms, the same figure appears: not loud, not ornamental, but steadily turning confusion into structure others can trust, then leaving enough space for them to understand and own the solution themselves.',
+      constitution: [
+        {
+          id: 'formatives',
+          label: 'FORMATIVES',
+          kind: 'shaping contexts',
+          text: 'Maya was formed by environments where intelligence had to become useful quickly: a family context of translation and coordination, a school context where technical resources were uneven, and project rooms where someone had to make scattered parts cohere. Her formation is less about a single breakthrough than repeated exposure to small systems that failed people. She learned to read friction as information and to experience competence as care, not performance.',
+        },
+        {
+          id: 'perception',
+          label: 'PERCEPTION',
+          kind: 'primary sensing mode',
+          text: 'She perceives through pattern and interruption. What first catches her attention is often a mismatch: a process that asks too much of a person, a machine behaving almost correctly, a data display that obscures what it should reveal. Her attention moves from surface event to underlying arrangement, then back toward the human experience inside it. This makes her observant in a practical way: she notices where a system is asking for mercy.',
+        },
+        {
+          id: 'temperament',
+          label: 'TEMPERAMENT',
+          kind: 'attributes and dispositions',
+          text: 'Her temperament is patient, diagnostic, and quietly insistent. She does not rush to dominate a room, but she does return to the problem until it yields. The persistent attributes are steadiness, responsibility, and a bias toward repair over display. There is also a restrained boldness: she is willing to redesign the frame when the inherited one wastes effort. Under pressure, she becomes more procedural, not less humane, and more attentive to what others need.',
+        },
+        {
+          id: 'relational',
+          label: 'RELATIONAL FIELD',
+          kind: 'social operation',
+          text: 'In relation to others, Maya often functions as a stabilizer and translator. She listens for what people cannot yet phrase, then builds a bridge between their lived difficulty and an actionable structure. Her leadership is less theatrical than infrastructural: creating conditions where quieter collaborators can contribute, where patients or peers can be understood, where a team can move without confusion. People around her are not merely helped; they become more capable.',
+        },
+        {
+          id: 'becoming',
+          label: 'BECOMING',
+          kind: 'directional arc',
+          text: 'The direction of becoming is toward civic engineering: a person who wants to build technical systems that remember the human bodies and communities inside them. She is moving from helpful problem-solver to designer of shared infrastructure, from fixing local breakdowns to asking why they recur. Her next stage is not just more advanced STEM work, but a deeper synthesis of ethics, usability, durable public usefulness, and responsibility for the people affected.',
+        },
+      ],
+      notation: [
+        'Higher-emerging identity: a builder who treats complexity as something to be made inhabitable.',
+        'Core attribute: diagnostic patience — she slows down enough to see the system beneath the symptom.',
+        'Admissions use: let accomplishments corroborate the person, not replace the person.',
+        'Risk to avoid: over-indexing on machinery; the human translation is the actual signal.',
+      ],
+      circumstantial: [
+        { label: 'CURRENT GRAVITY', text: 'Robotics and hospital data visualization carry the strongest evidence of applied systems thinking.' },
+        { label: 'MISSING PRESSURE', text: 'The narrative should show what the work cost or changed in her, not only what it produced.' },
+        { label: 'BEST READER AFTERTASTE', text: 'A calm, technically fluent student whose instinct is to make difficult systems usable for others.' },
+      ],
+      todos: [
+        { badge: 'J', label: 'Check expert judgement against the application throughline.' },
+        { badge: 'M', label: 'Add one concrete sensory beat to the montage if it still feels abstract.' },
+        { badge: 'T', label: 'Temperament should name attributes, not repeat achievements.' },
+        { badge: 'B', label: 'Becoming should point toward future civic or technical consequence.' },
+      ],
+    };
+  }
+
+  _wordCount(text) {
+    const t = String(text || '').trim();
+    return t ? t.split(/\s+/).filter(Boolean).length : 0;
+  }
+  _trim(s, n) {
+    s = String(s || '').trim();
+    return s.length > n ? s.slice(0, n).trim() + '…' : s;
+  }
+  _sectionById(data, id) {
+    if (id === 'judgement' || id === 'montage') return { text: data[id] || '' };
+    return (data.constitution || []).find(x => x.id === id) || null;
+  }
+  _displayText(id, expPreviewMap) {
+    return expPreviewMap[id] ? expPreviewMap[id].transmuted : (this._sectionById(this.state.data, id) || {}).text || '';
+  }
+  _textStyle(isPreview) {
+    return { fontSize: '13.5px', lineHeight: 1.65, color: isPreview ? '#2c7a55' : '#3a342b', fontWeight: isPreview ? 500 : 400, whiteSpace: 'pre-wrap' };
+  }
+  _wordStyle(words, min, max, editing) {
+    const ok = words >= min && words <= max;
+    return { fontFamily: "'IBM Plex Mono',monospace", fontSize: '9.5px', letterSpacing: '.08em', color: editing ? '#c08a1e' : (ok ? '#3fa776' : '#8a8170'), background: editing ? 'rgba(217,150,42,.13)' : (ok ? 'rgba(63,167,118,.12)' : 'rgba(60,50,30,.06)'), padding: '2px 8px', borderRadius: '999px', textTransform: 'uppercase' };
+  }
+  _wrapStyle(id, expPreviewMap) {
+    const on = !!expPreviewMap[id];
+    return { marginBottom: '12px', borderRadius: '14px', padding: on ? '3px' : '0', boxShadow: on ? '0 0 0 1px rgba(63,167,118,.38)' : 'none', background: on ? 'rgba(63,167,118,.045)' : 'transparent' };
+  }
+  _headerStyle(open) {
+    return { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', padding: '10px 14px', background: '#fffdf8', border: '1px solid rgba(60,50,30,.12)', borderRadius: open ? '13px 13px 0 0' : '13px', boxShadow: '0 1px 0 rgba(60,50,30,.03)' };
+  }
+
+  startEdit = (id) => {
+    const found = this._sectionById(this.state.data, id);
+    if (!found) return;
+    this.setState({ editId: id, draftText: found.text || '' });
+  };
+  setDraftText = (e) => this.setState({ draftText: e.target.value });
+  discardEdit = () => this.setState({ editId: null, draftText: '' });
+  confirmEdit = () => {
+    const id = this.state.editId;
+    if (!id) return;
+    this.setState(s => {
+      const data = { ...s.data };
+      if (id === 'judgement' || id === 'montage') data[id] = s.draftText;
+      else data.constitution = data.constitution.map(x => x.id === id ? { ...x, text: s.draftText } : x);
+      return { data, editId: null, draftText: '' };
+    });
+  };
+  toggleConstitution = () => this.setState(s => ({ constitutionOpen: !s.constitutionOpen }));
+  toggleSection = (id) => this.setState(s => ({ openSections: { ...s.openSections, [id]: !s.openSections[id] } }));
+
+  _expContext() {
+    const data = this.state.data;
+    return { name: data.personName, statement: data.judgement };
+  }
+  _expQuestions() {
+    return [
+      { id: 'q1', q: 'What feels under-seen?', scaffold: 'Name the missing quality, pressure, or sharper frame.', options: ['More precise', 'More human', 'More emergent', 'More grounded'] },
+      { id: 'q2', q: 'Where should the change land?', scaffold: 'Choose the layer of the gestalt to bend.', options: ['Judgement', 'Montage', 'Constitution', 'All layers'] },
+      { id: 'q3', q: 'How far should it move?', scaffold: 'This sets the boldness of the options.', options: ['A gentle nudge', 'A real shift', 'Reimagine it'] },
+    ];
+  }
+  _expTargetSlots(data, exp) {
+    const q2 = (exp && exp.answers && exp.answers.q2) || '';
+    const slot = (id, locate) => ({ key: id, anchorId: 'exp-' + id, locate, readOriginal: (d) => (this._sectionById(d, id) || {}).text || '' });
+    const constitution = data.constitution.map(x => slot(x.id, 'Constitution · ' + x.label));
+    if (q2 === 'Judgement') return [slot('judgement', 'Expert judgement'), slot('temperament', 'Constitution · TEMPERAMENT'), slot('becoming', 'Constitution · BECOMING')];
+    if (q2 === 'Montage') return [slot('montage', 'The montage'), slot('formatives', 'Constitution · FORMATIVES'), slot('relational', 'Constitution · RELATIONAL FIELD')];
+    if (q2 === 'Constitution') return constitution.slice(0, 3);
+    return [slot('judgement', 'Expert judgement'), slot('montage', 'The montage'), slot('temperament', 'Constitution · TEMPERAMENT')];
+  }
+  _expVariantText(label, original, ctx, slotKey) {
+    const o = String(original || '').trim();
+    const snippet = o.length > 90 ? o.slice(0, 90).trim() + '…' : o;
+    if (label === 'YOUR STEER') return (ctx.steer || o).trim();
+    if (label === 'SHARPER') return snippet ? (snippet + ' The claim should land with less abstraction and one unmistakable attribute.') : 'Sharper: name the durable attribute and its evidence.';
+    if (label === 'WARMER') return snippet ? ('Bring the person closer: ' + snippet) : ('Warmer: show ' + ctx.name + ' through one lived scene before explaining her.');
+    if (label === 'BOLDER') return snippet ? (snippet + ' Push it toward the higher-emerging entity, not just a competent applicant.') : ('Bolder: frame ' + ctx.name + ' as an emerging civic systems-builder.');
+    return o || 'Revised read.';
+  }
+  _expWhyShift(label, locate, hunch) {
+    const lead = hunch ? 'Answers your hunch by ' : '';
+    if (label === 'SHARPER') return lead + 'tightening ' + locate + ' around a specific persistent attribute.';
+    if (label === 'WARMER') return lead + 'giving ' + locate + ' more lived texture and less diagnostic distance.';
+    if (label === 'BOLDER') return lead + 'letting ' + locate + ' name the higher-emerging entity more directly.';
+    if (label === 'YOUR STEER') return lead + 'using your exact wording on ' + locate + '.';
+    return lead + 'reframing ' + locate + '.';
+  }
+  _expBundles(ctx, exp, data) {
+    data = data || this.state.data;
+    const labels = ['SHARPER', 'WARMER', 'BOLDER'];
+    const slots = this._expTargetSlots(data, exp);
+    const steer = exp && (exp.steer || '').trim();
+    const hunch = exp && (exp.hunch || '').trim();
+    let list = slots.slice(0, 3).map((sl, i) => {
+      const original = sl.readOriginal(data) || '—';
+      return { id: 'b' + (i + 1), label: labels[i], targetKey: sl.key, anchorId: sl.anchorId, locate: sl.locate, original, transmuted: this._expVariantText(labels[i], original === '—' ? '' : original, { ...ctx, steer, hunch }, sl.key) };
+    });
+    if (exp && exp.answers && exp.answers.q3 === 'A gentle nudge') list = list.slice(0, 2);
+    if (steer) {
+      const sl = slots[0];
+      const original = sl.readOriginal(data) || '—';
+      list = [{ id: 'bsteer', label: 'YOUR STEER', targetKey: sl.key, anchorId: sl.anchorId, locate: sl.locate, original, transmuted: steer }].concat(list);
+    }
+    const overrides = (exp && exp.bundleOverrides) || {};
+    return list.map((b, i) => overrides[i] ? { ...b, transmuted: overrides[i] } : b);
+  }
+  _expPreviewMap(exp, data) {
+    const map = {};
+    if (!exp) return map;
+    const bundles = this._expBundles(this._expContext(), exp, data);
+    (exp.chosen || []).forEach(i => {
+      const b = bundles[i];
+      if (b) map[b.targetKey] = { original: b.original, transmuted: b.transmuted, locate: b.locate, label: b.label };
+    });
+    return map;
+  }
+  _expRouteToTarget(bundle) {
+    if (!bundle) return;
+    const isConst = !['judgement', 'montage'].includes(bundle.targetKey);
+    const patch = isConst ? { constitutionOpen: true, openSections: { ...this.state.openSections, [bundle.targetKey]: true } } : {};
+    this.setState(patch, () => requestAnimationFrame(() => {
+      const el = document.getElementById(bundle.anchorId);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }));
+  }
+  _expApplyBundle(data, bundle) {
+    const key = bundle.targetKey;
+    const val = bundle.transmuted;
+    if (key === 'judgement' || key === 'montage') return { data: { ...data, [key]: val } };
+    return { data: { ...data, constitution: data.constitution.map(x => x.id === key ? { ...x, text: val } : x) } };
+  }
+  openExperiment = () => this.setState(s => {
+    if (s.exp) return { exp: null };
+    const base = window.ExperimentCore && window.ExperimentCore.initialExperimentState ? window.ExperimentCore.initialExperimentState() : {};
+    return { exp: { step: 'hunch', hunch: '', clarifyIdx: 0, answers: {}, chosen: [], previewFocus: 0, activeBundle: null, bundleOverrides: {}, steerInput: '', steer: '', ...base }, chatOpen: false, explainMode: false, explainChips: [], selRect: null, selText: '' };
+  });
+  closeExperiment = () => this.setState({ exp: null });
+  expSetHunchChip = (t) => this.setState(s => ({ exp: { ...s.exp, steerInput: t } }));
+  expSetSteer = (e) => this.setState(s => ({ exp: { ...s.exp, steerInput: e.target.value } }));
+  expStopProp = (e) => { if (e && e.stopPropagation) e.stopPropagation(); };
+  expSteerKey = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.expSteerSend(); } };
+  expSteerSend = () => {
+    const ex = this.state.exp;
+    const text = (ex.steerInput || '').trim();
+    if (!text) return;
+    if (ex.step === 'hunch') { this.setState(s => ({ exp: { ...s.exp, hunch: text, steerInput: '', step: 'clarify' } })); return; }
+    const next = { ...ex, steer: text, steerInput: '' };
+    if (ex.step === 'clarify') next.step = 'bundles';
+    this.setState({ exp: next });
+  };
+  expAnswer = (qid, opt, isLast) => this.setState(s => {
+    const e = { ...s.exp, answers: { ...s.exp.answers, [qid]: opt } };
+    if (isLast) { e.step = 'bundles'; e.chosen = []; e.previewFocus = 0; e.activeBundle = null; e.bundleOverrides = {}; }
+    else e.clarifyIdx = s.exp.clarifyIdx + 1;
+    return { exp: e };
+  });
+  expChoose = (i) => {
+    const b = this._expBundles(this._expContext(), this.state.exp, this.state.data)[i];
+    this.setState(s => {
+      const cur = s.exp.chosen || [];
+      const has = cur.indexOf(i) >= 0;
+      const chosen = has ? cur.filter(x => x !== i) : [...cur, i];
+      return { exp: { ...s.exp, chosen, activeBundle: i, step: 'bundles' } };
+    }, () => this._expRouteToTarget(b));
+  };
+  expSetActualized = (i, e) => {
+    const val = e.target.value;
+    this.setState(s => {
+      const cur = s.exp.chosen || [];
+      const chosen = cur.indexOf(i) >= 0 ? cur : [...cur, i];
+      return { exp: { ...s.exp, bundleOverrides: { ...(s.exp.bundleOverrides || {}), [i]: val }, activeBundle: i, chosen } };
+    });
+  };
+  expChooseAll = () => {
+    const all = this._expBundles(this._expContext(), this.state.exp, this.state.data).map((_, idx) => idx);
+    this.setState(s => {
+      const selectAll = (s.exp.chosen || []).length < all.length;
+      return { exp: { ...s.exp, chosen: selectAll ? all : [], activeBundle: selectAll ? all[0] : null, step: 'bundles' } };
+    });
+  };
+  expBack = () => this.setState(s => {
+    const e = { ...s.exp };
+    if (e.step === 'bundles' && (e.chosen || []).length) { e.chosen = []; e.activeBundle = null; return { exp: e }; }
+    if (e.step === 'clarify') { if (e.clarifyIdx > 0) e.clarifyIdx--; else e.step = 'hunch'; }
+    else if (e.step === 'bundles') { e.step = 'clarify'; e.clarifyIdx = 2; }
+    return { exp: e };
+  });
+  expClearProjections = () => this.setState(s => ({ exp: { ...s.exp, chosen: [], activeBundle: null, step: 'bundles' } }));
+  expApprove = () => {
+    const bundles = this._expBundles(this._expContext(), this.state.exp, this.state.data);
+    const picks = (this.state.exp.chosen || []).map(i => bundles[i]).filter(Boolean);
+    if (!picks.length) return;
+    let data = { ...this.state.data, constitution: [...this.state.data.constitution] };
+    picks.forEach(b => { const res = this._expApplyBundle(data, b); if (res.data) data = res.data; });
+    this._mid++;
+    this.setState(s => ({ data, exp: null, messages: [...s.messages, { id: 'm' + this._mid, role: 'assistant', text: 'Experiment applied to ' + picks.length + ' gestalt location' + (picks.length > 1 ? 's' : '') + '.' }] }));
+  };
+
+  onInput = e => this.setState({ input: e.target.value });
+  onKey = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.send(); } };
+  send = () => {
+    const chips = this.state.explainChips || [];
+    const text = this.state.input.trim();
+    if (!chips.length && !text) { this.setState({ chatOpen: true }); return; }
+    this._mid++;
+    const label = chips.length ? 'Explain ' + chips.map(c => '“' + c.abbr + '”').join(', ') + (text ? ' — ' + text : '') : text;
+    const um = { id: 'm' + this._mid, role: 'user', text: label };
+    this.setState(s => ({ messages: [...s.messages, um], input: '', typing: true, chatOpen: true }));
+    clearTimeout(this._t);
+    this._t = setTimeout(() => { this._mid++; const r = this._replies[this._mid % this._replies.length]; this.setState(s => ({ messages: [...s.messages, { id: 'm' + this._mid, role: 'assistant', text: r }], typing: false })); }, 800);
+  };
+  toggleChat = () => this.setState(s => ({ chatOpen: !s.chatOpen }));
+  collapse = () => this.setState({ chatOpen: false });
+  onHandleDown = (e) => { e.preventDefault(); const sy = e.clientY, sh = this.state.drawerHeight; const mv = (ev) => { let h = sh + (sy - ev.clientY); h = Math.max(170, Math.min(440, h)); this.setState({ drawerHeight: h }); }; const up = () => { window.removeEventListener('pointermove', mv); window.removeEventListener('pointerup', up); }; window.addEventListener('pointermove', mv); window.addEventListener('pointerup', up); };
+  uploadFiles = () => { if (this.fileRef.current) this.fileRef.current.click(); };
+  onFiles = (e) => {
+    const files = Array.from(e.target.files || []).slice(0, 3);
+    e.target.value = '';
+    if (!files.length) return;
+    this._mid++;
+    const um = { id: 'm' + this._mid, role: 'user', text: 'Dropped ' + files.length + ' stor' + (files.length > 1 ? 'ies' : 'y') + ': ' + files.map(f => f.name).join(', ') };
+    this.setState(s => ({ messages: [...s.messages, um], chatOpen: true, typing: true }));
+    clearTimeout(this._t);
+    this._t = setTimeout(() => { this._mid++; this.setState(s => ({ messages: [...s.messages, { id: 'm' + this._mid, role: 'assistant', text: 'Read them. I can fold the strongest signals into the gestalt read.' }], typing: false })); }, 950);
+  };
+  startExplain = () => this.setState(s => ({ explainMode: !s.explainMode, selRect: null, selText: '' }));
+  onSelectText = () => {
+    if (!this.state.explainMode || !window.getSelection) return;
+    const sel = window.getSelection();
+    const text = sel.toString().trim();
+    if (!text || !sel.rangeCount) { this.setState({ selRect: null, selText: '' }); return; }
+    const r = sel.getRangeAt(0).getBoundingClientRect();
+    this._lastSel = text;
+    this.setState({ selText: text, selRect: { top: r.bottom, left: r.left + r.width / 2 } });
+  };
+  confirmExplain = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    const sel = ((window.getSelection && window.getSelection().toString().trim()) || this.state.selText || this._lastSel || '');
+    if (!sel) return;
+    const abbr = sel.length > 26 ? sel.slice(0, 26).trim() + '…' : sel;
+    this._mid++;
+    const chip = { id: 'x' + this._mid, full: sel, abbr };
+    if (window.getSelection) window.getSelection().removeAllRanges();
+    this._lastSel = '';
+    this.setState(st => ({ explainChips: [...st.explainChips, chip], selRect: null, selText: '', chatOpen: true }));
+  };
+  removeChip = (id) => this.setState(st => ({ explainChips: st.explainChips.filter(c => c.id !== id) }));
+  addMoreSelect = () => this.setState({ explainMode: true, selRect: null, selText: '' });
+
+  renderVals() {
+    const data = this.state.data;
+    const expPreviewMap = this._expPreviewMap(this.state.exp, data);
+    const editId = this.state.editId;
+    const sectionVM = (item, min, max, top) => {
+      const id = item.id;
+      const editing = editId === id;
+      const isPreview = !!expPreviewMap[id];
+      const text = this._displayText(id, expPreviewMap);
+      const words = this._wordCount(editing ? this.state.draftText : text);
+      return {
+        ...item,
+        anchorId: 'exp-' + id,
+        editing,
+        readOnly: !editing,
+        text,
+        editValue: editing ? this.state.draftText : text,
+        wordLabel: words + 'w',
+        wordStyle: this._wordStyle(words, min, max, editing),
+        textStyle: this._textStyle(isPreview),
+        wrapStyle: this._wrapStyle(id, expPreviewMap),
+        headerStyle: this._headerStyle(true),
+        dotStyle: { width: '7px', height: '7px', borderRadius: '50%', flexShrink: 0, background: isPreview ? '#3fa776' : '#d9962a' },
+        onEdit: () => this.startEdit(id),
+        onInput: this.setDraftText,
+        onConfirm: this.confirmEdit,
+        onDiscard: this.discardEdit,
+        onToggle: top ? () => {} : () => this.toggleSection(id),
+      };
+    };
+    const topSections = [
+      sectionVM({ id: 'judgement', label: "EXPERT'S JUDGEMENT", text: data.judgement }, 65, 95, true),
+      sectionVM({ id: 'montage', label: 'THE MONTAGE', text: data.montage }, 85, 115, true),
+    ];
+    const constitutionSections = data.constitution.map(x => {
+      const vm = sectionVM(x, 70, 100, false);
+      const open = !!this.state.openSections[x.id];
+      return { ...vm, open, chevron: open ? '▴' : '▾', headerStyle: this._headerStyle(open) };
+    });
+    const dh = this.state.drawerHeight;
+    const open = this.state.chatOpen;
+    const panelStyle = { position: 'absolute', bottom: '24px', left: '50%', transform: 'translateX(-50%)', width: 'min(620px, calc(100% - 56px))', zIndex: 6, background: 'rgba(255,253,248,.82)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', border: '1px solid rgba(60,50,30,.13)', borderRadius: '26px', boxShadow: '0 24px 64px -28px rgba(90,70,20,.4), 0 0 0 1px rgba(255,255,255,.5)', display: 'flex', flexDirection: 'column', overflow: 'hidden' };
+    const conversationStyle = { height: open ? dh + 'px' : '0px', opacity: open ? 1 : 0, overflow: 'hidden', flexShrink: 0, transition: 'height .42s cubic-bezier(.22,.8,.2,1), opacity .3s ease' };
+    const btnBase = { display: 'flex', alignItems: 'center', gap: '6px', padding: '7px 10px', borderRadius: '9px', color: '#4a443a', fontSize: '12.5px', fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap' };
+    const chipsV = (this.state.explainChips || []).map(c => ({ ...c, onRemove: () => this.removeChip(c.id) }));
+    const messages = this.state.messages.map(m => ({ ...m, rowStyle: { display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start', animation: 'rollDown .22s ease' }, bubbleStyle: { maxWidth: '78%', padding: '10px 13px', borderRadius: m.role === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px', background: m.role === 'user' ? '#d9962a' : '#fffdf8', color: m.role === 'user' ? '#3a2700' : '#3a342b', border: m.role === 'user' ? 'none' : '1px solid rgba(60,50,30,.1)', fontSize: '13px', lineHeight: 1.45 } }));
+    const exp = this.state.exp;
+    const expQuestions = this._expQuestions();
+    const q = exp ? expQuestions[exp.clarifyIdx || 0] : expQuestions[0];
+    const expBundles = exp ? this._expBundles(this._expContext(), exp, data).map((b, i) => {
+      const chosen = (exp.chosen || []).indexOf(i) >= 0;
+      return {
+        ...b,
+        transmuted: b.transmuted,
+        whyShift: this._expWhyShift(b.label, b.locate, exp.hunch),
+        tick: chosen ? '✓' : '+',
+        tickStyle: { color: chosen ? '#2c7a55' : '#b0a692', fontWeight: 700 },
+        style: { padding: '12px', borderRadius: '13px', border: chosen ? '1px solid rgba(63,167,118,.55)' : '1px solid rgba(60,50,30,.12)', background: chosen ? 'rgba(63,167,118,.06)' : '#fffdf8', cursor: 'pointer', marginBottom: '10px', boxShadow: chosen ? '0 0 0 3px rgba(63,167,118,.08)' : 'none' },
+        onClick: () => this.expChoose(i),
+        onActualizedInput: (e) => this.expSetActualized(i, e),
+      };
+    }) : [];
+    const expHasChosen = exp && (exp.chosen || []).length > 0;
+    const expSteps = ['hunch', 'clarify', 'bundles'].map(st => ({ label: st, style: { fontFamily: "'IBM Plex Mono',monospace", fontSize: '9px', letterSpacing: '.08em', textTransform: 'uppercase', padding: '3px 7px', borderRadius: '999px', color: exp && exp.step === st ? '#3a2700' : '#8a8170', background: exp && exp.step === st ? 'rgba(217,150,42,.22)' : 'rgba(60,50,30,.06)' } }));
+    const todoTargets = ['exp-judgement', 'exp-montage', 'exp-temperament', 'exp-becoming'];
+    const todosShown = (data.todos || []).map((t, i) => ({
+      ...t,
+      badgeStyle: { width: '20px', height: '20px', borderRadius: '7px', background: i < 2 ? 'rgba(217,150,42,.18)' : 'rgba(60,50,30,.07)', color: i < 2 ? '#9a6b12' : '#8a8170', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'IBM Plex Mono',monospace", fontSize: '9px', fontWeight: 600, flexShrink: 0 },
+      onClick: () => {
+        const el = document.getElementById(todoTargets[i] || 'exp-judgement');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      },
+    }));
+    const sel = this.state.selRect;
+    return {
+      personName: data.personName,
+      personTag: data.personTag,
+      completionLabel: '7/7 gestalt blocks ready',
+      topSections,
+      constitutionOpen: this.state.constitutionOpen,
+      constitutionMeta: data.constitution.length + ' sub-sections · ' + data.constitution.reduce((n, x) => n + this._wordCount(x.text), 0) + ' words',
+      constitutionChevron: this.state.constitutionOpen ? '▴' : '▾',
+      constitutionSections,
+      toggleConstitution: this.toggleConstitution,
+      panelStyle,
+      conversationStyle,
+      drawerInnerStyle: { height: dh + 'px', display: 'flex', flexDirection: 'column' },
+      drawerLabel: (this.state.explainMode || chipsV.length) ? 'explaining' : 'conversation',
+      chatEmpty: messages.length === 0,
+      messages,
+      typing: this.state.typing,
+      input: this.state.input,
+      inputPlaceholder: 'Ask about who this person is…',
+      onInput: this.onInput,
+      onKey: this.onKey,
+      send: this.send,
+      toggleChat: this.toggleChat,
+      collapse: this.collapse,
+      onHandleDown: this.onHandleDown,
+      msgsRef: this.msgsRef,
+      uploadFiles: this.uploadFiles,
+      onFiles: this.onFiles,
+      fileRef: this.fileRef,
+      startExplain: this.startExplain,
+      onSelectText: this.onSelectText,
+      explainBtnStyle: { ...btnBase, background: this.state.explainMode ? 'rgba(217,150,42,.16)' : '#fff', border: this.state.explainMode ? '1px solid #d9962a' : '1px solid rgba(60,50,30,.13)' },
+      chatBtnStyle: { ...btnBase, background: open && !this.state.explainMode ? 'rgba(217,150,42,.16)' : '#fff', border: open && !this.state.explainMode ? '1px solid #d9962a' : '1px solid rgba(60,50,30,.13)' },
+      experimentBtnStyle: { ...btnBase, background: exp ? 'rgba(217,150,42,.16)' : '#fff', border: exp ? '1px solid #d9962a' : '1px solid rgba(60,50,30,.13)' },
+      hasChips: chipsV.length > 0,
+      explainChips: chipsV,
+      addMoreSelect: this.addMoreSelect,
+      showSelConfirm: this.state.explainMode && !!sel,
+      selConfirmStyle: sel ? { position: 'fixed', top: (sel.top + 8) + 'px', left: sel.left + 'px', transform: 'translateX(-50%)', zIndex: 60, background: '#2e2a24', color: '#fbf5e9', padding: '7px 13px', borderRadius: '10px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', boxShadow: '0 10px 30px -10px rgba(0,0,0,.5)', whiteSpace: 'nowrap' } : {},
+      explainHint: this.state.explainMode && !sel && chipsV.length === 0,
+      confirmExplain: this.confirmExplain,
+      rightPanelGestalt: !exp,
+      rightPanelExperiment: !!exp,
+      gestaltFrame: 'This panel reads the person as a higher-emerging entity: attributes, persistence, and circumstances that explain how the visible evidence coheres.',
+      notation: data.notation,
+      circumstantial: data.circumstantial,
+      todoCount: todosShown.length,
+      todosShown,
+      expOpen: !!exp,
+      expContextName: data.personName + ' · gestalt',
+      expIsHunch: exp && exp.step === 'hunch',
+      expIsClarify: exp && exp.step === 'clarify',
+      expIsTransmutePhase: exp && exp.step === 'bundles',
+      expHasChosen,
+      expHunchChips: ['more precise', 'more embodied', 'show temperament', 'less résumé'].map(t => ({ label: t, onClick: () => this.expSetHunchChip(t) })),
+      expSteps,
+      expClarifyLabel: q.id.toUpperCase(),
+      expQuestion: q.q,
+      expScaffold: q.scaffold,
+      expOptions: q.options.map(o => ({ label: o, onClick: () => this.expAnswer(q.id, o, (exp && exp.clarifyIdx || 0) >= expQuestions.length - 1), style: { padding: '9px 10px', borderRadius: '10px', border: '1px solid rgba(60,50,30,.12)', background: exp && exp.answers && exp.answers[q.id] === o ? 'rgba(217,150,42,.16)' : '#fff', color: '#4a443a', fontSize: '12px', cursor: 'pointer' } })),
+      expBundlesTitle: 'Possible gestalt transmutations',
+      expBundles,
+      expChooseAllLabel: exp && (exp.chosen || []).length === expBundles.length ? 'clear all' : 'choose all',
+      expChooseAllStyle: { padding: '7px 10px', borderRadius: '9px', background: '#fff', border: '1px solid rgba(60,50,30,.13)', color: '#4a443a', fontSize: '11px', fontWeight: 500, cursor: 'pointer' },
+      expSteerInput: exp ? exp.steerInput : '',
+      expSteerScaffold: exp && exp.step === 'hunch' ? 'TYPE YOUR HUNCH' : 'STEER IN YOUR OWN WORDS',
+      expSteerPlaceholder: exp && exp.step === 'hunch' ? 'e.g. temperament is still too hidden…' : 'or tell me where to take it…',
+      expShowSteerBar: !!exp && exp.step !== 'bundles',
+      openExperiment: this.openExperiment,
+      closeExperiment: this.closeExperiment,
+      expSetSteer: this.expSetSteer,
+      expSteerKey: this.expSteerKey,
+      expSteerSend: this.expSteerSend,
+      expStopProp: this.expStopProp,
+      expBack: this.expBack,
+      expClearProjections: this.expClearProjections,
+      expApprove: this.expApprove,
+      expChooseAll: this.expChooseAll,
+    };
+  }
+}
+</script>
+</body>
+</html>

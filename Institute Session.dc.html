@@ -1,0 +1,1849 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<script src="./experiment-runtime.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:rgba(60,50,30,.18);border-radius:6px}
+@keyframes railTwinkle{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+/* ===== Phase rail (HUMANITY / INSTITUTE) ===== */
+.phase-rail{position:relative;z-index:40;flex:0 0 auto;width:50px;display:flex;flex-direction:column;padding:13px 0;background:#efe6d3;border-right:1px solid rgba(60,50,30,.12);transition:width .22s cubic-bezier(.4,0,.2,1);overflow:hidden;cursor:pointer;outline:none}
+.phase-rail:focus-within{width:198px;box-shadow:16px 0 46px -26px rgba(60,50,30,.55);cursor:default}
+.rail-grip{align-self:flex-end;margin:-2px 17px 4px 0;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#b0a692;transition:transform .22s}
+.phase-rail:focus-within .rail-grip{transform:rotate(180deg)}
+.rail-top{display:flex;align-items:center;gap:11px;padding:0 0 13px 21px;border-bottom:1px solid rgba(60,50,30,.1)}
+.rail-dot{flex:0 0 auto;width:9px;height:9px;border-radius:50%;background:#d9962a;box-shadow:0 0 12px rgba(217,150,42,.7);animation:railTwinkle 3s ease-in-out infinite}
+.rail-label{opacity:0;transform:translateX(-4px);white-space:nowrap;transition:opacity .16s ease,transform .2s ease;font-family:'IBM Plex Mono',monospace}
+.phase-rail:hover .rail-label{opacity:1;transform:none}
+.rail-brand{font-family:'Space Grotesk',sans-serif;font-weight:600;letter-spacing:.14em;font-size:13px;color:#2e2a24}
+.rail-phases{display:flex;flex-direction:column;gap:5px;margin-top:14px}
+.rail-eyebrow{padding:0 0 7px 22px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.2em;color:#b0a692}
+.rail-item{display:flex;align-items:center;gap:14px;padding:11px 0 11px 19px;text-decoration:none;color:#8a8170;border-left:2px solid transparent;transition:background .15s,color .15s}
+.rail-item:hover{background:rgba(60,50,30,.06);color:#2e2a24}
+.rail-item--active{color:#2e2a24;border-left-color:#d9962a;background:rgba(217,150,42,.12)}
+.rail-ico{flex:0 0 22px;width:22px;height:22px;position:relative;display:flex;align-items:center;justify-content:center}
+.rail-name{font-size:11px;letter-spacing:.15em;font-weight:600}
+.rail-sub{display:block;margin-top:2px;font-size:8.5px;letter-spacing:.08em;color:#a59b88;font-weight:400}
+.rail-foot{margin-top:auto;padding:10px 0 0 22px;font-size:8.5px;letter-spacing:.16em;color:#b8af9b;border-top:1px solid rgba(60,50,30,.08)}
+.ico-hum i{position:absolute;width:4px;height:4px;border-radius:50%;background:currentColor}
+.ico-hum i:nth-child(1){top:2px;left:9px}.ico-hum i:nth-child(2){bottom:3px;left:2px}.ico-hum i:nth-child(3){bottom:4px;right:2px}
+.ico-hum::after{content:"";position:absolute;inset:0;background:linear-gradient(45deg,transparent 47%,currentColor 49%,currentColor 51%,transparent 53%),linear-gradient(-30deg,transparent 48%,currentColor 49.5%,currentColor 50.5%,transparent 52%);opacity:.28}
+.ico-inst{display:flex;align-items:flex-end;gap:2.5px}
+.ico-inst i{width:3px;background:currentColor;border-radius:1px}
+.ico-inst i:nth-child(1){height:11px}.ico-inst i:nth-child(2){height:16px}.ico-inst i:nth-child(3){height:13px}
+.ico-inst::before{content:"";position:absolute;top:2px;left:2px;right:2px;height:2px;background:currentColor;border-radius:1px}
+.ico-kernel::before{content:"";width:15px;height:15px;border-radius:50%;border:1.6px solid currentColor}
+.ico-kernel::after{content:"";position:absolute;top:50%;left:50%;width:4px;height:4px;border-radius:50%;background:currentColor;transform:translate(-50%,-50%)}
+/* ===== Workspace ===== */
+.lp{flex:1;min-width:0;display:flex;flex-direction:column;background:#f6efe0;position:relative}
+.lp-scroll{flex:1;overflow:auto;padding:22px 30px 60px}
+.rp{flex:0 0 348px;width:348px;display:flex;flex-direction:column;background:#fbf5e9;border-left:1px solid rgba(60,50,30,.12)}
+.card{background:#fffdf8;border:1px solid rgba(60,50,30,.12);border-radius:14px;padding:16px 18px;margin-bottom:13px;animation:fadeUp .3s ease both}
+.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.18em;color:#a59b88;text-transform:uppercase}
+.h1{font-size:21px;font-weight:600;letter-spacing:.01em;margin:4px 0 2px}
+.muted{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a8170}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em}
+.searchbox{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid rgba(60,50,30,.16);border-radius:12px;padding:10px 14px;margin:14px 0 18px}
+.searchbox input{flex:1;min-width:0;border:none;outline:none;background:transparent;font-size:14px;color:#2e2a24;font-family:'Space Grotesk',sans-serif}
+.row-hit{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border:1px solid rgba(60,50,30,.1);border-radius:11px;background:#fffdf8;margin-bottom:8px;cursor:pointer;transition:background .14s,border-color .14s}
+.row-hit:hover{background:#fff;border-color:#d9962a}
+.tab{cursor:pointer;padding:6px 13px;border-radius:999px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;border:1px solid rgba(60,50,30,.14);background:#fffdf8;color:#8a8170;transition:all .14s}
+.tab--on{background:#2e2a24;color:#fbf5e9;border-color:#2e2a24}
+.stagechip{flex:1;text-align:center;padding:7px 4px;border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.08em;border:1px solid rgba(60,50,30,.12)}
+.task-row{cursor:pointer;border:1px solid rgba(60,50,30,.12);border-radius:13px;padding:14px 16px;margin-bottom:11px;background:#fffdf8;transition:background .14s,border-color .14s,transform .12s}
+.task-row:hover{background:#fff;border-color:#d9962a;transform:translateX(2px)}
+.bar{height:5px;border-radius:999px;background:rgba(60,50,30,.1);overflow:hidden}
+.bar > i{display:block;height:100%;background:#d9962a;border-radius:999px}
+.mod{border-left:2px solid rgba(217,150,42,.5);padding:2px 0 2px 12px;margin:9px 0}
+.mod-k{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;color:#b0853a}
+.rost-row{cursor:pointer;padding:13px 15px;border-bottom:1px solid rgba(60,50,30,.08);transition:background .14s}
+.rost-row:hover{background:#fffdf8}
+.tg{cursor:pointer;padding:3px 9px;border-radius:999px;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.06em;border:1px solid rgba(60,50,30,.18);transition:all .14s}
+.addbtn{margin:0;padding:13px;text-align:center;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;color:#3a2700;background:rgba(217,150,42,.16);border-top:1px solid rgba(217,150,42,.4);transition:background .14s}
+.addbtn:hover{background:rgba(217,150,42,.28)}
+</style>
+</helmet>
+
+<div style="height:100vh;display:flex;flex-direction:row;background:#f6efe0;font-family:'Space Grotesk',sans-serif;color:#2e2a24;overflow:hidden">
+
+  <nav class="phase-rail" aria-label="Phase" tabindex="0" title="Click to expand phases">
+    <div class="rail-grip">›</div>
+    <div class="rail-top"><div class="rail-dot"></div><div class="rail-label rail-brand">FIELD</div></div>
+    <div class="rail-eyebrow rail-label">PHASE</div>
+    <div class="rail-phases">
+      <a class="rail-item" href="./Determining%20Seed.dc.html">
+        <span class="rail-ico ico-kernel"></span>
+        <span class="rail-name">ONBOARDING<span class="rail-sub rail-label">negative-space kernel</span></span>
+      </a>
+      <a class="rail-item" href="./constellation%2Bexperiment.dc.html">
+        <span class="rail-ico ico-hum"><i></i><i></i><i></i></span>
+        <span class="rail-name">HUMANITY<span class="rail-sub rail-label">the constellation</span></span>
+      </a>
+      <a class="rail-item rail-item--active" href="./Institute%20Session.dc.html">
+        <span class="rail-ico ico-inst"><i></i><i></i><i></i></span>
+        <span class="rail-name">INSTITUTE<span class="rail-sub rail-label">applications</span></span>
+      </a>
+    </div>
+    <div class="rail-foot rail-label">enter a phase</div>
+  </nav>
+
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;height:100vh">
+
+    <!-- two-panel body (no header — content is adaptive, defaults to tasks) -->
+    <div style="flex:1;display:flex;min-height:0">
+
+      <!-- ============ LEFT : surface ============ -->
+      <div class="lp">
+        <div class="lp-scroll">
+
+          <!-- BUILDING · search the catalog and add to the list -->
+          <sc-if value="{{ isBuilding }}" hint-placeholder-val="{{ true }}">
+            <div class="eyebrow">add to your list</div>
+            <div class="h1">Find an institute</div>
+            <div class="muted">Search the catalog. Tapping a school appends it to your list on the right — no commitment yet.</div>
+            <div class="searchbox">
+              <span style="color:#a59b88">⌕</span>
+              <input value="{{ searchQuery }}" onInput="{{ onSearchInput }}" placeholder="Search universities, programs, culture…" />
+            </div>
+            <sc-for list="{{ searchResults }}" as="r" hint-placeholder-count="3">
+              <div class="row-hit" title="{{ r.brief }}" onClick="{{ r.onAdd }}">
+                <div>
+                  <div style="font-weight:600;font-size:14px">{{ r.name }}</div>
+                  <div class="muted" style="margin-top:2px">{{ r.tag }}</div>
+                </div>
+                <div class="pill" style="{{ r.addStyle }}">{{ r.addLabel }}</div>
+              </div>
+            </sc-for>
+            <sc-if value="{{ searchEmpty }}" hint-placeholder-val="{{ false }}">
+              <div class="muted" style="padding:14px 2px">{{ searchEmptyMsg }}</div>
+            </sc-if>
+          </sc-if>
+
+          <!-- PENDING · provisional list established, awaiting approval — encouraging slogan -->
+          <sc-if value="{{ isPending }}" hint-placeholder-val="{{ false }}">
+            <div style="max-width:580px;margin-top:7vh">
+              <div class="eyebrow">provisional list · {{ rosterCount }} institutes</div>
+              <div class="h1" style="font-size:27px;line-height:1.25;margin:6px 0 16px">Your shortlist is taking shape.</div>
+              <div style="font-size:15px;line-height:1.75;color:#5a5246;margin-bottom:18px">{{ pendingHint }}</div>
+              <div style="font-size:15px;line-height:1.75;color:#5a5246;margin-bottom:22px">Nothing is locked in yet — explore freely. When the list feels right, <b>request approval</b> in the panel on the right to unlock task exploration and your institute profiles.</div>
+              <div class="muted" style="font-size:12px;line-height:1.7">↗ click any school in the list to research it · ＋ add more from there anytime.</div>
+            </div>
+          </sc-if>
+
+          <!-- INSTITUTE · staged page (research → exploration → profile) -->
+          <sc-if value="{{ isInstitute }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ onBackTasks }}" class="muted" style="cursor:pointer;margin-bottom:9px">{{ backLabel }}</div>
+            <div class="eyebrow">{{ instEyebrow }}</div>
+            <div class="h1">{{ activeName }}</div>
+            <div class="muted">{{ instStatusLine }}</div>
+
+            <!-- stage stepper -->
+            <div style="display:flex;gap:7px;margin:14px 0 18px">
+              <sc-for list="{{ stepperItems }}" as="st" hint-placeholder-count="3">
+                <div onClick="{{ st.onClick }}" style="{{ st.style }}">{{ st.label }}</div>
+              </sc-for>
+            </div>
+
+            <!-- STAGE 1 · research report -->
+            <sc-if value="{{ isStageResearch }}" hint-placeholder-val="{{ true }}">
+              <sc-for list="{{ researchSections }}" as="s" hint-placeholder-count="4">
+                <div class="card">
+                  <div class="eyebrow">{{ s.h }}</div>
+                  <div style="margin-top:7px;font-size:14px;line-height:1.6;color:#3a342b">{{ s.body }}</div>
+                </div>
+              </sc-for>
+              <div class="muted" style="margin-top:6px">↗ gauge resonance and confirm in the right panel →</div>
+            </sc-if>
+
+            <!-- STAGE 2 · explorative status (prompt-status) -->
+            <sc-if value="{{ isStageExploration }}" hint-placeholder-val="{{ false }}">
+              <div class="eyebrow" style="margin-bottom:9px">supplemental prompts · status</div>
+              <sc-for list="{{ promptStatusItems }}" as="p" hint-placeholder-count="2">
+                <div class="card">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+                    <div style="display:flex;align-items:center;gap:10px">
+                      <div style="padding:3px 9px;border-radius:999px;background:rgba(217,150,42,.16);border:1px solid rgba(217,150,42,.45);font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.06em;color:#3a2700">{{ p.taskNo }}</div>
+                      <div style="font-weight:600;font-size:14px">{{ p.label }}</div>
+                    </div>
+                    <div class="pill" style="{{ p.chipStyle }}">{{ p.chip }}</div>
+                  </div>
+                  <div class="muted" style="margin:6px 0 0;line-height:1.55">“{{ p.promptText }}”</div>
+                  <div style="{{ p.resultStyle }}">
+                    <div class="eyebrow" style="color:#2c7d57">result</div>
+                    <div style="margin-top:6px;font-size:13.5px;line-height:1.6;color:#2e2a24">{{ p.resultSentence }}</div>
+                    <div class="muted" style="margin-top:6px;font-size:10.5px">{{ p.resultMeta }}</div>
+                  </div>
+                  <div onClick="{{ p.onWork }}" style="{{ p.workStyle }}">{{ p.workLabel }}</div>
+                </div>
+              </sc-for>
+
+              <!-- artifact preview gate -->
+              <div style="{{ artifactPreviewStyle }}">
+                <div style="font-size:13.5px;color:#3a342b;line-height:1.55">{{ artifactPreviewMsg }}</div>
+                <sc-if value="{{ artifactPreviewReady }}" hint-placeholder-val="{{ false }}">
+                  <div onClick="{{ onGotoProfile }}" style="margin-top:11px;display:inline-block;cursor:pointer;padding:10px 18px;border-radius:11px;background:#d9962a;color:#3a2700;font-weight:600;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em">⟡ Preview &amp; build profile →</div>
+                </sc-if>
+              </div>
+            </sc-if>
+
+            <!-- STAGE 3 · profile review (skeleton + humanity meta) -->
+            <sc-if value="{{ isStageProfile }}" hint-placeholder-val="{{ false }}">
+              <!-- quick action panel: explain · experiment -->
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:2px 0 16px">
+                <div onClick="{{ startExplain }}" style="{{ explainBtnStyle }}"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.6" stroke="currentColor" stroke-width="1.2"/><path d="M7 6.2v3.4M7 4.2h.01" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Explain</div>
+                <div onClick="{{ openInstExperiment }}" style="{{ instExpBtnStyle }}"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2v10" stroke="#d9962a" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="7" r="5.6" stroke="#d9962a" stroke-width="1.1"/></svg>Experiment</div>
+                <sc-if value="{{ hasChips }}" hint-placeholder-val="{{ false }}">
+                  <sc-for list="{{ explainChips }}" as="c" hint-placeholder-count="0">
+                    <div style="display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:rgba(217,150,42,.14);border:1px solid rgba(217,150,42,.4);font-size:11px;color:#3a2700">{{ c.abbr }}<span onClick="{{ c.onRemove }}" style="cursor:pointer;color:#a08e6a">✕</span></div>
+                  </sc-for>
+                </sc-if>
+              </div>
+
+              <div class="eyebrow" style="margin-bottom:9px">supplemental prompts · skeleton</div>
+              <sc-for list="{{ profSuppItems }}" as="p" hint-placeholder-count="2">
+                <div class="card">
+                  <div style="font-weight:600;font-size:14px">{{ p.label }}</div>
+                  <div class="muted" style="margin:4px 0 10px;line-height:1.55">“{{ p.promptText }}”</div>
+                  <div class="mod"><div class="mod-k">TELOS</div><div style="font-size:13px;line-height:1.55;color:#3a342b;margin-top:2px">{{ p.telos }}</div></div>
+                  <div class="mod"><div class="mod-k">FUNCTIONALITY</div><div style="font-size:13px;line-height:1.55;color:#3a342b;margin-top:2px">{{ p.functionality }}</div></div>
+                  <div class="mod"><div class="mod-k">PIVOTAL</div><div style="font-size:13px;line-height:1.55;color:#3a342b;margin-top:2px">{{ p.pivotal }}</div></div>
+                </div>
+              </sc-for>
+
+              <div class="eyebrow" style="margin:18px 0 9px">humanity profile · full application workspace (collapsed)</div>
+              <sc-for list="{{ strataItems }}" as="s" hint-placeholder-count="5">
+                <div style="border:1px solid rgba(60,50,30,.1);border-radius:11px;margin-bottom:8px;overflow:hidden;background:#fffdf8">
+                  <div onClick="{{ s.onToggle }}" style="display:flex;align-items:center;justify-content:space-between;padding:11px 15px;cursor:pointer">
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;color:#6a6253">{{ s.name }}</div>
+                    <div class="muted">{{ s.caret }}</div>
+                  </div>
+                  <div style="{{ s.bodyStyle }}">
+                    <div style="padding:2px 15px 13px">
+                      <sc-for list="{{ s.cats }}" as="c" hint-placeholder-count="3">
+                        <div style="margin-bottom:12px">
+                          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#a08e6a;margin-bottom:3px">{{ c.label }}</div>
+                          <div style="font-size:12.5px;line-height:1.6;color:#3a342b;white-space:pre-line">{{ c.body }}</div>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                </div>
+              </sc-for>
+
+              <div onClick="{{ onGotoArtifact }}" class="muted" style="margin-top:18px;cursor:pointer;color:#c08a1e">→ Generate the artifact in the Artifact stage</div>
+            </sc-if>
+
+            <!-- STAGE 4 · artifact (generation + generated supplements) -->
+            <sc-if value="{{ isStageArtifact }}" hint-placeholder-val="{{ false }}">
+              <div style="margin:2px 0 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+                <sc-if value="{{ canGenerate }}" hint-placeholder-val="{{ true }}">
+                  <div onClick="{{ onGenerate }}" style="cursor:pointer;padding:11px 22px;border-radius:11px;background:#d9962a;color:#3a2700;font-weight:600;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em">⟡ Generate artifact</div>
+                </sc-if>
+                <sc-if value="{{ generated }}" hint-placeholder-val="{{ false }}">
+                  <div class="pill" style="background:rgba(63,167,118,.16);color:#2c7d57">✓ artifact generated</div>
+                </sc-if>
+                <div class="muted">{{ generateHint }}</div>
+              </div>
+
+              <div class="eyebrow" style="margin-bottom:9px">generated supplements</div>
+              <sc-for list="{{ profSuppItems }}" as="p" hint-placeholder-count="2">
+                <div class="card">
+                  <div style="font-weight:600;font-size:14px">{{ p.label }}</div>
+                  <div class="muted" style="margin:4px 0 0;line-height:1.55">“{{ p.promptText }}”</div>
+                  <div style="{{ p.essayStyle }}">
+                    <div class="eyebrow" style="color:#2c7d57">generated artifact</div>
+                    <div style="margin-top:6px;font-size:13.5px;line-height:1.65;color:#2e2a24">{{ p.essay }}</div>
+                  </div>
+                  <div style="{{ p.placeholderStyle }}">Artifact will appear here once generated.</div>
+                </div>
+              </sc-for>
+            </sc-if>
+          </sc-if>
+
+          <!-- TASKS -->
+          <sc-if value="{{ isTasks }}" hint-placeholder-val="{{ false }}">
+            <div class="eyebrow">work surface · prioritized</div>
+            <div class="h1">Tasks</div>
+            <div class="muted">Thematically convergent supp-prompts across your confirmed institutes. Worked once, fed everywhere.</div>
+            <div style="height:16px"></div>
+            <sc-if value="{{ tasksEmpty }}" hint-placeholder-val="{{ false }}">
+              <div class="card"><div style="font-size:14px;line-height:1.6;color:#3a342b">{{ tasksEmptyMsg }}</div></div>
+            </sc-if>
+            <sc-for list="{{ taskItems }}" as="t" hint-placeholder-count="2">
+              <div class="task-row" onClick="{{ t.onOpen }}">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+                  <div style="display:flex;align-items:center;gap:11px">
+                    <div style="width:23px;height:23px;border-radius:50%;background:rgba(217,150,42,.16);border:1px solid rgba(217,150,42,.5);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#3a2700">{{ t.order }}</div>
+                    <div style="font-weight:600;font-size:15px">{{ t.theme }}</div>
+                  </div>
+                  <div class="pill" style="{{ t.chipStyle }}">{{ t.chip }}</div>
+                </div>
+                <div class="muted" style="margin:7px 0 10px;padding-left:34px">{{ t.blurb }}</div>
+                <div style="padding-left:34px"><div class="bar"><i style="width:{{ t.pct }}%"></i></div></div>
+              </div>
+            </sc-for>
+          </sc-if>
+
+          <!-- LOCUS · ported exploration module (survey → lens → frame → DEPTH → complete) -->
+          <sc-if value="{{ isLocus }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ onLocusBack }}" class="muted" style="cursor:pointer;margin-bottom:12px">← back</div>
+            <div style="max-width:720px">
+              <div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;color:#8a8170">EXPLORING · {{ themeName }}</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#c08a1e">{{ doneCount }}/{{ total }} · {{ progressPct }}%</span>
+                </div>
+                <div style="height:6px;border-radius:999px;background:rgba(60,50,30,.12);overflow:hidden">
+                  <div style="{{ progressFillStyle }}"></div>
+                </div>
+                <sc-if value="{{ allDone }}" hint-placeholder-val="{{ false }}">
+                  <div style="margin-top:9px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#3fa776;letter-spacing:.03em">✓ {{ completionMsg }}</div>
+                </sc-if>
+              </div>
+
+              <div style="display:flex;align-items:center;gap:6px;margin:14px 0 10px;flex-wrap:wrap">
+                <sc-for list="{{ stageRail }}" as="sr" hint-placeholder-count="4">
+                  <div style="{{ sr.style }}">{{ sr.label }}<sc-if value="{{ sr.revisited }}" hint-placeholder-val="{{ false }}"><span style="color:#d9962a;margin-left:4px">•</span></sc-if></div>
+                </sc-for>
+              </div>
+              <sc-if value="{{ showContinueForward }}" hint-placeholder-val="{{ false }}">
+                <div onClick="{{ continueForward }}" style="margin-bottom:10px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#c08a1e;cursor:pointer">Continue forward →</div>
+              </sc-if>
+              <sc-if value="{{ agentNote }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-bottom:10px;padding:10px 12px;background:rgba(217,150,42,.1);border-radius:10px;font-size:12px;color:#5a5246;line-height:1.45">{{ agentNote }}</div>
+              </sc-if>
+
+              <div style="background:#fffdf8;border:1px solid rgba(60,50,30,.12);border-radius:16px;padding:22px;box-shadow:0 14px 40px -24px rgba(90,70,20,.35)">
+                <div style="font-size:15.5px;font-weight:600;color:#2e2a24;line-height:1.5;margin-bottom:18px">{{ stagePrompt }}</div>
+
+                <sc-if value="{{ isSurveyStage }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;color:#c08a1e;margin-bottom:12px">RAW MATERIAL · answer all · {{ surveyProgress }}</div>
+                  <div style="display:flex;flex-direction:column;gap:18px">
+                    <sc-for list="{{ surveySections }}" as="sq" hint-placeholder-count="4">
+                      <div style="padding-bottom:4px;border-bottom:1px solid rgba(60,50,30,.08)">
+                        <div style="font-size:14px;font-weight:600;color:#2e2a24;line-height:1.45;margin-bottom:10px">{{ sq.prompt }}</div>
+                        <div style="display:flex;flex-direction:column;gap:8px">
+                          <sc-for list="{{ sq.options }}" as="o" hint-placeholder-count="3">
+                            <div onClick="{{ o.onClick }}" style="{{ o.style }}">{{ o.label }}</div>
+                          </sc-for>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <sc-if value="{{ showProceedSurvey }}" hint-placeholder-val="{{ false }}">
+                    <div onClick="{{ proceedSurveyClick }}" style="{{ proceedSurveyStyle }}">Continue to lens →</div>
+                  </sc-if>
+                </sc-if>
+
+                <sc-if value="{{ isLensStage }}" hint-placeholder-val="{{ false }}">
+                  <sc-if value="{{ lensNotChosen }}" hint-placeholder-val="{{ true }}">
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:10px;align-items:stretch">
+                      <sc-for list="{{ lensModules }}" as="lm" hint-placeholder-count="3">
+                        <div onClick="{{ lm.onClick }}" style="{{ lm.style }}">
+                          <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;color:#c08a1e;margin-bottom:6px">{{ lm.title }}</div>
+                          <div style="font-size:12.5px;color:#4a443a;line-height:1.5">{{ lm.blurb }}</div>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ lensChosen }}" hint-placeholder-val="{{ false }}">
+                    <div style="padding:14px 15px;border-radius:12px;border:1.5px solid #d9962a;background:rgba(217,150,42,.08);margin-bottom:14px">
+                      <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;color:#c08a1e;margin-bottom:6px">CHOSEN LENS</div>
+                      <div style="font-size:14px;font-weight:600;color:#2e2a24;margin-bottom:6px">{{ chosenLensTitle }}</div>
+                      <div style="font-size:13px;color:#5a5246;line-height:1.55">{{ chosenLensBlurb }}</div>
+                    </div>
+                    <div class="muted" style="margin-bottom:12px;font-size:12px;color:#c08a1e">↗ prime key notation in the right panel →</div>
+                    <div onClick="{{ proceedFrameClick }}" style="{{ proceedFrameStyle }}">Proceed to frame →</div>
+                  </sc-if>
+                </sc-if>
+
+                <sc-if value="{{ isFrameStage }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:14.5px;line-height:1.85;color:#3a342b;margin-bottom:16px">
+                    <sc-for list="{{ frameParts }}" as="fp" hint-placeholder-count="5">
+                      <sc-if value="{{ fp.isText }}" hint-placeholder-val="{{ true }}"><span>{{ fp.text }}</span></sc-if>
+                      <sc-if value="{{ fp.isSlot }}" hint-placeholder-val="{{ false }}"><span onClick="{{ fp.onClick }}" style="{{ fp.style }}">{{ fp.text }}</span></sc-if>
+                    </sc-for>
+                  </div>
+                  <sc-if value="{{ frameSlotOpen }}" hint-placeholder-val="{{ false }}">
+                    <div class="muted" style="margin-bottom:14px;font-size:12px;color:#c08a1e">↗ choose the phrase for this slot in the right panel →</div>
+                  </sc-if>
+                  <sc-if value="{{ showFrameGapElev }}" hint-placeholder-val="{{ false }}">
+                    <div onClick="{{ confirmFrameClick }}" style="{{ confirmFrameStyle }}">Confirm frame</div>
+                  </sc-if>
+                </sc-if>
+
+                <sc-if value="{{ isTextureStage }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;color:#8a8170;margin-bottom:12px">WORTHY EXPLORING · select threads</div>
+                  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px">
+                    <sc-for list="{{ frameSubjectChips }}" as="fs" hint-placeholder-count="5">
+                      <div onClick="{{ fs.onClick }}" style="{{ fs.style }}">{{ fs.label }}</div>
+                    </sc-for>
+                  </div>
+                  <div style="font-size:13px;color:#5a5246;line-height:1.55;margin-bottom:16px">Tap what still feels worth exploring — or finish when you are ready.</div>
+                  <div onClick="{{ skipDepthClick }}" style="padding:11px 16px;border-radius:11px;border:1px solid rgba(60,50,30,.14);background:#fff;color:#5a5246;font-size:13px;cursor:pointer;display:inline-block" style-hover="border-color:#d9962a;color:#3a2700">{{ depthDoneLabel }}</div>
+                </sc-if>
+
+                <sc-if value="{{ isCompleteStage }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#3fa776;line-height:1.6">{{ completionMsg }} · written back into the linked supp-prompts.</div>
+                  <div onClick="{{ onLocusBack }}" class="muted" style="cursor:pointer;margin-top:14px">return →</div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-if>
+
+
+        </div>
+        <sc-if value="{{ showSelConfirm }}" hint-placeholder-val="{{ false }}">
+          <div onMouseDown="{{ confirmExplain }}" style="{{ selConfirmStyle }}">+ Explain this</div>
+        </sc-if>
+      </div>
+
+      <!-- ============ RIGHT : institute roster / frame slot picker ============ -->
+      <div class="rp" style="{{ rpStyle }}">
+
+        <!-- profile experiment · transmute wizard (ported from constellation) -->
+        <sc-if value="{{ expVisible }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid rgba(60,50,30,.1);flex-shrink:0">
+              <div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.18em;color:#2e2a24">EXPERIMENT</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#a59b88;margin-top:3px">{{ expContextName }}</div>
+              </div>
+              <div onClick="{{ expClose }}" class="muted" style="cursor:pointer;font-size:10px">✕ close</div>
+            </div>
+
+            <div style="flex:1;overflow:auto;padding:16px">
+              <!-- step rail -->
+              <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px">
+                <sc-for list="{{ expSteps }}" as="st" hint-placeholder-count="3">
+                  <div style="{{ st.style }}">{{ st.label }}</div>
+                </sc-for>
+              </div>
+
+              <!-- HUNCH -->
+              <sc-if value="{{ expIsHunch }}" hint-placeholder-val="{{ true }}">
+                <div style="font-size:10px;font-family:'IBM Plex Mono',monospace;letter-spacing:.14em;color:#c08a1e;margin-bottom:8px">START WITH A HUNCH</div>
+                <div style="font-size:17px;font-weight:600;line-height:1.35;margin-bottom:8px">What do you wish were different?</div>
+                <div style="font-size:12px;color:#8a8170;line-height:1.55;margin-bottom:12px">Half-formed is fine. Clarify, transmute — nothing commits until you approve.</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                  <sc-for list="{{ expHunchChips }}" as="h" hint-placeholder-count="4"><div onClick="{{ h.onClick }}" style="padding:5px 10px;border-radius:999px;border:1px solid rgba(60,50,30,.14);background:#fff;color:#5a5246;font-size:11px;cursor:pointer" style-hover="border-color:#d9962a">{{ h.label }}</div></sc-for>
+                </div>
+                <div style="margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#c08a1e">type below ↓</div>
+              </sc-if>
+
+              <!-- CLARIFY -->
+              <sc-if value="{{ expIsClarify }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:10px;font-family:'IBM Plex Mono',monospace;letter-spacing:.14em;color:#c08a1e;margin-bottom:8px">CLARIFY · {{ expClarifyLabel }}</div>
+                <div style="font-size:16px;font-weight:600;line-height:1.35;margin-bottom:8px">{{ expQuestion }}</div>
+                <div style="padding:9px 11px;background:#f4eee1;border-radius:10px;border-left:2px solid #d9962a;font-size:11.5px;color:#6f675a;line-height:1.5;margin-bottom:10px">{{ expScaffold }}</div>
+                <div style="display:flex;flex-direction:column;gap:7px">
+                  <sc-for list="{{ expOptions }}" as="o" hint-placeholder-count="4"><div onClick="{{ o.onClick }}" style="{{ o.style }}">{{ o.label }}</div></sc-for>
+                </div>
+                <div onClick="{{ expBack }}" style="margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8a8170;cursor:pointer">← back</div>
+              </sc-if>
+
+              <!-- TRANSMUTE -->
+              <sc-if value="{{ expIsTransmutePhase }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:10px;font-family:'IBM Plex Mono',monospace;letter-spacing:.14em;color:#c08a1e;margin-bottom:6px">TRANSMUTE · select a pair · edit actualized · enrich when needed</div>
+                <div style="font-size:15px;font-weight:600;line-height:1.35;margin-bottom:8px">{{ expBundlesTitle }}</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+                  <div style="font-size:11px;color:#8a8170;line-height:1.5;flex:1;min-width:120px">Live on the skeleton as you edit · Approve commits immediately.</div>
+                  <div onClick="{{ expChooseAll }}" style="{{ expChooseAllStyle }}">{{ expChooseAllLabel }}</div>
+                </div>
+                <sc-if value="{{ expRefineFocus }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;padding:8px 10px;background:#fff;border-radius:10px;border:1px solid rgba(217,150,42,.35)">
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;color:#c08a1e">REFINING ONE PAIR</div>
+                    <div onClick="{{ expExitRefine }}" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8a8170;cursor:pointer">← all options</div>
+                  </div>
+                </sc-if>
+                <sc-for list="{{ expBundles }}" as="b" hint-placeholder-count="3">
+                  <sc-if value="{{ b.showInList }}" hint-placeholder-val="{{ true }}">
+                  <div onClick="{{ b.onClick }}" style="{{ b.style }}">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:6px">
+                      <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#c08a1e">{{ b.label }}</span>
+                      <span style="{{ b.tickStyle }}">{{ b.tick }}</span>
+                    </div>
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;color:#b0a692;margin-bottom:8px">{{ b.locate }}</div>
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;color:#a59b88;margin-bottom:3px">ORIGINAL</div>
+                    <div style="font-size:11px;color:#6f675a;line-height:1.45;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(60,50,30,.08)">{{ b.original }}</div>
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;color:#2c7a55;margin-bottom:3px">ACTUALIZED</div>
+                    <sc-if value="{{ b.isActive }}" hint-placeholder-val="{{ false }}">
+                      <textarea value="{{ b.transmuted }}" onInput="{{ b.onActualizedInput }}" onClick="{{ expStopProp }}" onMouseDown="{{ expStopProp }}" style="width:100%;min-height:64px;box-sizing:border-box;font-size:12px;color:#2c7a55;line-height:1.5;font-weight:500;margin-bottom:6px;padding:8px 10px;border-radius:10px;border:1px solid rgba(63,167,118,.35);background:rgba(255,255,255,.85);resize:vertical;outline:none;font-family:inherit"></textarea>
+                    </sc-if>
+                    <sc-if value="{{ b.showActualizedReadOnly }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-size:12px;color:#2c7a55;line-height:1.45;font-weight:500;margin-bottom:8px">{{ b.transmuted }}</div>
+                    </sc-if>
+                    <sc-if value="{{ b.showRefineBtn }}" hint-placeholder-val="{{ false }}">
+                      <div onClick="{{ b.onRefine }}" style="margin-bottom:8px;padding:7px 10px;border-radius:9px;border:1px dashed rgba(217,150,42,.45);background:rgba(217,150,42,.06);font-family:'IBM Plex Mono',monospace;font-size:9px;color:#9a6b12;cursor:pointer;text-align:center">Refine with FIELD</div>
+                    </sc-if>
+                    <sc-if value="{{ b.isRefining }}" hint-placeholder-val="{{ false }}">
+                      <div style="margin-bottom:8px;padding:10px;border-radius:10px;background:#fff;border:1px solid rgba(217,150,42,.28)">
+                        <textarea value="{{ expRefineInput }}" onInput="{{ expSetRefineInput }}" onKeyDown="{{ expRefineKey }}" onClick="{{ expStopProp }}" placeholder="Enrich the actualized text…" style="width:100%;min-height:48px;box-sizing:border-box;padding:8px;border-radius:8px;border:1px solid rgba(60,50,30,.14);font-size:12px;resize:vertical;outline:none;font-family:inherit"></textarea>
+                        <div onClick="{{ expRefineSend }}" style="margin-top:6px;padding:6px 10px;border-radius:8px;background:#d9962a;color:#3a2700;font-size:11px;font-weight:600;cursor:pointer;text-align:center">Enrich</div>
+                      </div>
+                    </sc-if>
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:.1em;color:#a59b88;margin-bottom:3px">WHY THIS SHIFT</div>
+                    <div style="font-size:10.5px;color:#5a5246;line-height:1.5">{{ b.whyShift }}</div>
+                  </div>
+                  </sc-if>
+                </sc-for>
+                <sc-if value="{{ expHasChosen }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:8px;flex-wrap:wrap;padding-top:10px;border-top:1px solid rgba(60,50,30,.1)">
+                    <div onClick="{{ expClearProjections }}" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8a8170;cursor:pointer">clear previews</div>
+                    <div onClick="{{ expApprove }}" style="padding:9px 14px;border-radius:10px;background:#d9962a;color:#3a2700;font-size:12.5px;font-weight:600;cursor:pointer">Approve ✓</div>
+                  </div>
+                </sc-if>
+                <div onClick="{{ expBack }}" style="margin-top:10px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8a8170;cursor:pointer">← back</div>
+              </sc-if>
+            </div>
+
+            <!-- steer input bar (hunch / clarify) -->
+            <sc-if value="{{ expShowSteerBar }}" hint-placeholder-val="{{ true }}">
+            <div style="flex-shrink:0;padding:12px 14px 16px;border-top:1px solid rgba(60,50,30,.1);background:#faf6ec">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#a59b88;margin-bottom:6px">{{ expSteerScaffold }}</div>
+              <div style="display:flex;align-items:center;gap:7px;background:#fff;border:1px solid rgba(60,50,30,.14);border-radius:12px;padding:6px 7px 6px 12px">
+                <input value="{{ expSteerInput }}" onInput="{{ expSetSteer }}" onKeyDown="{{ expSteerKey }}" placeholder="{{ expSteerPlaceholder }}" style="flex:1;min-width:0;background:transparent;border:none;outline:none;color:#2e2a24;font-size:13px" />
+                <div onClick="{{ expSteerSend }}" style="width:30px;height:30px;flex-shrink:0;border-radius:9px;background:#d9962a;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="14" height="14" viewBox="0 0 15 15" fill="none"><path d="M7.5 12V3.2M3.6 7 7.5 3.1 11.4 7" stroke="#3a2700" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+            </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <!-- IKEA frame: open-slot picker takes over the right panel -->
+        <sc-if value="{{ frameSlotOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid rgba(60,50,30,.1);flex-shrink:0">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.16em;color:#6a6253">ASSEMBLE FRAME</div>
+              <div onClick="{{ onSlotCancel }}" class="muted" style="cursor:pointer">✕ close</div>
+            </div>
+            <div style="flex:1;overflow:auto;padding:16px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;color:#a59b88;margin-bottom:13px;line-height:1.6">{{ slotPickHint }}</div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <sc-for list="{{ frameSlotOptions }}" as="fo" hint-placeholder-count="3">
+                  <div onClick="{{ fo.onClick }}" style="padding:12px 13px;border:1px solid rgba(60,50,30,.14);border-radius:11px;background:#fffdf8;color:#3a342b;font-size:13px;cursor:pointer;line-height:1.5" style-hover="border-color:#d9962a;background:#fff">{{ fo.label }}</div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- in-institute exploration companion: notation prime + adaptive action (same style as constellation locus) -->
+        <sc-if value="{{ locusNoteVisible }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid rgba(60,50,30,.1);flex-shrink:0">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.16em;color:#6a6253">NOTATION</div>
+              <div class="muted" style="font-size:9px">{{ companionStageLabel }}</div>
+            </div>
+            <div style="flex:1;overflow:auto;padding:16px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;color:#8a8170;margin-bottom:10px">KEY NOTATION · {{ themeName }}</div>
+              <sc-for list="{{ companionNotations }}" as="nt" hint-placeholder-count="0">
+                <div style="display:flex;gap:8px;margin-bottom:9px;align-items:flex-start"><span style="color:#d9962a;flex-shrink:0">+</span><span style="font-size:13px;color:#3a342b;line-height:1.5">{{ nt.text }}</span></div>
+              </sc-for>
+              <sc-if value="{{ notationEmptyCompanion }}" hint-placeholder-val="{{ true }}">
+                <div style="font-size:12px;color:#bcb2a0;font-style:italic;margin-bottom:12px">No notation yet — prime the throughline as you explore.</div>
+              </sc-if>
+              <sc-if value="{{ companionCanAdd }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;gap:7px;align-items:center;margin-top:6px">
+                  <input value="{{ notationDraft }}" onInput="{{ onNotationInput }}" onKeyDown="{{ onNotationKey }}" placeholder="add a notation…" style="flex:1;min-width:0;background:#fff;border:1px solid rgba(60,50,30,.16);border-radius:9px;padding:8px 11px;font-size:13px;outline:none;font-family:'Space Grotesk',sans-serif;color:#2e2a24" />
+                  <div onClick="{{ onAddNotation }}" style="cursor:pointer;padding:8px 13px;border-radius:9px;background:rgba(217,150,42,.18);border:1px solid #d9962a;color:#3a2700;font-family:'IBM Plex Mono',monospace;font-size:11px">+ add</div>
+                </div>
+              </sc-if>
+              <div class="muted" style="margin-top:16px;padding-top:13px;border-top:1px dashed rgba(60,50,30,.14);font-size:11px;line-height:1.6">{{ companionHint }}</div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- resonant substrate (research stage): why the student resonates with this institute -->
+        <sc-if value="{{ substrateVisible }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid rgba(60,50,30,.1);flex-shrink:0">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.16em;color:#6a6253">RESONANT SUBSTRATE</div>
+              <div class="muted" style="font-size:9px">why you ↔ {{ activeName }}</div>
+            </div>
+            <div style="flex:1;overflow:auto;padding:16px">
+              <div class="muted" style="font-size:11px;line-height:1.6;margin-bottom:14px">Throughlines from your humanity profile that resonate with this institute.</div>
+              <sc-for list="{{ substrateItems }}" as="r" hint-placeholder-count="4">
+                <div style="display:flex;gap:8px;margin-bottom:12px;align-items:flex-start">
+                  <span style="color:#d9962a;flex-shrink:0;margin-top:1px">+</span>
+                  <div>
+                    <div style="font-size:13px;color:#2e2a24;line-height:1.5;font-weight:500">{{ r.evidence }}</div>
+                    <div class="muted" style="font-size:11px;line-height:1.5;margin-top:2px">→ {{ r.link }}</div>
+                  </div>
+                </div>
+              </sc-for>
+
+              <sc-if value="{{ selectionPhase }}" hint-placeholder-val="{{ true }}">
+                <div style="margin-top:16px;padding-top:14px;border-top:1px dashed rgba(60,50,30,.16)">
+                  <div class="muted" style="font-size:10.5px;line-height:1.6">Explorative only. Exploration &amp; tasks unlock once your whole <b>institute list</b> is approved — request stakeholder approval in the list (open <b>＋ find</b>).</div>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- building phase: selected-names log only (no status / approval / +add / sim) -->
+        <sc-if value="{{ selectLogVisible }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid rgba(60,50,30,.1);flex-shrink:0">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.16em;color:#6a6253">SELECTED · {{ rosterCount }}</div>
+              <div class="muted" style="font-size:9.5px">your list</div>
+            </div>
+            <div style="flex:1;overflow:auto;padding:6px 0">
+              <sc-for list="{{ selectedLog }}" as="r" hint-placeholder-count="2">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 16px;border-bottom:1px solid rgba(60,50,30,.06)">
+                  <div style="font-weight:600;font-size:13.5px">{{ r.name }}</div>
+                  <div onClick="{{ r.onRemove }}" style="cursor:pointer;font-size:13px;color:#b0a692" title="remove">✕</div>
+                </div>
+              </sc-for>
+              <sc-if value="{{ selectedEmpty }}" hint-placeholder-val="{{ true }}">
+                <div class="muted" style="padding:16px;font-size:12px;line-height:1.6">No schools yet — search on the left and tap to add them to your list.</div>
+              </sc-if>
+            </div>
+            <div onClick="{{ onConfirmList }}" style="{{ confirmListStyle }}">Confirm list →</div>
+          </div>
+        </sc-if>
+
+        <!-- institute roster (default) -->
+        <sc-if value="{{ rosterVisible }}" hint-placeholder-val="{{ true }}">
+          <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid rgba(60,50,30,.1);flex-shrink:0">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.16em;color:#6a6253">INSTITUTES · {{ rosterCount }}</div>
+              <div class="muted" style="font-size:9.5px">{{ rosterPhaseLabel }}</div>
+            </div>
+
+            <div style="flex:1;overflow:auto">
+              <sc-for list="{{ rosterItems }}" as="r" hint-placeholder-count="3">
+                <div class="rost-row" style="{{ r.rowStyle }}" onClick="{{ r.onSelect }}">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                    <div style="font-weight:600;font-size:13.5px">{{ r.name }}</div>
+                    <div class="pill" style="{{ r.statusStyle }}">{{ r.statusLabel }}</div>
+                  </div>
+                  <div class="muted" style="margin:3px 0 8px;font-size:10px">{{ r.tag }}</div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.04em;color:#8a8170">{{ r.progressLine }}</div>
+                </div>
+              </sc-for>
+            </div>
+
+            <!-- list-level stakeholder approval gate -->
+            <sc-if value="{{ selectionPhase }}" hint-placeholder-val="{{ true }}">
+              <div style="padding:12px 16px;border-top:1px solid rgba(60,50,30,.1);background:#faf5ea">
+                <div class="muted" style="font-size:9px;letter-spacing:.06em;margin-bottom:8px;color:#9a6a14">EXPLORATIVE ONLY · approve the list to unlock tasks</div>
+                <sc-if value="{{ approvalNotRequested }}" hint-placeholder-val="{{ true }}">
+                  <div onClick="{{ requestApproval }}" style="{{ requestBtnStyle }}">Request approval to proceed →</div>
+                </sc-if>
+                <sc-if value="{{ approvalPending }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;align-items:center;gap:14px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8a8170">
+                    <span>{{ counselorDot }} counselor</span><span>{{ parentDot }} parent</span>
+                  </div>
+                  <div class="muted" style="margin-top:6px;font-size:10px">Awaiting stakeholder approval…</div>
+                </sc-if>
+              </div>
+              <div style="padding:10px 16px;border-top:1px dashed rgba(176,122,42,.4);background:rgba(176,122,42,.06)">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.14em;margin-bottom:7px;color:#b07a2a">TEST · STAKEHOLDER SIM</div>
+                <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+                  <span class="tg" style="{{ simCounselorStyle }}" onClick="{{ simCounselor }}">{{ simCounselorLabel }}</span>
+                  <span class="tg" style="{{ simParentStyle }}" onClick="{{ simParent }}">{{ simParentLabel }}</span>
+                  <span class="tg" style="background:#fff;color:#8a8170;border-color:rgba(60,50,30,.18)" onClick="{{ resetApproval }}">⟲ reset</span>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ listApprovedV }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:12px 16px;border-top:1px solid rgba(60,50,30,.1);display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#2c7d57">✓ list approved · tasks unlocked<span class="muted" onClick="{{ resetApproval }}" style="cursor:pointer;margin-left:auto;font-size:9px">⟲ reset</span></div>
+            </sc-if>
+
+            <div class="addbtn" onClick="{{ onAddSchool }}">＋ Add school</div>
+          </div>
+        </sc-if>
+      </div>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    personName: 'Maya Okonkwo',
+    leftMode: 'search',         // search | institute | tasks | locus
+    instStage: 'research',      // institute sub-stage: research | exploration | profile
+    locusOrigin: 'tasks',       // where openTask launched from: tasks | institute
+    listApproval: { requested: false, counselor: false, parent: false },  // list-level stakeholder gate
+    listConfirmed: false,       // building (selected-names log) → confirmed list (roster + approval)
+    activeId: null,
+    activeTaskId: null,
+    searchQuery: '',
+    slotOpenId: null,           // open frame slot in locus
+    notationDraft: '',          // notation input draft
+    taskState: {},              // theme -> full locus object (makeLocus)
+    openStrata: {},             // strata name -> bool
+    explainMode: false, selRect: null, selText: '', explainChips: [],  // explain mode
+    exp: null,                  // profile experiment (transmute) flow
+    institutes: [],   // first stage starts empty — institutes are logged only as the student adds them
+    catalog: [
+      { id: 'stanford', name: 'Stanford University', tag: 'design × CS · the d.school', suppPrompts: [
+        { id: 'st-vitality', theme: 'Intellectual vitality', label: 'Intellectual vitality · 250w', promptText: 'The Stanford community is deeply curious. Reflect on an idea or experience that makes you genuinely excited about learning.' },
+        { id: 'st-roommate', theme: 'Self & community', label: 'Note to your roommate · 250w', promptText: 'Write a note to your future roommate that reveals something about you.' },
+      ] },
+      { id: 'mit', name: 'MIT', tag: 'maker culture · systems', suppPrompts: [
+        { id: 'mit-pleasure', theme: 'Intellectual vitality', label: 'For the pleasure of it · 200w', promptText: 'Describe something you do simply for the pleasure of it.' },
+        { id: 'mit-contribution', theme: 'Community & contribution', label: 'Contribution to community · 200w', promptText: 'How have you contributed to a community that is meaningful to you?' },
+      ] },
+      { id: 'berkeley', name: 'UC Berkeley', tag: 'public mission · scale', suppPrompts: [
+        { id: 'bk-leadership', theme: 'Community & contribution', label: 'Leadership experience · 350w', promptText: 'Describe an example of your leadership in which you positively influenced others.' },
+      ] },
+      { id: 'gatech', name: 'Georgia Tech', tag: 'engineering · co-op pipeline' },
+      { id: 'olin', name: 'Olin College', tag: 'project-based engineering' },
+      { id: 'cmu', name: 'Carnegie Mellon', tag: 'HCI · interdisciplinary' },
+      { id: 'umich', name: 'University of Michigan', tag: 'broad research · community' },
+    ],
+  };
+
+  NOTATION_TARGET = 3;
+  _mid = 0;
+
+  // ---------- explain mode (ported from Application Workspace) ----------
+  componentDidMount() {
+    this._onUp = () => {
+      if (!this.state.explainMode) return;
+      const sel = window.getSelection ? window.getSelection() : null;
+      const txt = sel ? sel.toString().trim() : '';
+      if (txt && sel.rangeCount) {
+        this._lastSel = txt;
+        const r = sel.getRangeAt(0).getBoundingClientRect();
+        if (r && r.width) { this.setState({ selText: txt, selRect: { top: r.bottom, left: r.left + r.width / 2 } }); return; }
+      }
+      this.setState({ selRect: null, selText: '' });
+    };
+    document.addEventListener('mouseup', this._onUp);
+  }
+  componentWillUnmount() { if (this._onUp) document.removeEventListener('mouseup', this._onUp); }
+  startExplain = () => this.setState(s => ({ explainMode: !s.explainMode, selRect: null, selText: '' }));
+  addMoreSelect = () => this.setState({ explainMode: true, selRect: null, selText: '' });
+  confirmExplain = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    const sel = ((window.getSelection && window.getSelection().toString().trim()) || this.state.selText || this._lastSel || '');
+    if (!sel) return;
+    const abbr = sel.length > 26 ? sel.slice(0, 26).trim() + '…' : sel;
+    this._mid++;
+    const chip = { id: 'x' + this._mid, full: sel, abbr };
+    if (window.getSelection) window.getSelection().removeAllRanges();
+    this._lastSel = '';
+    this.setState(st => ({ explainChips: [...st.explainChips, chip], selRect: null, selText: '' }));
+  };
+  removeChip = (id) => this.setState(st => ({ explainChips: st.explainChips.filter(c => c.id !== id) }));
+
+  // ---------- profile experiment · transmute supp-prompt skeleton (ported from constellation) ----------
+  _expName(inst) { return inst ? inst.name : 'this institute'; }
+  _expQuestions(inst) {
+    return [
+      { id: 'q1', q: 'What’s pulling at you?', scaffold: 'Name the itch, even vaguely — saying it out loud is already the first transmutation.', options: ['Something feels missing', 'Something feels off', 'I want a bolder version', 'A whole new angle'] },
+      { id: 'q2', q: 'Where should the change land?', scaffold: 'Every hunch has a home. Point at the part of ' + this._expName(inst) + '’s skeleton you want to bend.', options: ['Pivotal claim', 'Telos', 'Functionality'] },
+      { id: 'q3', q: 'How far do you want to push?', scaffold: 'This sets how wild the options get — a nudge stays recognizable, a reimagining might surprise you.', options: ['A gentle nudge', 'A real shift', 'Reimagine it'] }
+    ];
+  }
+  _expField(exp) {
+    const q2 = (exp && exp.answers && exp.answers.q2) || 'Pivotal claim';
+    if (q2 === 'Telos') return 'telos';
+    if (q2 === 'Functionality') return 'functionality';
+    return 'pivotal';
+  }
+  _expFieldLabel(field) { return field === 'telos' ? 'Telos' : field === 'functionality' ? 'Functionality' : 'Pivotal claim'; }
+  _expOriginal(inst, field) {
+    const sp = inst && inst.suppPrompts[0];
+    if (!sp) return '—';
+    const sk = this._skeleton(sp);
+    return sp[field + 'Override'] || sk[field] || '—';
+  }
+  _expBundles(inst, exp) {
+    const N = this._expName(inst);
+    const answers = (exp && exp.answers) || {};
+    const hunch = ((exp && exp.hunch) || '').trim();
+    const steer = exp && (exp.steer || '').trim();
+    const field = this._expField(exp);
+    const O = this._expOriginal(inst, field);
+    const fl = this._expFieldLabel(field);
+    const base = [
+      { id: 'b1', label: 'SHARPER', field, original: O, transmuted: 'Said in one breath: the single thing about ' + N + '’s ' + fl.toLowerCase() + ' no admissions reader forgets.' },
+      { id: 'b2', label: 'WARMER', field, original: O, transmuted: 'Less résumé, more human — what ' + N + ' is actually like to build alongside.' },
+      { id: 'b3', label: 'BOLDER', field, original: O, transmuted: 'The believer’s read: the claim only someone who truly gets ' + N + ' would dare make.' }
+    ];
+    let list = (answers.q3 === 'A gentle nudge') ? base.slice(0, 2) : base;
+    if (answers.q3 === 'Reimagine it') {
+      list = list.concat([{ id: 'b4', label: 'REIMAGINE', field, original: O, transmuted: (hunch ? hunch + ' — ' : '') + 'A completely reframed center of gravity for the ' + fl.toLowerCase() + '.' }]);
+    }
+    if (steer) list = [{ id: 'bsteer', label: 'YOUR STEER', field, original: O, transmuted: steer }].concat(list);
+    list = list.map(b => ({ ...b, locate: fl }));
+    const overrides = (exp && exp.bundleOverrides) || {};
+    return list.map((b, i) => {
+      const ov = overrides[i];
+      if (ov == null || ov === '') return b;
+      return { ...b, transmuted: ov, refined: true };
+    });
+  }
+  _expWhyShift(label, locate, hunch) { const EC = window.ExperimentCore; return EC ? EC.whyShift(label, locate, hunch) : ''; }
+
+  openInstExperiment = () => {
+    const a = this._inst(); if (!a) return;
+    if (this.state.exp) { this.setState({ exp: null }); return; }
+    this.setState({
+      exp: { ...(window.ExperimentCore ? window.ExperimentCore.initialExperimentState() : { step: 'hunch', hunch: '', clarifyIdx: 0, answers: {}, chosen: [], previewFocus: 0, activeBundle: null, refiningBundle: null, refineInput: '', bundleOverrides: {}, steerInput: '', steer: '' }), contextId: a.id },
+      explainMode: false, explainChips: [], selRect: null, selText: ''
+    });
+  };
+  expClose = () => this.setState({ exp: null });
+  expSetHunchChip = (t) => this.setState(s => ({ exp: { ...s.exp, steerInput: t } }));
+  expSetSteer = (e) => { const v = (e && e.target) ? e.target.value : (e || ''); this.setState(s => ({ exp: { ...s.exp, steerInput: v } })); };
+  expSetRefineInput = (e) => { const v = (e && e.target) ? e.target.value : (e || ''); this.setState(s => ({ exp: { ...s.exp, refineInput: v } })); };
+  expStopProp = (e) => { if (e && e.stopPropagation) e.stopPropagation(); };
+  expNoop = () => {};
+  expSteerKey = (e) => { if (e && e.key === 'Enter' && !e.shiftKey) { if (e.preventDefault) e.preventDefault(); this.expSteerSend(); } };
+  expRefineKey = (e) => { if (e && e.key === 'Enter' && !e.shiftKey) { if (e.preventDefault) e.preventDefault(); this.expRefineSend(); } };
+  expRefineSend = () => {
+    const ex = this.state.exp;
+    const text = (ex.refineInput || '').trim();
+    const active = ex.refiningBundle != null ? ex.refiningBundle : ex.activeBundle;
+    if (!text || active == null || ex.step !== 'bundles') return;
+    const inst = this._inst(ex.contextId);
+    const ebs = this._expBundles(inst, ex);
+    const current = (ebs[active] && ebs[active].transmuted) || '';
+    const enrich = window.ExperimentCore ? window.ExperimentCore.enrichActualized(current, text) : (current + ' ' + text);
+    const cur = ex.chosen || [];
+    const chosen = cur.indexOf(active) >= 0 ? cur : [...cur, active];
+    this.setState(s => ({ exp: { ...s.exp, bundleOverrides: { ...(s.exp.bundleOverrides || {}), [active]: enrich }, refineInput: '', chosen, activeBundle: active } }));
+  };
+  expSteerSend = () => {
+    const e = this.state.exp; const text = (e.steerInput || '').trim(); if (!text) return;
+    if (e.step === 'hunch') { this.setState(s => ({ exp: { ...s.exp, hunch: text, steerInput: '', step: 'clarify' } })); return; }
+    const next = { ...e, steer: text, steerInput: '' };
+    if (e.step === 'clarify') { next.step = 'bundles'; next.chosen = []; next.bundleOverrides = {}; next.activeBundle = null; next.refiningBundle = null; }
+    else if (e.step === 'bundles') { next.chosen = Array.from(new Set([...(e.chosen || []), 0])); next.activeBundle = 0; }
+    this.setState({ exp: next });
+  };
+  expAnswer = (qid, opt, isLast) => this.setState(s => {
+    const e = { ...s.exp, answers: { ...s.exp.answers, [qid]: opt } };
+    if (isLast) { e.step = 'bundles'; e.chosen = []; e.previewFocus = 0; e.activeBundle = null; e.refiningBundle = null; e.refineInput = ''; e.bundleOverrides = {}; }
+    else e.clarifyIdx = s.exp.clarifyIdx + 1;
+    return { exp: e };
+  });
+  expSetActualized = (i, ev) => {
+    const val = (ev && ev.target) ? ev.target.value : (ev || '');
+    this.setState(s => {
+      const cur = s.exp.chosen || [];
+      const chosen = cur.indexOf(i) >= 0 ? cur : [...cur, i];
+      return { exp: { ...s.exp, bundleOverrides: { ...(s.exp.bundleOverrides || {}), [i]: val }, activeBundle: i, chosen } };
+    });
+  };
+  expEnterRefine = (i) => this.setState(s => {
+    const cur = s.exp.chosen || [];
+    const chosen = cur.indexOf(i) >= 0 ? cur : [...cur, i];
+    return { exp: { ...s.exp, refiningBundle: i, activeBundle: i, chosen } };
+  });
+  expExitRefine = () => this.setState(s => ({ exp: { ...s.exp, refiningBundle: null, refineInput: '' } }));
+  expChoose = (i) => this.setState(s => {
+    const cur = s.exp.chosen || [];
+    const has = cur.indexOf(i) >= 0;
+    const wasActive = s.exp.activeBundle === i;
+    let chosen = cur;
+    if (!has) chosen = [...cur, i];
+    else if (wasActive) chosen = cur.filter(x => x !== i);
+    return { exp: { ...s.exp, chosen, activeBundle: i, step: 'bundles' } };
+  });
+  expChooseAll = () => {
+    const inst = this._inst(this.state.exp.contextId);
+    const ebs = this._expBundles(inst, this.state.exp);
+    const allIdx = ebs.map((_, idx) => idx);
+    this.setState(s => {
+      const cur = s.exp.chosen || [];
+      const selectAll = cur.length < allIdx.length;
+      const chosen = selectAll ? allIdx : [];
+      return { exp: { ...s.exp, chosen, previewFocus: 0, activeBundle: chosen.length ? chosen[0] : null, refiningBundle: null, refineInput: '', step: 'bundles' } };
+    });
+  };
+  expBack = () => this.setState(s => {
+    const e = { ...s.exp };
+    if (e.step === 'bundles' && e.refiningBundle != null) { e.refiningBundle = null; e.refineInput = ''; return { exp: e }; }
+    if (e.step === 'bundles' && (e.chosen || []).length) { e.chosen = []; e.activeBundle = null; e.refiningBundle = null; e.refineInput = ''; e.bundleOverrides = {}; return { exp: e }; }
+    if (e.step === 'clarify') { if (e.clarifyIdx > 0) e.clarifyIdx--; else e.step = 'hunch'; }
+    else if (e.step === 'bundles') { e.step = 'clarify'; e.clarifyIdx = 2; }
+    return { exp: e };
+  });
+  expClearProjections = () => this.setState(s => ({ exp: { ...s.exp, chosen: [], previewFocus: 0, activeBundle: null, refiningBundle: null, refineInput: '', bundleOverrides: {}, step: 'bundles' } }));
+  expApprove = () => {
+    const e = this.state.exp; if (!e) return;
+    const inst = this._inst(e.contextId); if (!inst) return;
+    const bundles = this._expBundles(inst, e);
+    const picks = (e.chosen || []).map(i => bundles[i]).filter(Boolean);
+    if (!picks.length) return;
+    const fieldMap = {}; picks.forEach(b => { fieldMap[b.field] = b.transmuted; });
+    this.setState({
+      institutes: this.state.institutes.map(i => i.id === inst.id
+        ? { ...i, suppPrompts: i.suppPrompts.map(sp => { const n = { ...sp }; Object.keys(fieldMap).forEach(f => { n[f + 'Override'] = fieldMap[f]; }); return n; }) }
+        : i),
+      exp: null,
+    });
+  };
+
+  // ---------- lookups ----------
+  _inst(id) { return this.state.institutes.find(i => i.id === (id == null ? this.state.activeId : id)); }
+  _confirmed() { return this.state.institutes.filter(i => i.status === 'confirmed'); }
+  _locus(theme) { return (theme && this.state.taskState[theme]) || null; }
+
+  // ---------- exploration module (ported from constellation locus) ----------
+  genSurvey(theme) {
+    const t = theme.toLowerCase();
+    return [
+      { id: 'q1', prompt: 'What’s already obvious about ' + t + '?', options: ['A clear pattern', 'One standout moment', 'Still forming'] },
+      { id: 'q2', prompt: 'What feels fuzzy or contested here?', options: ['Timing unclear', 'Two stories clash', 'Nothing yet'] },
+      { id: 'q3', prompt: 'Strongest raw signal so far?', options: ['Something they made', 'Something someone said', 'A habit or repeat'] },
+      { id: 'q4', prompt: 'Where might this thread lead?', options: ['A claim for essays', 'A scene to tell', 'A value to name'] }
+    ];
+  }
+  genLenses(theme, name) {
+    const t = theme.toLowerCase();
+    return [
+      { id: 'l1', title: 'The craft read', blurb: 'Treat ' + name + '’s ' + t + ' as proof of how they work with their hands and tools, not just what they say they care about.' },
+      { id: 'l2', title: 'The relationship read', blurb: 'Read ' + t + ' through who was in the room, who changed, and who still carries part of the story for ' + name + '.' },
+      { id: 'l3', title: 'The inner turn', blurb: 'Follow the private shift inside ' + name + ' — what they stopped believing, started wanting, or finally admitted during ' + t + '.' }
+    ];
+  }
+  genFrameTemplate(theme, name, lensTitle) {
+    const t = theme.toLowerCase();
+    const lt = lensTitle || 'this lens';
+    return {
+      prompt: 'Assemble the frame — fill each slot with the piece that fits.',
+      segments: [
+        'When ' + name + ' talks about ' + t + ' through ' + lt + ', the story that holds is the one where they ',
+        { slotId: 's1', options: [
+          'quietly took the first step before anyone else felt ready to move',
+          'asked the question no one wanted in the room until the silence broke',
+          'stayed with the problem until the workable piece finally showed itself'
+        ] },
+        ', and the detail that makes it undeniable is how they ',
+        { slotId: 's2', options: [
+          'repeat the same disciplined move when the stakes rise and shortcuts tempt',
+          'change tactics without drama when the first approach stops earning trust',
+          'bring someone else into the win so the story is never solo heroics'
+        ] },
+        '. That pairing is the spine of what colleges should remember about this thread.'
+      ]
+    };
+  }
+  genFrameSubjects() {
+    return [
+      { id: 'f1', label: 'Clearer raw material still needed', revisit: 'survey' },
+      { id: 'f2', label: 'A picturable scene still missing', revisit: null },
+      { id: 'f3', label: 'Named tension not yet felt', revisit: null },
+      { id: 'f4', label: 'Sharpen to one honest reading', revisit: 'frame' },
+      { id: 'f5', label: 'Specific detail only they know', revisit: 'lens' }
+    ];
+  }
+  makeLocus(theme, name) {
+    return {
+      theme,
+      exploreStage: 'survey',
+      completedStages: { survey: false, lens: false, frame: false },
+      revisitedStages: {},
+      survey: this.genSurvey(theme), surveyAnswers: {},
+      lenses: this.genLenses(theme, name), lensId: null, notations: [],
+      frameTemplate: null, frameFills: {},
+      frameSubjects: this.genFrameSubjects(), subjectSelections: [],
+      frameConfirmed: false, depthUsed: false, agentNote: ''
+    };
+  }
+  locusRequiredDone(c) {
+    const cs = (c && c.completedStages) || {};
+    let done = 0;
+    if (cs.survey) done++;
+    if (cs.lens) done++;
+    if (cs.frame && c.frameConfirmed) done++;
+    return { done, total: 3 };
+  }
+  _frameSlotsFilled(c) {
+    const segs = (c.frameTemplate && c.frameTemplate.segments) || [];
+    return segs.filter(x => x && x.slotId).every(sl => (c.frameFills || {})[sl.slotId]);
+  }
+  _patchLocus(theme, patch) {
+    const c = this._locus(theme);
+    if (!c) return;
+    this.setState(s => ({ taskState: { ...s.taskState, [theme]: { ...c, ...patch } } }));
+  }
+
+  _tasks() {
+    const map = {};
+    this._confirmed().forEach(inst => {
+      inst.suppPrompts.forEach(sp => {
+        if (!map[sp.theme]) map[sp.theme] = { theme: sp.theme, prompts: [] };
+        map[sp.theme].prompts.push({ inst: inst.name, label: sp.label });
+      });
+    });
+    return Object.keys(map).map(k => map[k]);
+  }
+
+  // ---------- heuristic content ----------
+  _research(inst) {
+    const n = inst.name;
+    return [
+      { h: 'fit to your profile', body: 'For a systems-builder like ' + this.state.personName.split(' ')[0] + ', ' + n + ' rewards students who turn community need into working artifacts — your throughline lands here without translation.' },
+      { h: 'distinctive programs', body: n + ' is unusual for letting undergraduates own real projects early. Look at its cross-disciplinary studios and the way coursework expects you to ship, not just analyze.' },
+      { h: 'culture', body: 'Collaborative more than competitive; the people who thrive treat peers as collaborators on a shared build. Initiative is read as generosity, not self-promotion.' },
+      { h: 'what you should understand', body: 'The supplement is not asking for a résumé in prose. ' + n + ' wants to see how you think when a system you care about is failing — the move from noticing to building.' },
+    ];
+  }
+  // resonant substrate: which throughlines in the humanity profile resonate with this institute
+  _resonantSubstrate(inst) {
+    const n = (inst && inst.name) || 'this institute';
+    return [
+      { evidence: 'Robotics captain — leads design & build', link: n + '’s make-it-real, ship-don’t-just-analyze culture' },
+      { evidence: 'Hospital data-viz lead — dashboards for patient-flow', link: 'systems built for real people, not portfolios' },
+      { evidence: 'Essay: “the moment a system finally listens”', link: 'the builder’s throughline ' + n + ' reads as fit' },
+      { evidence: 'Pharmacy shifts after a family injury', link: 'initiative read as generosity, not self-promotion' },
+    ];
+  }
+  // explored result for a supp-prompt theme (null until its task is complete)
+  _promptResult(theme) {
+    const c = this._locus(theme);
+    if (!c || c.exploreStage !== 'complete') return null;
+    const segs = (c.frameTemplate && c.frameTemplate.segments) || [];
+    const sentence = segs.length
+      ? segs.map(seg => typeof seg === 'string' ? seg : ((c.frameFills || {})[seg.slotId] || '___')).join('')
+      : '';
+    const lens = (c.lenses || []).find(l => l.id === c.lensId);
+    const notations = (c.notations || []).map(nt => nt.text);
+    const threads = (c.subjectSelections || [])
+      .map(id => { const fs = (c.frameSubjects || []).find(f => f.id === id); return fs ? fs.label : ''; })
+      .filter(Boolean);
+    return { sentence, lens: lens ? lens.title : '', notations, threads };
+  }
+  _skeleton(sp) {
+    return {
+      telos: 'Show a builder who converts a felt community problem into a working system — the same throughline as the humanity profile, localized to “' + sp.theme + '”.',
+      functionality: 'Open on the concrete moment of noticing → the decision to build → one specific obstacle → what the artifact changed for real people.',
+      pivotal: 'The pivot is ownership: not “I helped” but “I saw it break, so I made the thing that fixed it,” told with one unforgettable detail.',
+    };
+  }
+  _essay(sp, sk) {
+    return 'The vending machine in the band room ate quarters, and everyone shrugged — that was just how it was. I am the kind of person who cannot leave a broken system alone. ' +
+      'Over three weekends I mapped the coin mechanism, found the jam, and wrote the small inventory tracker the booster club still uses. ' +
+      'For “' + sp.theme + '”, that is the whole of me in miniature: I notice what others have learned to tolerate, and I build the thing that fixes it. ' +
+      '[draft transmuted from skeleton — telos/functionality/pivotal merged]';
+  }
+
+  // ---------- humanity profile (full Application Workspace, inherited intact) ----------
+  _humSchema() {
+    const honorF = [{ k: 'title', label: 'Honor' }, { k: 'grade_level', label: 'Grade level(s)' }, { k: 'recognition_level', label: 'Level of recognition' }];
+    const actF = [{ k: 'activity_type', label: 'Activity type' }, { k: 'position', label: 'Position / leadership' }, { k: 'organization', label: 'Organization' }, { k: 'description', label: 'Description' }, { k: 'grade_levels', label: 'Grade levels' }, { k: 'timing', label: 'Timing' }, { k: 'hours_per_week', label: 'Hours / week' }, { k: 'weeks_per_year', label: 'Weeks / year' }, { k: 'continue_in_college', label: 'Continue in college?' }];
+    return [
+      { label: 'PROFILE', cats: [
+        { id: 'legal_name', label: 'Legal name', fields: [{ k: 'first', label: 'First' }, { k: 'last', label: 'Last' }, { k: 'middle', label: 'Middle' }, { k: 'preferred', label: 'Goes by' }] },
+        { id: 'dob', label: 'Date of birth', fields: [{ k: 'dob', label: 'DOB' }] },
+        { id: 'address', label: 'Permanent address', fields: [{ k: 'address', label: 'Address' }] },
+        { id: 'citizenship', label: 'Citizenship', fields: [{ k: 'status', label: 'Status' }, { k: 'ssn', label: 'SSN' }] },
+        { id: 'sexgender', label: 'Sex & gender', fields: [{ k: 'legal_sex', label: 'Legal sex' }, { k: 'gender', label: 'Gender' }, { k: 'pronouns', label: 'Pronouns' }] },
+        { id: 'race', label: 'Race & ethnicity', fields: [{ k: 'hispanic', label: 'Hispanic/Latino' }, { k: 'races', label: 'Race' }] },
+        { id: 'firstgen', label: 'First-generation', fields: [{ k: 'parents_degree', label: 'Parent BA+' }] },
+      ] },
+      { label: 'EDUCATION', cats: [
+        { id: 'school', label: 'Current secondary school', fields: [{ k: 'name', label: 'School' }, { k: 'type', label: 'Type' }, { k: 'city', label: 'City' }, { k: 'grad', label: 'Graduation' }] },
+        { id: 'grades', label: 'Grades & rank', fields: [{ k: 'gpa', label: 'Cumulative GPA' }, { k: 'scale', label: 'Scale' }, { k: 'weighting', label: 'Weighting' }, { k: 'rank_method', label: 'Rank method' }, { k: 'rank', label: 'Rank' }] },
+        { id: 'courses_now', label: 'Current-year courses', fields: [{ k: 'list', label: 'Courses' }] },
+        { id: 'courses_senior', label: 'Senior-year courses', fields: [{ k: 'list', label: 'Planned' }] },
+        { id: 'future_plans', label: 'Future plans', fields: [{ k: 'career', label: 'Career interest' }, { k: 'degree', label: 'Highest degree' }] },
+      ] },
+      { label: 'HONORS', cats: [
+        { id: 'honors', label: 'Academic honors', unitFields: honorF },
+      ] },
+      { label: 'ACTIVITIES', cats: [
+        { id: 'activities', label: 'Activities', unitFields: actF },
+        { id: 'responsibilities', label: 'Responsibilities & circumstances', fields: [{ k: 'items', label: 'Responsibilities' }] },
+      ] },
+      { label: 'PERSONAL STATEMENT', cats: [
+        { id: 'essay', label: 'Personal essay', fields: [{ k: 'prompt', label: 'Prompt' }, { k: 'response', label: 'Essay' }] },
+        { id: 'challenges', label: 'Challenges & circumstances', fields: [{ k: 'share', label: 'Share?' }, { k: 'description', label: 'Description' }] },
+        { id: 'additional', label: 'Additional information', fields: [{ k: 'text', label: 'Notes' }] },
+      ] },
+    ];
+  }
+  _humData() {
+    return {
+      legal_name: { first: 'Maya', last: 'Okonkwo', middle: 'R.', preferred: '' },
+      dob: { dob: 'March 14, 2008' },
+      address: { address: '1420 Linden Ave, Columbus, OH 43201' },
+      citizenship: { status: 'U.S. citizen or U.S. National', ssn: '' },
+      sexgender: { legal_sex: 'female', gender: 'Female', pronouns: 'She/Her' },
+      race: { hispanic: 'No', races: 'Black or African American' },
+      firstgen: { parents_degree: 'No' },
+      school: { name: 'Columbus Alternative High School', type: 'Public', city: 'Columbus, OH', grad: 'May 2026' },
+      grades: { gpa: '3.92', scale: '4.0', weighting: 'Weighted', rank_method: 'Decile', rank: 'Top 10%' },
+      courses_now: { list: 'AP Calculus BC · AP Physics C · AP Literature · Spanish IV · Robotics Engineering' },
+      courses_senior: { list: '' },
+      future_plans: { career: '', degree: "Bachelor's" },
+      honors: { units: [
+        { id: 'h1', title: 'National Merit Semifinalist', grade_level: '11', recognition_level: 'National' },
+        { id: 'h2', title: 'State Science Fair, 1st in Engineering', grade_level: '11', recognition_level: 'State or regional' },
+        { id: 'h3', title: 'AP Scholar with Distinction', grade_level: '11', recognition_level: 'National' },
+      ] },
+      activities: { has_activities: 'Yes', units: [
+        { id: 'a1', activity_type: 'Robotics', position: 'Captain', organization: 'CAHS Robotics Team', description: 'Lead design and build; qualified for worlds twice.', grade_levels: '9, 10, 11, 12', timing: 'During school year', hours_per_week: '15', weeks_per_year: '40', continue_in_college: 'Yes' },
+        { id: 'a2', activity_type: 'Community Service (Volunteer)', position: 'Data viz lead', organization: 'Regional hospital', description: 'Built dashboards for patient-flow bottlenecks.', grade_levels: '10, 11, 12', timing: 'All year', hours_per_week: '4', weeks_per_year: '45', continue_in_college: 'Yes' },
+        { id: 'a3', activity_type: 'Debate/Speech', position: 'Varsity member', organization: 'Policy debate', description: 'State semifinalist; research-heavy cases.', grade_levels: '9, 10, 11', timing: 'During school year', hours_per_week: '8', weeks_per_year: '30', continue_in_college: 'No' },
+        { id: 'a4', activity_type: 'Work (Paid)', position: 'Pharmacy assistant', organization: 'Family pharmacy', description: 'Evening shifts; inventory and customer care.', grade_levels: '11, 12', timing: 'All year', hours_per_week: '10', weeks_per_year: '48', continue_in_college: 'No' },
+      ] },
+      responsibilities: { items: 'Taking care of younger family members · Working a paid job to contribute to household income' },
+      essay: { prompt: '6 · A topic you lose time in', response: 'The first time a robot I built actually moved, I forgot to breathe. I keep chasing that feeling — the moment a system finally listens.' },
+      challenges: { share: 'Yes', description: 'After my father’s injury I took on evening shifts at our pharmacy and helped manage the household, which reshaped how I budget my time and attention.' },
+      additional: { text: '' },
+    };
+  }
+
+  // ---------- navigation ----------
+  _listApproved() { const la = this.state.listApproval || {}; return !!(la.counselor && la.parent); }
+  _defaultMode() {
+    if (this.state.institutes.length === 0) return 'search';
+    if (this._listApproved()) return 'tasks';
+    return this.state.activeId ? 'institute' : 'search';
+  }
+  // every supp-prompt theme of an institute explored to completion (or skeleton already built)
+  _instAllExplored(inst) {
+    if (!inst) return false;
+    if (inst.progress && inst.progress.skeleton) return true;
+    return inst.suppPrompts.length > 0 && inst.suppPrompts.every(sp => {
+      const x = this._locus(sp.theme); return x && x.exploreStage === 'complete';
+    });
+  }
+  // default sub-stage to land on when an institute is opened
+  _instDefaultStage(inst) {
+    if (!inst || inst.status !== 'confirmed') return 'research';
+    if (inst.profileGenerated) return 'artifact';
+    if (this._instAllExplored(inst)) return 'profile';
+    return 'exploration';
+  }
+  // is a sub-stage reachable for the active institute?
+  _stageUnlocked(inst, stage) {
+    if (stage === 'research') return true;
+    if (stage === 'exploration') return !!inst && inst.status === 'confirmed';
+    if (stage === 'profile' || stage === 'artifact') return !!inst && inst.status === 'confirmed' && (inst.profileGenerated || this._instAllExplored(inst));
+    return false;
+  }
+  gotoStage = (stage) => {
+    const inst = this._inst();
+    if (!inst || !this._stageUnlocked(inst, stage)) return;
+    this.setState({ instStage: stage, exp: null, explainMode: false, selRect: null });
+  };
+  goTasks = () => { if (!this._listApproved()) return; this.setState({ leftMode: 'tasks', activeTaskId: null }); };
+  goSearch = () => this.setState({ leftMode: 'search' });
+  // re-open the build screen (search + selected-names log) to add more before approval
+  goBuild = () => this.setState({ leftMode: 'search', listConfirmed: false, activeId: null });
+  selectInstitute = (id) => {
+    const inst = this._inst(id);
+    const patch = { activeId: id, leftMode: 'institute', instStage: this._instDefaultStage(inst), exp: null, explainMode: false, selRect: null };
+    if (inst.status !== 'confirmed' && !inst.progress.researched) this._setProgress(id, 'researched', true, patch);
+    this.setState(patch);
+  };
+
+  _setProgress(id, key, val, patch) {
+    const institutes = this.state.institutes.map(i =>
+      i.id === id ? { ...i, progress: { ...i.progress, [key]: val } } : i);
+    if (patch) { patch.institutes = institutes; return; }
+    this.setState({ institutes });
+  }
+
+  // ---------- search / add ----------
+  onSearchInput = (e) => {
+    const v = (e && e.target) ? e.target.value : (e || '');
+    this.setState({ searchQuery: v });
+  };
+  // append to the selected list only — no jump into the per-institute page (that happens later, from the roster)
+  addInstitute = (id) => {
+    if (this._inst(id)) return;
+    const c = this.state.catalog.find(x => x.id === id);
+    if (!c) return;
+    const newInst = {
+      id: c.id, name: c.name, tag: c.tag, status: 'provisional',
+      counselor: false, parent: false,
+      progress: { researched: false, bonded: false, explored: false, skeleton: false, artifact: false },
+      researchReport: null,
+      suppPrompts: (c.suppPrompts && c.suppPrompts.length) ? c.suppPrompts.map(p => ({ ...p })) : [
+        { id: c.id + '-fit', theme: 'Why this institute', label: 'Why ' + c.name + ' · 250w', promptText: 'Why are you drawn to ' + c.name + ', and what will you build there?' },
+        { id: c.id + '-vitality', theme: 'Intellectual vitality', label: 'Intellectual vitality · 250w', promptText: 'Reflect on an idea or experience that excites you about learning.' },
+      ],
+    };
+    this.setState({ institutes: [...this.state.institutes, newInst] });
+  };
+  removeInstitute = (id) => this.setState(s => ({
+    institutes: s.institutes.filter(i => i.id !== id),
+    activeId: s.activeId === id ? null : s.activeId,
+  }));
+  // building → confirmed list: reveals the roster + stakeholder approval gate
+  confirmList = () => { if (this.state.institutes.length) this.setState({ listConfirmed: true }); };
+
+  // ---------- list-level stakeholder approval gate ----------
+  // Selection phase = institutes are explorative only. Tasks unlock only after the whole list is approved.
+  requestApproval = () => { if (!this.state.institutes.length) return; this.setState(s => ({ listApproval: { ...s.listApproval, requested: true } })); };
+  _setApproval = (who) => {
+    const la = { ...this.state.listApproval, [who]: !this.state.listApproval[who] };
+    if (la.counselor && la.parent) {
+      // both stakeholders approved → the whole list becomes workable, tasks unlock
+      this.setState({
+        listApproval: la,
+        institutes: this.state.institutes.map(i => ({ ...i, status: 'confirmed', counselor: true, parent: true })),
+        leftMode: 'tasks', activeTaskId: null,
+      });
+    } else {
+      this.setState({ listApproval: la });
+    }
+  };
+  simCounselor = () => this._setApproval('counselor');
+  simParent = () => this._setApproval('parent');
+  resetApproval = () => this.setState({
+    listApproval: { requested: false, counselor: false, parent: false },
+    listConfirmed: false,
+    institutes: this.state.institutes.map(i => ({ ...i, status: 'provisional', counselor: false, parent: false })),
+    leftMode: 'search', activeTaskId: null, instStage: 'research',
+  });
+  // retained but no longer the primary path (kept so any stray reference stays valid)
+  confirmInstitute = (id) => { if (id) this.simCounselor(); };
+
+  // ---------- task exploration (ported locus handlers) ----------
+  openTask = (theme) => {
+    const origin = this.state.leftMode === 'institute' ? 'institute' : 'tasks';
+    const patch = { leftMode: 'locus', activeTaskId: theme, slotOpenId: null, locusOrigin: origin };
+    if (!this._locus(theme)) patch.taskState = { ...this.state.taskState, [theme]: this.makeLocus(theme, this.state.personName) };
+    this.setState(patch);
+  };
+  // leave the locus, returning to wherever it was opened from
+  locusBack = () => {
+    if (this.state.locusOrigin === 'institute') {
+      this.setState({ leftMode: 'institute', instStage: 'exploration', activeTaskId: null });
+    } else {
+      this.setState({ leftMode: 'tasks', activeTaskId: null });
+    }
+  };
+  answerSurvey = (theme, qid, option) => {
+    const c = this._locus(theme); if (!c) return;
+    this._patchLocus(theme, { surveyAnswers: { ...c.surveyAnswers, [qid]: option } });
+  };
+  proceedSurveyToLens = (theme) => {
+    const c = this._locus(theme); if (!c) return;
+    if (!(c.survey || []).every(q => (c.surveyAnswers || {})[q.id])) return;
+    this._patchLocus(theme, { exploreStage: 'lens', completedStages: { ...c.completedStages, survey: true }, agentNote: 'Choose a lens, then add any key notation.' });
+  };
+  continueForwardLocus = (theme) => {
+    const c = this._locus(theme); if (!c) return;
+    const cs = c.completedStages || {}; let st = c.exploreStage;
+    if (st === 'survey' && cs.survey) st = 'lens';
+    else if (st === 'lens' && cs.lens) st = 'frame';
+    else if (st === 'frame' && cs.frame && c.frameConfirmed) st = 'texture';
+    this._patchLocus(theme, { exploreStage: st, agentNote: '' });
+  };
+  pickLocusLens = (theme, lensId) => {
+    const c = this._locus(theme); if (!c) return;
+    const lens = (c.lenses || []).find(l => l.id === lensId); if (!lens) return;
+    const frameTemplate = this.genFrameTemplate(c.theme, (this.state.personName || '').split(' ')[0], lens.title);
+    this._patchLocus(theme, { lensId, frameTemplate, frameFills: {}, notations: c.lensId !== lensId ? [] : c.notations, agentNote: 'Add key notation if you like, then proceed.' });
+  };
+  proceedLensToFrame = (theme) => {
+    const c = this._locus(theme); if (!c || !c.lensId || c.exploreStage !== 'lens') return;
+    this._patchLocus(theme, { exploreStage: 'frame', completedStages: { ...c.completedStages, lens: true }, agentNote: '' });
+  };
+  onNotationInput = (e) => { const v = (e && e.target) ? e.target.value : (e || ''); this.setState({ notationDraft: v }); };
+  onAddNotation = () => {
+    const theme = this.state.activeTaskId; const c = this._locus(theme);
+    const text = (this.state.notationDraft || '').trim();
+    if (!c || !text) return;
+    const line = text.length > 120 ? text.slice(0, 120) + '…' : text;
+    const notations = [...(c.notations || []), { id: 'n' + (c.notations || []).length, text: line }];
+    this.setState(s => ({ taskState: { ...s.taskState, [theme]: { ...c, notations } }, notationDraft: '' }));
+  };
+  onNotationKey = (e) => { if (e && e.key === 'Enter') { if (e.preventDefault) e.preventDefault(); this.onAddNotation(); } };
+  toggleFrameSlot = (theme, slotId) => this.setState(s => ({ slotOpenId: s.slotOpenId === slotId ? null : slotId }));
+  onSlotCancel = () => this.setState({ slotOpenId: null });
+  fillFrameSlot = (theme, slotId, value) => {
+    const c = this._locus(theme); if (!c) return;
+    this.setState(s => ({ taskState: { ...s.taskState, [theme]: { ...c, frameFills: { ...(c.frameFills || {}), [slotId]: value } } }, slotOpenId: null }));
+  };
+  confirmFrame = (theme) => {
+    const c = this._locus(theme); if (!c || !this._frameSlotsFilled(c)) return;
+    this.setState(s => ({ taskState: { ...s.taskState, [theme]: { ...c, frameConfirmed: true, exploreStage: 'texture', completedStages: { ...c.completedStages, frame: true }, agentNote: 'Select threads worth exploring — or finish.' } }, slotOpenId: null }));
+  };
+  toggleFrameSubject = (theme, subjectId) => {
+    const c = this._locus(theme); if (!c) return;
+    const cur = c.subjectSelections || [];
+    const next = cur.indexOf(subjectId) >= 0 ? cur.filter(x => x !== subjectId) : [...cur, subjectId];
+    this._patchLocus(theme, { subjectSelections: next });
+  };
+  skipDepthFromTexture = (theme) => {
+    const c = this._locus(theme); if (!c) return;
+    const depthUsed = (c.subjectSelections || []).length > 0;
+    const taskState = { ...this.state.taskState, [theme]: { ...c, exploreStage: 'complete', depthUsed } };
+    const institutes = this.state.institutes.map(i => {
+      if (i.status !== 'confirmed' || !i.suppPrompts.some(sp => sp.theme === theme)) return i;
+      const allDone = i.suppPrompts.every(sp => { const x = sp.theme === theme ? { exploreStage: 'complete' } : taskState[sp.theme]; return x && x.exploreStage === 'complete'; });
+      return { ...i, progress: { ...i.progress, explored: true, skeleton: i.progress.skeleton || allDone } };
+    });
+    const toInstitute = this.state.locusOrigin === 'institute';
+    this.setState({
+      taskState, institutes, activeTaskId: null,
+      leftMode: toInstitute ? 'institute' : 'tasks',
+      ...(toInstitute ? { instStage: 'exploration' } : {}),
+    });
+  };
+
+  // ---------- strata collapse ----------
+  toggleStratum = (name) => this.setState({ openStrata: { ...this.state.openStrata, [name]: !this.state.openStrata[name] } });
+
+  // ---------- generate ----------
+  generateProfile = () => {
+    const inst = this._inst();
+    if (!inst) return;
+    const suppPrompts = inst.suppPrompts.map(sp => {
+      const sk = this._skeleton(sp);
+      return { ...sp, generated: this._essay(sp, sk) };
+    });
+    this.setState({
+      institutes: this.state.institutes.map(i =>
+        i.id === inst.id
+          ? { ...i, suppPrompts, profileGenerated: true, progress: { ...i.progress, artifact: true, skeleton: true } }
+          : i),
+    });
+  };
+
+  // ---------- styles ----------
+  _pill(bg, col) { return 'background:' + bg + ';color:' + col; }
+  _tg(on) {
+    return on
+      ? 'background:#2e2a24;color:#fbf5e9;border-color:#2e2a24'
+      : 'background:#fffdf8;color:#8a8170;border-color:rgba(60,50,30,.18)';
+  }
+
+  renderVals() {
+    const s = this.state;
+    const mode = s.leftMode;
+    const active = this._inst();
+    const confirmed = this._confirmed();
+    const first = (s.personName || '').split(' ')[0];
+    const exp = s.exp;
+
+    // ----- left context tabs -----
+    const leftTabs = [];
+    if (confirmed.length) {
+      leftTabs.push({ label: 'TASKS', cls: (mode === 'tasks' || mode === 'locus') ? 'tab tab--on' : 'tab', onClick: this.goTasks });
+    }
+    if (active) {
+      const onName = () => this.selectInstitute(active.id);
+      leftTabs.push({ label: active.name, cls: mode === 'institute' ? 'tab tab--on' : 'tab', onClick: onName });
+    }
+    leftTabs.push({ label: '＋ find', cls: mode === 'search' ? 'tab tab--on' : 'tab', onClick: this.goSearch });
+
+    // ----- search -----
+    const q = (s.searchQuery || '').toLowerCase();
+    const searchResults = s.catalog
+      .filter(c => !q || c.name.toLowerCase().includes(q) || c.tag.toLowerCase().includes(q))
+      .map(c => {
+        const already = !!this._inst(c.id);
+        return {
+          name: c.name, tag: c.tag,
+          brief: c.name + ' — ' + c.tag + '. ' + (already ? 'Already on your list.' : 'Tap to add to your list (no commitment yet).'),
+          addLabel: already ? 'in list' : '＋ add',
+          addStyle: already ? this._pill('rgba(60,50,30,.08)', '#8a8170') : this._pill('rgba(217,150,42,.18)', '#3a2700'),
+          onAdd: () => this.addInstitute(c.id),
+        };
+      });
+    const searchEmpty = searchResults.length === 0;
+
+    // ----- research -----
+    const researchSections = active ? this._research(active) : [];
+
+    // ----- tasks -----
+    const tasks = this._tasks();
+    const taskItems = tasks.map((t, i) => {
+      const c = this._locus(t.theme);
+      const req = c ? this.locusRequiredDone(c) : { done: 0, total: 3 };
+      const complete = !!(c && c.exploreStage === 'complete');
+      const pct = complete ? 100 : Math.round((req.done / req.total) * 100);
+      const started = !!c && (c.exploreStage !== 'survey' || Object.keys(c.surveyAnswers || {}).length > 0);
+      return {
+        order: i + 1, theme: t.theme,
+        blurb: t.prompts.length + ' supp-prompt' + (t.prompts.length > 1 ? 's' : '') + ' · ' + t.prompts.map(p => p.inst).join(', '),
+        chip: complete ? 'complete' : (started ? 'in progress' : 'not started'),
+        chipStyle: complete ? this._pill('rgba(63,167,118,.16)', '#2c7d57')
+                        : (started ? this._pill('rgba(217,150,42,.18)', '#3a2700') : this._pill('rgba(60,50,30,.08)', '#8a8170')),
+        pct,
+        onOpen: () => this.openTask(t.theme),
+      };
+    });
+
+    // ----- locus (ported exploration view-model) -----
+    const cur = this._locus(s.activeTaskId);
+    let themeName = s.activeTaskId || '';
+    let doneCount = 0, total = 3, progressPct = 0, allDone = false, completionMsg = 'This thread is fully explored';
+    let progressFillStyle = { width: '0%', height: '100%', background: '#d9962a', borderRadius: '999px', transition: 'width .5s cubic-bezier(.2,.8,.2,1)' };
+    let stageRail = [], agentNote = '', showContinueForward = false, continueForward = () => {};
+    let isSurveyStage = false, isLensStage = false, isFrameStage = false, isTextureStage = false, isCompleteStage = false;
+    let stagePrompt = '', surveyProgress = '', surveySections = [], showProceedSurvey = false, proceedSurveyClick = () => {}, proceedSurveyStyle = {};
+    let lensChosen = false, lensNotChosen = true, lensModules = [], chosenLensTitle = '', chosenLensBlurb = '';
+    let notationItems = [], notationEmpty = true, proceedFrameClick = () => {}, proceedFrameStyle = {};
+    let frameParts = [], frameSlotOpen = false, frameSlotOptions = [], slotPickHint = '', showFrameGapElev = false, confirmFrameClick = () => {}, confirmFrameStyle = {};
+    let frameSubjectChips = [], skipDepthClick = () => {}, depthDoneLabel = 'Finish — skip depth';
+
+    if (cur) {
+      const st = cur.exploreStage || 'survey';
+      const cs = cur.completedStages || {};
+      const rev = cur.revisitedStages || {};
+      const req = this.locusRequiredDone(cur);
+      doneCount = req.done; total = req.total; progressPct = Math.round(doneCount / total * 100);
+      allDone = st === 'complete';
+      progressFillStyle = { ...progressFillStyle, width: progressPct + '%' };
+      themeName = cur.theme; agentNote = cur.agentNote || '';
+
+      const railDefs = [{ key: 'survey', label: 'SURVEY' }, { key: 'lens', label: 'LENS' }, { key: 'frame', label: 'FRAME' }, { key: 'texture', label: 'DEPTH' }];
+      stageRail = railDefs.map(rd => {
+        const activeStage = (st === rd.key) || (st === 'complete' && (rd.key === 'frame' || rd.key === 'texture'));
+        const done = rd.key === 'survey' ? cs.survey : rd.key === 'lens' ? cs.lens : rd.key === 'frame' ? (cs.frame && cur.frameConfirmed) : (cur.depthUsed || st === 'complete');
+        return { label: rd.label, revisited: !!rev[rd.key], style: {
+          fontFamily: "'IBM Plex Mono',monospace", fontSize: '9px', letterSpacing: '.12em', padding: '5px 9px', borderRadius: '999px',
+          color: activeStage ? '#3a2700' : (done ? '#5a5246' : '#b0a692'),
+          background: activeStage ? 'rgba(217,150,42,.2)' : (done ? 'rgba(60,50,30,.06)' : 'transparent'),
+          border: activeStage ? '1px solid #d9962a' : '1px solid transparent'
+        } };
+      });
+      showContinueForward = !!(rev[st] && ((st === 'survey' && cs.survey) || (st === 'lens' && cs.lens) || (st === 'frame' && cs.frame)));
+      continueForward = () => this.continueForwardLocus(cur.theme);
+
+      isSurveyStage = st === 'survey'; isLensStage = st === 'lens'; isFrameStage = st === 'frame'; isTextureStage = st === 'texture'; isCompleteStage = st === 'complete';
+
+      const chipOff = { padding: '10px 12px', borderRadius: '10px', border: '1px solid rgba(60,50,30,.14)', background: '#fff', color: '#4a443a', fontSize: '13px', cursor: 'pointer', textAlign: 'left' };
+      const chipOn = { ...chipOff, border: '1.5px solid #d9962a', background: 'rgba(217,150,42,.12)', color: '#3a2700', fontWeight: 600 };
+      const chipCompactOff = { padding: '6px 11px', borderRadius: '999px', border: '1px solid rgba(60,50,30,.14)', background: '#fff', color: '#4a443a', fontSize: '12px', cursor: 'pointer', lineHeight: 1.35 };
+      const chipCompactOn = { ...chipCompactOff, border: '1.5px solid #d9962a', background: 'rgba(217,150,42,.14)', color: '#3a2700', fontWeight: 600 };
+
+      if (isSurveyStage) {
+        stagePrompt = 'Raw-material survey — answer every question.';
+        const qs = cur.survey || []; const ans = cur.surveyAnswers || {};
+        surveyProgress = qs.filter(q => ans[q.id]).length + ' / ' + qs.length + ' answered';
+        surveySections = qs.map(q => ({ prompt: q.prompt, options: q.options.map(o => ({ label: o, onClick: () => this.answerSurvey(cur.theme, q.id, o), style: ans[q.id] === o ? chipOn : chipOff })) }));
+        showProceedSurvey = qs.length > 0 && qs.every(q => ans[q.id]);
+        proceedSurveyClick = () => this.proceedSurveyToLens(cur.theme);
+        proceedSurveyStyle = { marginTop: '16px', padding: '12px 18px', borderRadius: '11px', textAlign: 'center', fontSize: '13.5px', fontWeight: 600, background: '#d9962a', color: '#3a2700', cursor: 'pointer' };
+      }
+      if (isLensStage) {
+        stagePrompt = cur.lensId ? 'Add any key notation — proceed when ready.' : 'Choose one lens (~20 words each).';
+        lensChosen = !!cur.lensId; lensNotChosen = !cur.lensId;
+        lensModules = (cur.lenses || []).map(lm => {
+          const selected = cur.lensId === lm.id;
+          return { title: lm.title, blurb: lm.blurb, onClick: () => this.pickLocusLens(cur.theme, lm.id), style: {
+            padding: '12px 13px', borderRadius: '12px', height: '100%', minHeight: '132px',
+            border: selected ? '1.5px solid #d9962a' : '1px solid rgba(60,50,30,.14)',
+            background: selected ? 'rgba(217,150,42,.1)' : '#fff', cursor: 'pointer', textAlign: 'left', transition: 'all .15s'
+          } };
+        });
+        const chosen = (cur.lenses || []).find(l => l.id === cur.lensId);
+        if (chosen) { chosenLensTitle = chosen.title; chosenLensBlurb = chosen.blurb; }
+        notationItems = (cur.notations || []).map(n => ({ text: n.text }));
+        notationEmpty = notationItems.length === 0;
+        proceedFrameClick = () => this.proceedLensToFrame(cur.theme);
+        const canPF = !!cur.lensId;
+        proceedFrameStyle = { marginTop: '12px', padding: '11px 16px', borderRadius: '11px', textAlign: 'center', fontSize: '13px', fontWeight: 600,
+          background: canPF ? 'rgba(217,150,42,.18)' : '#e6ddc9', border: canPF ? '1px solid #d9962a' : '1px solid rgba(60,50,30,.08)', color: canPF ? '#3a2700' : '#a59b88', cursor: canPF ? 'pointer' : 'default' };
+      }
+      if (isFrameStage) {
+        const ft = cur.frameTemplate || { prompt: 'Assemble the frame.', segments: [] };
+        stagePrompt = ft.prompt; showFrameGapElev = true;
+        const fills = cur.frameFills || {}; const openId = s.slotOpenId;
+        frameParts = (ft.segments || []).map((seg) => {
+          if (typeof seg === 'string') return { isText: true, isSlot: false, text: seg };
+          const filled = fills[seg.slotId];
+          return { isText: false, isSlot: true, text: filled || 'choose +', onClick: () => this.toggleFrameSlot(cur.theme, seg.slotId),
+            style: filled ? { color: '#3a2700', fontWeight: 600, borderBottom: '2px solid #d9962a', cursor: 'pointer', padding: '0 3px' }
+              : { display: 'inline-block', minWidth: '72px', padding: '1px 10px', borderRadius: '8px', border: '1.5px dashed #d9962a', color: '#c08a1e', cursor: 'pointer', fontSize: '13px' } };
+        });
+        frameSlotOpen = !!openId;
+        const openSeg = (ft.segments || []).find(x => x && x.slotId === openId);
+        frameSlotOptions = openSeg ? openSeg.options.map(o => ({ label: o, onClick: () => this.fillFrameSlot(cur.theme, openId, o) })) : [];
+        slotPickHint = openId === 's1' ? 'First slot — the move that carries the story.' : (openId === 's2' ? 'Second slot — the detail that makes it stick.' : 'Choose the phrase that fits.');
+        const canConfirm = this._frameSlotsFilled(cur);
+        confirmFrameClick = () => this.confirmFrame(cur.theme);
+        confirmFrameStyle = { marginTop: '16px', padding: '12px 18px', borderRadius: '11px', textAlign: 'center', fontSize: '13.5px', fontWeight: 600, background: canConfirm ? '#d9962a' : '#e6ddc9', color: canConfirm ? '#3a2700' : '#a59b88', cursor: canConfirm ? 'pointer' : 'default' };
+      }
+      if (isTextureStage) {
+        stagePrompt = 'Depth — stay with what is still worth exploring.';
+        frameSubjectChips = (cur.frameSubjects || this.genFrameSubjects()).map(fs => {
+          const sel = (cur.subjectSelections || []).indexOf(fs.id) >= 0;
+          return { label: fs.label, onClick: () => this.toggleFrameSubject(cur.theme, fs.id), style: sel ? chipCompactOn : chipCompactOff };
+        });
+        depthDoneLabel = (cur.subjectSelections || []).length > 0 ? 'Finish with these threads →' : 'Finish — skip depth';
+        skipDepthClick = () => this.skipDepthFromTexture(cur.theme);
+      }
+      if (isCompleteStage) {
+        completionMsg = cur.depthUsed ? 'Depth added — this thread is complete' : 'Core path complete — depth skipped';
+        stagePrompt = 'Exploration complete for this thread.';
+      }
+    }
+    const showAddNotation = isLensStage && lensChosen;
+    const notationHint = 'Notations are optional here — add any, then proceed.';
+    // right-panel locus companion (notation prime + adaptive action)
+    const companionNotations = cur ? (cur.notations || []).map(n => ({ text: n.text })) : [];
+    const notationEmptyCompanion = companionNotations.length === 0;
+    const companionCanAdd = !!(cur && cur.lensId && cur.exploreStage !== 'complete');
+    const companionStageLabel = cur ? (cur.exploreStage || 'survey').toUpperCase() : '';
+    const companionHint = !cur ? '' :
+      (cur.exploreStage === 'survey' ? 'Answer the survey on the left to unlock the lens.'
+      : cur.exploreStage === 'lens' ? 'Choose a lens on the left, then prime key notation here.'
+      : cur.exploreStage === 'frame' ? 'Open a slot in the frame (left) — its phrase options appear here.'
+      : cur.exploreStage === 'texture' ? 'Select the threads worth exploring on the left.'
+      : 'Thread complete — notation written back into the linked supp-prompts.');
+
+    // ----- profile ----- (experiment live-preview overrides the active skeleton field)
+    const expPrev = {};
+    if (exp && active && exp.contextId === active.id) {
+      const ebs = this._expBundles(active, exp);
+      (exp.chosen || []).forEach(i => { const b = ebs[i]; if (b) expPrev[b.field] = b.transmuted; });
+    }
+    const profSuppItems = active ? active.suppPrompts.map(sp => {
+      const sk = this._skeleton(sp);
+      const essay = sp.generated || '';
+      return {
+        label: sp.label, promptText: sp.promptText,
+        telos: expPrev.telos || sp.telosOverride || sk.telos,
+        functionality: expPrev.functionality || sp.functionalityOverride || sk.functionality,
+        pivotal: expPrev.pivotal || sp.pivotalOverride || sk.pivotal,
+        essay, essayStyle: essay ? 'margin-top:11px;padding-top:11px;border-top:1px dashed rgba(63,167,118,.5)' : 'display:none',
+        placeholderStyle: essay ? 'display:none' : 'margin-top:11px;padding-top:11px;border-top:1px dashed rgba(60,50,30,.14);font-size:12.5px;color:#bcb2a0;font-style:italic',
+      };
+    }) : [];
+    const humData = this._humData();
+    const strataItems = this._humSchema().map(st => {
+      const open = !!s.openStrata[st.label];
+      const cats = st.cats.map(c => {
+        const block = humData[c.id] || {};
+        let body;
+        if (c.unitFields) {
+          const units = block.units || [];
+          body = units.length
+            ? units.map(u => c.unitFields.map(f => (u[f.k] != null && String(u[f.k]).trim()) ? f.label + ': ' + u[f.k] : '').filter(Boolean).join('   ·   ')).join('\n\n')
+            : '—';
+        } else {
+          body = c.fields.map(f => { const v = block[f.k]; return (v != null && String(v).trim()) ? f.label + ': ' + v : ''; }).filter(Boolean).join('\n');
+          if (!body) body = '—';
+        }
+        return { label: c.label, body };
+      });
+      return { name: st.label, open, caret: open ? '▾ collapse' : '▸ expand', bodyStyle: open ? '' : 'display:none', onToggle: () => this.toggleStratum(st.label), cats };
+    });
+    const allExplored = this._instAllExplored(active);
+    const canGenerate = active && active.status === 'confirmed' && !active.profileGenerated && allExplored;
+    const generated = active && active.profileGenerated;
+
+    // ----- institute staged page (research → exploration → profile) -----
+    const isInstitute = mode === 'institute';
+    const instStage = s.instStage;
+    const isStageResearch = isInstitute && instStage === 'research';
+    const isStageExploration = isInstitute && instStage === 'exploration';
+    const isStageProfile = isInstitute && instStage === 'profile';
+    const isStageArtifact = isInstitute && instStage === 'artifact';
+
+    const stageDefs = [
+      { key: 'research', label: '1 · Research' },
+      { key: 'exploration', label: '2 · Explore' },
+      { key: 'profile', label: '3 · Profile' },
+      { key: 'artifact', label: '4 · Artifact' },
+    ];
+    const stepperItems = stageDefs.map(sd => {
+      const unlocked = this._stageUnlocked(active, sd.key);
+      const activeStage = instStage === sd.key;
+      const done = active && ((sd.key === 'research' && active.status === 'confirmed') ||
+        (sd.key === 'exploration' && allExplored) ||
+        (sd.key === 'profile' && active.profileGenerated) ||
+        (sd.key === 'artifact' && active.profileGenerated));
+      return {
+        label: sd.label,
+        onClick: () => this.gotoStage(sd.key),
+        style: 'flex:1;text-align:center;padding:9px 5px;border-radius:9px;font-family:\'IBM Plex Mono\',monospace;font-size:9.5px;letter-spacing:.04em;cursor:' + (unlocked ? 'pointer' : 'not-allowed') + ';' +
+          (activeStage ? 'background:#2e2a24;color:#fbf5e9;border:1px solid #2e2a24'
+            : unlocked ? 'background:#fffdf8;color:' + (done ? '#2c7d57' : '#6a6253') + ';border:1px solid rgba(60,50,30,.16)'
+            : 'background:#f2ece0;color:#b8af9b;border:1px solid rgba(60,50,30,.1)'),
+      };
+    });
+    const instEyebrow = isStageResearch ? 'provisional · read-only research'
+      : isStageExploration ? 'exploration · prompt status'
+      : isStageArtifact ? 'artifact · generated supplements'
+      : 'profile · skeleton review';
+    const instStatusLine = !active ? ''
+      : isStageResearch ? (active.tag + ' · understand the fit before committing.')
+      : isStageExploration ? (active.tag + ' · each prompt routes to a shared task; status mirrors the work surface.')
+      : isStageArtifact ? (active.tag + ' · ' + (generated ? 'artifact generated — supplements drafted from the skeleton.' : (canGenerate ? 'skeleton ready — generate the artifact.' : 'finish exploration to build the skeleton.')))
+      : (active.tag + ' · the skeleton and humanity meta behind the artifact.');
+
+    // resonant substrate (right panel during research stage)
+    const substrateVisible = isStageResearch && !!active;
+    const substrateItems = active ? this._resonantSubstrate(active) : [];
+    const substIsProvisional = active && active.status !== 'confirmed';
+
+    // exploration · prompt-status (mirror of Tasks/locus engine)
+    const themeOrder = {}; tasks.forEach((t, i) => { themeOrder[t.theme] = i + 1; });
+    const promptStatusItems = (active && active.status === 'confirmed') ? active.suppPrompts.map(sp => {
+      const c = this._locus(sp.theme);
+      const complete = !!(c && c.exploreStage === 'complete');
+      const started = !!c && (c.exploreStage !== 'survey' || Object.keys(c.surveyAnswers || {}).length > 0);
+      const res = this._promptResult(sp.theme);
+      const meta = res ? [res.lens ? 'lens: ' + res.lens : '',
+        res.notations.length ? res.notations.length + ' notation' + (res.notations.length > 1 ? 's' : '') : '',
+        res.threads.length ? 'depth: ' + res.threads.join(' · ') : ''].filter(Boolean).join('   ·   ') : '';
+      return {
+        label: sp.label, promptText: sp.promptText,
+        taskNo: themeOrder[sp.theme] ? ('Task #' + themeOrder[sp.theme]) : 'Task —',
+        chip: complete ? 'complete' : (started ? 'in progress' : 'not started'),
+        chipStyle: complete ? this._pill('rgba(63,167,118,.16)', '#2c7d57')
+          : (started ? this._pill('rgba(217,150,42,.18)', '#3a2700') : this._pill('rgba(60,50,30,.08)', '#8a8170')),
+        resultSentence: res ? res.sentence : '',
+        resultMeta: meta,
+        resultStyle: res ? 'margin-top:10px;padding-top:10px;border-top:1px dashed rgba(63,167,118,.5)' : 'display:none',
+        workLabel: complete ? 'revisit task →' : (started ? 'continue task →' : 'work this task →'),
+        workStyle: 'margin-top:11px;display:inline-block;cursor:pointer;padding:8px 14px;border-radius:10px;font-family:\'IBM Plex Mono\',monospace;font-size:10.5px;letter-spacing:.05em;' + (complete ? 'background:#fffdf8;color:#6a6253;border:1px solid rgba(60,50,30,.16)' : 'background:rgba(217,150,42,.18);color:#3a2700;border:1px solid #d9962a'),
+        onWork: () => this.openTask(sp.theme),
+      };
+    }) : [];
+    const artifactPreviewReady = !!(active && active.status === 'confirmed' && allExplored);
+    const artifactPreviewStyle = 'margin-top:18px;padding:15px 17px;border-radius:13px;' + (artifactPreviewReady
+      ? 'background:rgba(63,167,118,.1);border:1px solid rgba(63,167,118,.45)'
+      : 'background:rgba(60,50,30,.04);border:1px dashed rgba(60,50,30,.18)');
+    const artifactPreviewMsg = artifactPreviewReady
+      ? 'All prompts explored — the artifact is ready to preview.'
+      : 'Complete every prompt above to unlock the artifact preview.';
+    const onGotoProfile = () => this.gotoStage('profile');
+    const onGotoArtifact = () => this.gotoStage('artifact');
+
+    // ----- explain mode -----
+    const _sc = s.selRect;
+    const explainOn = s.explainMode;
+    const showSelConfirm = explainOn && !!_sc;
+    const selConfirmStyle = _sc ? { position: 'fixed', top: (_sc.top + 8) + 'px', left: _sc.left + 'px', transform: 'translateX(-50%)', zIndex: 80, background: '#2e2a24', color: '#fbf5e9', padding: '7px 13px', borderRadius: '9px', fontSize: '12px', fontFamily: "'IBM Plex Mono',monospace", cursor: 'pointer', boxShadow: '0 8px 24px -10px rgba(0,0,0,.5)', whiteSpace: 'nowrap' } : {};
+    const explainChipsV = (s.explainChips || []).map(c => ({ abbr: c.abbr, onRemove: () => this.removeChip(c.id) }));
+    const explainBtnStyle = 'display:flex;align-items:center;gap:6px;padding:8px 13px;border-radius:10px;font-size:12.5px;font-weight:500;cursor:pointer;' + (explainOn ? 'background:#2e2a24;color:#fbf5e9;border:1px solid #2e2a24' : 'background:#fff;color:#4a443a;border:1px solid rgba(60,50,30,.16)');
+    const instExpBtnStyle = 'display:flex;align-items:center;gap:6px;padding:8px 13px;border-radius:10px;font-size:12.5px;font-weight:500;cursor:pointer;color:#4a443a;' + (exp ? 'background:rgba(217,150,42,.16);border:1px solid #d9962a' : 'background:#fff;border:1px solid rgba(60,50,30,.16)');
+
+    // ----- profile experiment (full transmute wizard, ported from constellation) -----
+    const expVisible = !!exp;
+    let expContextName = '', expIsHunch = false, expIsClarify = false, expIsTransmutePhase = false, expHasChosen = false;
+    let expHunchChips = [], expSteps = [], expClarifyLabel = '', expQuestion = '', expScaffold = '', expOptions = [];
+    let expBundlesTitle = '', expBundles = [];
+    let expSteerInput = '', expSteerScaffold = '', expSteerPlaceholder = '';
+    let expRefineInput = '', expRefineFocus = false, expShowSteerBar = false;
+    let expChooseAllLabel = 'Preview all';
+    const expChooseAllStyle = 'font-family:\'IBM Plex Mono\',monospace;font-size:10px;letter-spacing:.06em;padding:6px 10px;border-radius:8px;border:1px solid rgba(60,50,30,.14);background:#fff;color:#3a342b;cursor:pointer;flex-shrink:0';
+    if (exp) {
+      const en = this._inst(exp.contextId) || active;
+      expContextName = this._expName(en);
+      expSteerInput = exp.steerInput || '';
+      expRefineInput = exp.refineInput || '';
+      expShowSteerBar = exp.step === 'hunch' || exp.step === 'clarify';
+      expRefineFocus = exp.step === 'bundles' && exp.refiningBundle != null;
+      const EC = window.ExperimentCore;
+      const stepScaf = EC && EC.steerScaffold ? EC.steerScaffold : { hunch: { label: 'TYPE YOUR HUNCH', placeholder: 'e.g. feels flatter than reality…' }, clarify: { label: 'STEER IN YOUR OWN WORDS', placeholder: 'or tell me where to take it…' } };
+      const steerStep = exp.step === 'clarify' ? 'clarify' : 'hunch';
+      if (expShowSteerBar) { expSteerScaffold = (stepScaf[steerStep] || stepScaf.hunch).label; expSteerPlaceholder = (stepScaf[steerStep] || stepScaf.hunch).placeholder; }
+      expIsHunch = exp.step === 'hunch'; expIsClarify = exp.step === 'clarify'; expIsTransmutePhase = exp.step === 'bundles';
+      expHasChosen = (exp.chosen || []).length > 0;
+      const order = ['hunch', 'clarify', 'bundles'];
+      const labels = { hunch: 'Hunch', clarify: 'Clarify', bundles: 'Transmute' };
+      expSteps = order.map((kk) => ({ id: kk, label: labels[kk], style: 'font-family:\'IBM Plex Mono\',monospace;font-size:10.5px;letter-spacing:.1em;padding:5px 11px;border-radius:999px;color:' + (kk === exp.step ? '#3a2700' : '#b0a692') + ';background:' + (kk === exp.step ? 'rgba(217,150,42,.16)' : 'transparent') }));
+      expHunchChips = ['feels flatter than reality', 'too one-note', 'missing the contradiction', 'wrong center of gravity'].map(t => ({ id: t, label: t, onClick: () => this.expSetHunchChip(t) }));
+      const qs = this._expQuestions(en);
+      if (expIsClarify) {
+        const qi = Math.min(exp.clarifyIdx, qs.length - 1); const q = qs[qi]; const isLast = qi === qs.length - 1;
+        expClarifyLabel = (qi + 1) + ' of ' + qs.length; expQuestion = q.q; expScaffold = q.scaffold;
+        expOptions = q.options.map(o => { const sel = exp.answers[q.id] === o; return { id: o, label: o, onClick: () => this.expAnswer(q.id, o, isLast), style: 'padding:10px 12px;border-radius:10px;font-size:12.5px;cursor:pointer;border:' + (sel ? '1.5px solid #d9962a' : '1px solid rgba(60,50,30,.14)') + ';background:' + (sel ? 'rgba(217,150,42,.12)' : '#fff') + ';color:' + (sel ? '#3a2700' : '#4a443a') + ';font-weight:' + (sel ? 600 : 400) }; });
+      }
+      const ebs = this._expBundles(en, exp);
+      if (expIsTransmutePhase) {
+        const refining = exp.refiningBundle;
+        const hunchSet = (exp.hunch || '').trim();
+        expBundlesTitle = (hunchSet ? '“' + exp.hunch + '” — ' : '') + (refining != null ? 'refine pairs' : 'ways to transmute ' + expContextName);
+        const expAllSelected = (exp.chosen || []).length >= ebs.length;
+        expChooseAllLabel = expAllSelected ? 'Clear all' : 'Preview all';
+        expBundles = ebs.map((b, i) => {
+          const sel = (exp.chosen || []).indexOf(i) >= 0;
+          const activeCard = exp.activeBundle === i;
+          const refined = !!(exp.bundleOverrides && exp.bundleOverrides[i] != null && String(exp.bundleOverrides[i]).trim());
+          const tick = sel ? (refined ? '● live · edited' : '● live') : (activeCard ? '◎ selected' : '○');
+          const tickColor = sel ? '#2c7a55' : activeCard ? '#c08a1e' : '#c8bfa8';
+          const showInList = refining == null || refining === i;
+          return {
+            id: b.id, label: b.label, locate: b.locate, original: b.original, transmuted: b.transmuted,
+            whyShift: this._expWhyShift(b.label, b.locate, hunchSet),
+            showInList, isActive: activeCard, showActualizedReadOnly: !activeCard, isRefining: refining === i, showRefineBtn: activeCard && refining !== i,
+            onClick: refining == null ? () => this.expChoose(i) : this.expNoop,
+            onActualizedInput: (e) => this.expSetActualized(i, e),
+            onRefine: (e) => { this.expStopProp(e); this.expEnterRefine(i); },
+            tick, tickStyle: 'font-family:\'IBM Plex Mono\',monospace;font-size:10px;color:' + tickColor,
+            style: 'text-align:left;padding:14px 16px;border-radius:13px;margin-bottom:11px;cursor:' + (refining != null ? 'default' : 'pointer') + ';'
+              + 'border:' + (refining === i ? '1.5px solid rgba(217,150,42,.6)' : activeCard ? '1.5px solid rgba(217,150,42,.55)' : sel ? '1.5px solid rgba(63,167,118,.45)' : '1px solid rgba(60,50,30,.12)') + ';'
+              + 'background:' + (refining === i ? 'rgba(217,150,42,.09)' : activeCard ? 'rgba(217,150,42,.07)' : sel ? 'rgba(63,167,118,.07)' : '#fff') + ';'
+              + 'box-shadow:' + (refining === i ? '0 12px 32px -14px rgba(217,150,42,.4)' : activeCard ? '0 10px 28px -14px rgba(217,150,42,.35)' : sel ? '0 8px 24px -16px rgba(63,167,118,.4)' : 'none'),
+          };
+        });
+      }
+    }
+
+    // ----- roster -----
+    const rosterItems = s.institutes.map(inst => {
+      const isConf = inst.status === 'confirmed';
+      const pr = inst.progress;
+      const mark = (b) => b ? '●' : '○';
+      // two-level status: provisional (before approval) → explore · profile · artifact (after)
+      const progressLine = isConf
+        ? mark(pr.explored) + ' explore   ' + mark(pr.skeleton) + ' profile   ' + mark(pr.artifact) + ' artifact'
+        : 'research only';
+      const showApproval = !isConf;
+      return {
+        name: inst.name, tag: inst.tag,
+        statusLabel: isConf ? 'approved' : 'provisional',
+        statusStyle: isConf ? this._pill('rgba(63,167,118,.16)', '#2c7d57') : this._pill('rgba(217,150,42,.2)', '#9a6a14'),
+        rowStyle: inst.id === s.activeId ? 'background:#fffdf8;box-shadow:inset 3px 0 0 #d9962a' : '',
+        progressLine,
+        approvalStyle: showApproval ? 'margin-top:11px;padding-top:11px;border-top:1px dashed rgba(60,50,30,.16)' : 'display:none',
+        confirmLabel: '✓ confirm →',
+        confirmStyle: 'background:#d9962a;color:#3a2700;border-color:#d9962a',
+        onSelect: () => this.selectInstitute(inst.id),
+        onConfirm: (ev) => { if (ev && ev.stopPropagation) ev.stopPropagation(); this.confirmInstitute(inst.id); },
+      };
+    });
+
+    // building phase (search, list not yet confirmed): right panel = selected-names log only
+    const selectLogVisible = mode === 'search' && !s.listConfirmed;
+    const selectedLog = s.institutes.map(inst => ({ name: inst.name, onRemove: (ev) => { if (ev && ev.stopPropagation) ev.stopPropagation(); this.removeInstitute(inst.id); } }));
+    const selectedEmpty = s.institutes.length === 0;
+    const canConfirmList = s.institutes.length > 0;
+    const confirmListStyle = 'margin:0;padding:13px;text-align:center;cursor:' + (canConfirmList ? 'pointer' : 'not-allowed') + ';font-family:\'IBM Plex Mono\',monospace;font-size:11px;letter-spacing:.1em;border-top:1px solid rgba(217,150,42,.4);' + (canConfirmList ? 'color:#3a2700;background:rgba(217,150,42,.18)' : 'color:#b8af9b;background:#f2ece0');
+
+    // right panel visibility — the institute page never shows the roster; collapse the panel when empty
+    const locusNoteVisible = mode === 'locus' && !frameSlotOpen;
+    const rosterVisible = mode !== 'locus' && mode !== 'institute' && !expVisible && s.institutes.length > 0 && s.listConfirmed;
+    const rightPanelVisible = rosterVisible || selectLogVisible || substrateVisible || expVisible || frameSlotOpen || locusNoteVisible;
+    const rpStyle = rightPanelVisible ? '' : 'display:none';
+
+    // ----- list-level approval gate -----
+    const la = s.listApproval || {};
+    const listApprovedV = !!(la.counselor && la.parent);
+    const selectionPhase = !listApprovedV;
+    const approvalNotRequested = !la.requested;
+    const approvalPending = !!la.requested && !listApprovedV;
+    const counselorDot = la.counselor ? '●' : '○';
+    const parentDot = la.parent ? '●' : '○';
+    const canRequest = s.institutes.length > 0;
+    const requestBtnStyle = 'cursor:' + (canRequest ? 'pointer' : 'not-allowed') + ';text-align:center;padding:10px 14px;border-radius:10px;font-family:\'IBM Plex Mono\',monospace;font-size:11px;letter-spacing:.06em;' + (canRequest ? 'background:#d9962a;color:#3a2700;font-weight:600' : 'background:#f2ece0;color:#b8af9b');
+    const simCounselorLabel = (la.counselor ? '✓ ' : '') + 'counselor approves';
+    const simParentLabel = (la.parent ? '✓ ' : '') + 'parent approves';
+    const simCounselorStyle = this._tg(la.counselor);
+    const simParentStyle = this._tg(la.parent);
+    const rosterPhaseLabel = listApprovedV ? 'approved · working' : 'provisional · selection';
+
+    // left-surface phase: building (search/add) → pending (slogan, list established, awaiting approval)
+    const isBuilding = mode === 'search' && !s.listConfirmed;
+    const isPending = mode === 'search' && s.listConfirmed && !listApprovedV;
+    const pendingAllResearched = s.institutes.length > 0 && s.institutes.every(i => i.progress && i.progress.researched);
+    const pendingHint = pendingAllResearched
+      ? 'You’ve looked through each one — when the list feels right, request approval in the list to unlock exploration.'
+      : 'Open each institute on the right to research the fit, then talk it through with your counselor and parents.';
+
+    return {
+      personName: s.personName,
+      hasInstitutes: s.institutes.length > 0,
+      rpStyle,
+
+      isSearch: mode === 'search',
+      isBuilding, isPending, pendingHint,
+      isInstitute,
+      isStageResearch, isStageExploration, isStageProfile, isStageArtifact, instStage,
+      stepperItems, instEyebrow, instStatusLine,
+      isTasks: mode === 'tasks',
+      isLocus: mode === 'locus',
+
+      searchQuery: s.searchQuery,
+      searchResults, searchEmpty,
+      searchEmptyMsg: 'No catalog match for “' + s.searchQuery + '”. Try a program, city, or culture word.',
+      onSearchInput: this.onSearchInput,
+
+      activeName: active ? active.name : '',
+      activeTag: active ? active.tag : '',
+      researchSections,
+
+      tasksEmpty: taskItems.length === 0,
+      tasksEmptyMsg: 'No tasks yet — add institutes and get the list approved (request approval in the institute list) to aggregate their supp-prompts into tasks here.',
+      taskItems,
+
+      themeName,
+      doneCount, total, progressPct, progressFillStyle, allDone, completionMsg,
+      stageRail, showContinueForward, continueForward, agentNote, stagePrompt,
+      isSurveyStage, surveyProgress, surveySections, showProceedSurvey, proceedSurveyClick, proceedSurveyStyle,
+      isLensStage, lensChosen, lensNotChosen, lensModules, chosenLensTitle, chosenLensBlurb,
+      notationItems, notationEmpty, proceedFrameClick, proceedFrameStyle,
+      showAddNotation, notationHint, notationDraft: s.notationDraft,
+      onNotationInput: this.onNotationInput, onAddNotation: this.onAddNotation, onNotationKey: this.onNotationKey,
+      isFrameStage, frameParts, frameSlotOpen, frameSlotOptions, slotPickHint, showFrameGapElev, confirmFrameClick, confirmFrameStyle,
+      rosterVisible, onSlotCancel: this.onSlotCancel,
+      selectLogVisible, selectedLog, selectedEmpty, confirmListStyle, onConfirmList: this.confirmList,
+      locusNoteVisible,
+      onLocusBack: this.locusBack,
+      companionNotations, notationEmptyCompanion, companionCanAdd, companionStageLabel, companionHint,
+
+      // resonant substrate (research-stage right panel)
+      substrateVisible, substrateItems, substIsProvisional,
+      onSubstConfirm: () => active && this.confirmInstitute(active.id),
+
+      // exploration · prompt-status
+      promptStatusItems, artifactPreviewReady, artifactPreviewStyle, artifactPreviewMsg, onGotoProfile, onGotoArtifact,
+
+      startExplain: this.startExplain, explainOn, explainBtnStyle,
+      showSelConfirm, selConfirmStyle, confirmExplain: this.confirmExplain,
+      explainChips: explainChipsV, hasChips: explainChipsV.length > 0, addMoreSelect: this.addMoreSelect,
+      openInstExperiment: this.openInstExperiment, instExpBtnStyle,
+      expVisible, expContextName, expClose: this.expClose,
+      expSteps, expIsHunch, expIsClarify, expIsTransmutePhase,
+      expHunchChips, expClarifyLabel, expQuestion, expScaffold, expOptions,
+      expBundlesTitle, expBundles, expHasChosen, expRefineFocus,
+      expChooseAllLabel, expChooseAllStyle, expChooseAll: this.expChooseAll,
+      expApprove: this.expApprove, expClearProjections: this.expClearProjections, expBack: this.expBack, expExitRefine: this.expExitRefine,
+      expShowSteerBar, expSteerScaffold, expSteerPlaceholder, expSteerInput,
+      expSetSteer: this.expSetSteer, expSteerKey: this.expSteerKey, expSteerSend: this.expSteerSend,
+      expRefineInput, expSetRefineInput: this.expSetRefineInput, expRefineKey: this.expRefineKey, expRefineSend: this.expRefineSend,
+      expStopProp: this.expStopProp,
+      isTextureStage, frameSubjectChips, depthDoneLabel, skipDepthClick,
+      isCompleteStage,
+      onBackTasks: listApprovedV ? this.goTasks : this.goSearch,
+      backLabel: listApprovedV ? '← back to tasks' : '← back to institute list',
+      selectionPhase, listApprovedV, approvalNotRequested, approvalPending,
+      counselorDot, parentDot, requestBtnStyle, requestApproval: this.requestApproval,
+      simCounselor: this.simCounselor, simParent: this.simParent, resetApproval: this.resetApproval,
+      simCounselorLabel, simParentLabel, simCounselorStyle, simParentStyle, rosterPhaseLabel,
+
+      profStatusLine: active ? (active.tag + ' · ' + (generated ? 'artifact generated' : (canGenerate ? 'skeleton ready — generate when you are' : 'work its tasks to build the skeleton'))) : '',
+      profSuppItems,
+      strataItems,
+      canGenerate, generated,
+      onGenerate: this.generateProfile,
+      generateHint: generated ? 'supplements drafted from the skeleton — refine with explain & experiment.' : (canGenerate ? 'drafts one supplement from each prompt skeleton.' : 'available once the skeleton is built.'),
+
+      rosterCount: s.institutes.length,
+      rosterItems,
+      onAddSchool: this.goBuild,
+    };
+  }
+}
+</script>
+</body>
+</html>

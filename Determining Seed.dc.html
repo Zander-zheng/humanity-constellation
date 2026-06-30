@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%;background:#f6efe0}
+input{font-family:inherit}
+::placeholder{color:#a59b88}
+@keyframes msgSlide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes itemIn{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+@keyframes panelIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
+@keyframes pulseSeed{0%,100%{box-shadow:0 0 0 0 rgba(217,150,42,.28),0 0 28px rgba(217,150,42,.26)}50%{box-shadow:0 0 0 16px rgba(217,150,42,0),0 0 38px rgba(217,150,42,.38)}}
+@keyframes twinkle{0%,100%{opacity:1}50%{opacity:.48}}
+/* ===== Phase rail ===== */
+@keyframes railTwinkle{0%,100%{opacity:1}50%{opacity:.5}}
+.phase-rail{position:relative;z-index:40;flex:0 0 auto;width:50px;display:flex;flex-direction:column;padding:13px 0;background:#efe6d3;border-right:1px solid rgba(60,50,30,.12);transition:width .22s cubic-bezier(.4,0,.2,1);overflow:hidden;cursor:pointer;outline:none}
+.phase-rail:focus-within{width:198px;box-shadow:16px 0 46px -26px rgba(60,50,30,.55);cursor:default}
+.rail-grip{align-self:flex-end;margin:-2px 17px 4px 0;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#b0a692;transition:transform .22s}
+.phase-rail:focus-within .rail-grip{transform:rotate(180deg)}
+.rail-top{display:flex;align-items:center;gap:11px;padding:0 0 13px 21px;border-bottom:1px solid rgba(60,50,30,.1)}
+.rail-dot{flex:0 0 auto;width:9px;height:9px;border-radius:50%;background:#d9962a;box-shadow:0 0 12px rgba(217,150,42,.7);animation:railTwinkle 3s ease-in-out infinite}
+.rail-label{opacity:0;transform:translateX(-4px);white-space:nowrap;transition:opacity .16s ease,transform .2s ease;font-family:'IBM Plex Mono',monospace}
+.phase-rail:focus-within .rail-label{opacity:1;transform:none}
+.rail-brand{font-family:'Space Grotesk',sans-serif;font-weight:600;letter-spacing:.14em;font-size:13px;color:#2e2a24}
+.rail-phases{display:flex;flex-direction:column;gap:5px;margin-top:14px}
+.rail-eyebrow{padding:0 0 7px 22px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.2em;color:#b0a692}
+.rail-item{display:flex;align-items:center;gap:14px;padding:11px 0 11px 19px;text-decoration:none;color:#8a8170;border-left:2px solid transparent;transition:background .15s,color .15s}
+.rail-item:hover{background:rgba(60,50,30,.06);color:#2e2a24}
+.rail-item--active{color:#2e2a24;border-left-color:#d9962a;background:rgba(217,150,42,.12)}
+.rail-ico{flex:0 0 22px;width:22px;height:22px;position:relative;display:flex;align-items:center;justify-content:center}
+.rail-name{font-size:11px;letter-spacing:.15em;font-weight:600}
+.rail-sub{display:block;margin-top:2px;font-size:8.5px;letter-spacing:.08em;color:#a59b88;font-weight:400}
+.rail-foot{margin-top:auto;padding:10px 0 0 22px;font-size:8.5px;letter-spacing:.16em;color:#b8af9b;border-top:1px solid rgba(60,50,30,.08)}
+.ico-hum i{position:absolute;width:4px;height:4px;border-radius:50%;background:currentColor}
+.ico-hum i:nth-child(1){top:2px;left:9px}.ico-hum i:nth-child(2){bottom:3px;left:2px}.ico-hum i:nth-child(3){bottom:4px;right:2px}
+.ico-hum::after{content:"";position:absolute;inset:0;background:linear-gradient(45deg,transparent 47%,currentColor 49%,currentColor 51%,transparent 53%),linear-gradient(-30deg,transparent 48%,currentColor 49.5%,currentColor 50.5%,transparent 52%);opacity:.28}
+.ico-inst{display:flex;align-items:flex-end;gap:2.5px}
+.ico-inst i{width:3px;background:currentColor;border-radius:1px}
+.ico-inst i:nth-child(1){height:11px}.ico-inst i:nth-child(2){height:16px}.ico-inst i:nth-child(3){height:13px}
+.ico-inst::before{content:"";position:absolute;top:2px;left:2px;right:2px;height:2px;background:currentColor;border-radius:1px}
+.ico-kernel::before{content:"";width:15px;height:15px;border-radius:50%;border:1.6px solid currentColor}
+.ico-kernel::after{content:"";position:absolute;top:50%;left:50%;width:4px;height:4px;border-radius:50%;background:currentColor;transform:translate(-50%,-50%)}
+</style>
+</helmet>
+
+<div style="height:100vh;display:flex;flex-direction:row;background:#f6efe0;font-family:'Space Grotesk',sans-serif;color:#2e2a24;overflow:hidden">
+
+  <nav class="phase-rail" aria-label="Phase" tabindex="0" title="Click to expand phases">
+    <div class="rail-grip">›</div>
+    <div class="rail-top"><div class="rail-dot"></div><div class="rail-label rail-brand">FIELD</div></div>
+    <div class="rail-eyebrow rail-label">PHASE</div>
+    <div class="rail-phases">
+      <a class="rail-item rail-item--active" href="./Determining%20Seed.dc.html">
+        <span class="rail-ico ico-kernel"></span>
+        <span class="rail-name">ONBOARDING<span class="rail-sub rail-label">negative-space kernel</span></span>
+      </a>
+      <a class="rail-item" href="./constellation%2Bexperiment.dc.html">
+        <span class="rail-ico ico-hum"><i></i><i></i><i></i></span>
+        <span class="rail-name">HUMANITY<span class="rail-sub rail-label">the constellation</span></span>
+      </a>
+      <a class="rail-item" href="./Institute%20Session.dc.html">
+        <span class="rail-ico ico-inst"><i></i><i></i><i></i></span>
+        <span class="rail-name">INSTITUTE<span class="rail-sub rail-label">applications</span></span>
+      </a>
+    </div>
+    <div class="rail-foot rail-label">enter a phase</div>
+  </nav>
+
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;height:100vh">
+
+  <div style="display:flex;align-items:center;justify-content:space-between;height:54px;padding:0 22px;border-bottom:1px solid rgba(60,50,30,.1);flex-shrink:0;background:#fbf5e9">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:9px;height:9px;border-radius:50%;background:#d9962a;box-shadow:0 0 12px rgba(217,150,42,.7);animation:twinkle 3s ease-in-out infinite"></div>
+      <div style="font-weight:600;font-size:15px;letter-spacing:.14em">FIELD</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a8170;letter-spacing:.03em;margin-left:4px">determining seed session</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a8170">
+      <span style="{{ sessionDotStyle }}"></span>{{ sessionStatus }}
+    </div>
+  </div>
+
+  <div style="flex:1;display:flex;min-height:0;position:relative">
+    <div style="{{ stageStyle }}">
+      <div style="position:absolute;inset:0;background-image:radial-gradient(rgba(60,50,30,.06) 1px, transparent 1px);background-size:30px 30px;pointer-events:none"></div>
+
+      <div style="position:absolute;top:14px;left:18px;display:flex;align-items:center;gap:7px;z-index:4;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em">
+        <sc-for list="{{ crumbs }}" as="cr" hint-placeholder-count="1">
+          <div onClick="{{ cr.onClick }}" style="cursor:pointer;color:#9a9082" style-hover="color:#2e2a24">{{ cr.label }}</div>
+          <sc-if value="{{ cr.sep }}" hint-placeholder-val="{{ false }}"><span style="color:#c8bfa8">/</span></sc-if>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ showConstellation }}" hint-placeholder-val="{{ true }}">
+        <div style="position:absolute;inset:0">
+          <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <sc-for list="{{ lines }}" as="ln" hint-placeholder-count="0">
+              <line x1="{{ ln.x1 }}" y1="{{ ln.y1 }}" x2="{{ ln.x2 }}" y2="{{ ln.y2 }}" stroke="#2e2a24" stroke-opacity="0.25" stroke-width="1" vector-effect="non-scaling-stroke"></line>
+            </sc-for>
+          </svg>
+
+          <div style="position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);width:360px;text-align:center;z-index:2;pointer-events:none">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;color:#c08a1e;margin-bottom:12px">{{ centerKicker }}</div>
+            <div style="font-size:18px;font-weight:500;line-height:1.55;color:#3a342b;font-style:italic;text-wrap:balance">"{{ centralStatement }}"</div>
+            <div style="margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#a59b88;line-height:1.7">{{ centerHint }}</div>
+          </div>
+
+          <sc-for list="{{ stageItems }}" as="it" hint-placeholder-count="1">
+            <div onClick="{{ it.onClick }}" onMouseEnter="{{ it.onEnter }}" onMouseLeave="{{ it.onLeave }}" style="{{ it.wrapStyle }}" style-hover="filter:brightness(1.08)">
+              <div style="{{ it.glyphStyle }}"></div>
+              <div style="max-width:150px;text-align:center;font-size:11.5px;font-weight:500;line-height:1.25;color:#4a443a;text-wrap:balance">{{ it.label }}</div>
+              <sc-if value="{{ it.showProgress }}" hint-placeholder-val="{{ false }}">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#a59b88">{{ it.progress }}</div>
+              </sc-if>
+            </div>
+          </sc-for>
+
+          <sc-if value="{{ showHoverCard }}" hint-placeholder-val="{{ false }}">
+            <div style="{{ hoverCardStyle }}">
+              <div style="font-size:14px;font-weight:600;color:#2e2a24;line-height:1.3;margin-bottom:11px">{{ hoverName }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.16em;color:#c08a1e;margin-bottom:3px">{{ hoverL1 }}</div>
+              <div style="font-size:12px;color:#5a5246;margin-bottom:10px;line-height:1.4">{{ hoverV1 }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.16em;color:#c08a1e;margin-bottom:3px">{{ hoverL2 }}</div>
+              <div style="font-size:12px;color:#5a5246;line-height:1.45">{{ hoverV2 }}</div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isLocus }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;top:54px;left:0;right:0;bottom:120px;z-index:2;display:flex;flex-direction:column;align-items:center;padding:0 28px;pointer-events:none;overflow:hidden">
+          <div style="width:100%;max-width:720px;display:flex;flex-direction:column;gap:14px;pointer-events:auto;max-height:100%;overflow-y:auto;padding-bottom:12px">
+            <div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;color:#8a8170">PENETRATING · {{ themeName }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#c08a1e">{{ doneCount }}/{{ total }} · {{ progressPct }}%</span>
+              </div>
+              <div style="height:6px;border-radius:999px;background:rgba(60,50,30,.12);overflow:hidden">
+                <div style="{{ progressFillStyle }}"></div>
+              </div>
+              <sc-if value="{{ allDone }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:9px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#3fa776;letter-spacing:.03em">{{ completionMsg }}</div>
+              </sc-if>
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+              <sc-for list="{{ stageRail }}" as="sr" hint-placeholder-count="4">
+                <div style="{{ sr.style }}">{{ sr.label }}</div>
+              </sc-for>
+            </div>
+
+            <div style="background:#fffdf8;border:1px solid rgba(60,50,30,.12);border-radius:16px;padding:22px;box-shadow:0 14px 40px -24px rgba(90,70,20,.35)">
+              <div style="font-size:15.5px;font-weight:600;color:#2e2a24;line-height:1.5;text-align:center;text-wrap:balance;margin-bottom:18px">{{ stagePrompt }}</div>
+
+              <sc-if value="{{ isSurveyStage }}" hint-placeholder-val="{{ false }}">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;color:#c08a1e;margin-bottom:12px">RAW SIGNALS · answer all · {{ surveyProgress }}</div>
+                <div style="display:flex;flex-direction:column;gap:16px">
+                  <sc-for list="{{ surveySections }}" as="sq" hint-placeholder-count="3">
+                    <div style="padding-bottom:4px;border-bottom:1px solid rgba(60,50,30,.08)">
+                      <div style="font-size:14px;font-weight:600;color:#2e2a24;line-height:1.45;margin-bottom:10px;text-wrap:balance">{{ sq.prompt }}</div>
+                      <div style="display:flex;flex-direction:column;gap:8px">
+                        <sc-for list="{{ sq.options }}" as="o" hint-placeholder-count="3">
+                          <div onClick="{{ o.onClick }}" style="{{ o.style }}">{{ o.label }}</div>
+                        </sc-for>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+                <sc-if value="{{ showProceedSurvey }}" hint-placeholder-val="{{ false }}">
+                  <div onClick="{{ proceedSurveyClick }}" style="{{ proceedSurveyStyle }}">Continue to lens -&gt;</div>
+                </sc-if>
+              </sc-if>
+
+              <sc-if value="{{ isLensStage }}" hint-placeholder-val="{{ false }}">
+                <sc-if value="{{ lensNotChosen }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:10px;align-items:stretch">
+                    <sc-for list="{{ lensModules }}" as="lm" hint-placeholder-count="3">
+                      <div onClick="{{ lm.onClick }}" style="{{ lm.style }}">
+                        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;color:#c08a1e;margin-bottom:6px">{{ lm.title }}</div>
+                        <div style="font-size:12.5px;color:#4a443a;line-height:1.5">{{ lm.blurb }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ lensChosen }}" hint-placeholder-val="{{ false }}">
+                  <div style="padding:14px 15px;border-radius:12px;border:1.5px solid #d9962a;background:rgba(217,150,42,.08);margin-bottom:14px">
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;color:#c08a1e;margin-bottom:6px">CHOSEN LENS</div>
+                    <div style="font-size:14px;font-weight:600;color:#2e2a24;margin-bottom:6px">{{ chosenLensTitle }}</div>
+                    <div style="font-size:13px;color:#5a5246;line-height:1.55">{{ chosenLensBlurb }}</div>
+                  </div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;color:#8a8170;margin-bottom:8px">KEY NOTATION</div>
+                  <sc-for list="{{ notationItems }}" as="nt" hint-placeholder-count="2">
+                    <div style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-start;padding-left:2px"><span style="color:#d9962a;flex-shrink:0">+</span><span style="font-size:13px;color:#4a443a;line-height:1.45">{{ nt.text }}</span></div>
+                  </sc-for>
+                  <sc-if value="{{ notationEmpty }}" hint-placeholder-val="{{ true }}">
+                    <div style="font-size:12px;color:#bcb2a0;font-style:italic;margin-bottom:10px">Use chat below. Two notations are enough to frame.</div>
+                  </sc-if>
+                  <div onClick="{{ proceedFrameClick }}" style="{{ proceedFrameStyle }}">Proceed to frame -&gt;</div>
+                </sc-if>
+              </sc-if>
+
+              <sc-if value="{{ isFrameStage }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:14.5px;line-height:1.85;color:#3a342b;text-align:left;margin-bottom:16px">
+                  <sc-for list="{{ frameParts }}" as="fp" hint-placeholder-count="5">
+                    <sc-if value="{{ fp.isText }}" hint-placeholder-val="{{ true }}"><span>{{ fp.text }}</span></sc-if>
+                    <sc-if value="{{ fp.isSlot }}" hint-placeholder-val="{{ false }}"><span onClick="{{ fp.onClick }}" style="{{ fp.style }}">{{ fp.text }}</span></sc-if>
+                  </sc-for>
+                </div>
+                <sc-if value="{{ showFrameGapElev }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8a8170;text-align:center;margin-bottom:10px">Pick slots in the right panel, then confirm.</div>
+                  <div onClick="{{ confirmFrameClick }}" style="{{ confirmFrameStyle }}">Confirm frame</div>
+                </sc-if>
+              </sc-if>
+
+              <sc-if value="{{ isTextureStage }}" hint-placeholder-val="{{ false }}">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;color:#8a8170;margin-bottom:8px">OPTIONAL DEPTH</div>
+                <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:14px">
+                  <sc-for list="{{ textureSuggestions }}" as="ts" hint-placeholder-count="4">
+                    <div onClick="{{ ts.onClick }}" style="{{ ts.style }}">{{ ts.label }}</div>
+                  </sc-for>
+                </div>
+                <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap">
+                  <div onClick="{{ finishTextureClick }}" style="padding:10px 14px;border-radius:10px;border:1px solid rgba(60,50,30,.14);background:#fff;color:#4a443a;font-size:12.5px;font-weight:600;cursor:pointer">Finish this locus</div>
+                  <div onClick="{{ skipDepthClick }}" style="padding:10px 14px;border-radius:10px;background:#d9962a;color:#3a2700;font-size:12.5px;font-weight:600;cursor:pointer">Skip for now</div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ isCompleteStage }}" hint-placeholder-val="{{ false }}">
+                <div style="text-align:center">
+                  <div style="font-size:14px;color:#5a5246;line-height:1.6;margin-bottom:14px">{{ completionMsg }}</div>
+                  <div onClick="{{ returnToCoordClick }}" style="display:inline-block;padding:10px 14px;border-radius:10px;background:#d9962a;color:#3a2700;font-size:12.5px;font-weight:600;cursor:pointer">Back to coordinate</div>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <div style="{{ panelStyle }}">
+        <div style="padding:12px 14px 0;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-shrink:0">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;color:#8a8170">{{ drawerLabel }}</div>
+          <div onClick="{{ collapse }}" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#a59b88;cursor:pointer">collapse</div>
+        </div>
+        <div style="{{ conversationStyle }}">
+          <div ref="{{ msgsRef }}" style="height:100%;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px">
+            <sc-if value="{{ chatEmpty }}" hint-placeholder-val="{{ true }}">
+              <div style="height:100%;display:flex;align-items:center;justify-content:center;text-align:center;color:#a59b88;font-size:13px;line-height:1.5">Type a detail. In lens or texture, it becomes notation.</div>
+            </sc-if>
+            <sc-for list="{{ messages }}" as="m" hint-placeholder-count="2">
+              <div style="{{ m.rowStyle }}"><div style="{{ m.bubbleStyle }}">{{ m.text }}</div></div>
+            </sc-for>
+            <sc-if value="{{ showTyping }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:4px;padding:8px 11px;background:#fffdf8;border:1px solid rgba(60,50,30,.08);border-radius:14px;width:max-content">
+                <span style="width:5px;height:5px;border-radius:50%;background:#b0a692;animation:twinkle 1s infinite"></span>
+                <span style="width:5px;height:5px;border-radius:50%;background:#b0a692;animation:twinkle 1s .15s infinite"></span>
+                <span style="width:5px;height:5px;border-radius:50%;background:#b0a692;animation:twinkle 1s .3s infinite"></span>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+        <div style="padding:10px 12px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0">
+          <input value="{{ inputValue }}" onInput="{{ onInput }}" onKeyDown="{{ onKey }}" placeholder="{{ inputPlaceholder }}" style="flex:1;min-width:0;background:#fff;border:1px solid rgba(60,50,30,.13);border-radius:12px;padding:10px 12px;color:#2e2a24;outline:none;font-size:13.5px" />
+          <div onClick="{{ send }}" style="width:34px;height:34px;flex-shrink:0;border-radius:11px;background:#d9962a;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="14" height="14" viewBox="0 0 15 15" fill="none"><path d="M7.5 12V3.2M3.6 7 7.5 3.1 11.4 7" stroke="#3a2700" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="width:360px;max-width:38vw;min-width:300px;flex-shrink:0;border-left:1px solid rgba(60,50,30,.1);background:#fbf6ec;display:flex;flex-direction:column;animation:panelIn .28s ease;min-height:0">
+      <div style="flex:1;overflow-y:auto;padding:16px 18px 18px">
+        <div style="font-size:16px;font-weight:600;color:#2e2a24;line-height:1.3;text-wrap:balance">{{ entityName }}</div>
+        <div style="margin-top:7px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#a59b88;line-height:1.6">{{ readingIntro }}</div>
+
+        <sc-if value="{{ showSeedPanel }}" hint-placeholder-val="{{ true }}">
+          <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(60,50,30,.09)">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.15em;color:#8a8170;margin-bottom:10px">SEED PROCESS</div>
+            <div style="height:7px;border-radius:999px;background:rgba(60,50,30,.12);overflow:hidden;margin-bottom:10px"><div style="{{ seedProgressStyle }}"></div></div>
+            <div style="font-size:12px;color:#5a5246;line-height:1.55;margin-bottom:12px">{{ seedProgressText }}</div>
+            <sc-for list="{{ locusProgressRows }}" as="lp" hint-placeholder-count="4">
+              <div onClick="{{ lp.onClick }}" style="{{ lp.style }}">
+                <span>{{ lp.label }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#a59b88">{{ lp.status }}</span>
+              </div>
+            </sc-for>
+            <sc-if value="{{ seedReady }}" hint-placeholder-val="{{ false }}">
+              <div onClick="{{ actualizeSeed }}" style="margin-top:14px;padding:11px 13px;border-radius:11px;background:#d9962a;color:#3a2700;font-size:12.5px;font-weight:600;text-align:center;cursor:pointer">Actualize coordinate · enter constellation</div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ rightPanelSlotPick }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin:18px 0 12px;padding-top:14px;border-top:1px solid rgba(60,50,30,.09)">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.15em;color:#8a8170">FRAME SLOT</div>
+            <div onClick="{{ slotCancelClick }}" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#c08a1e;cursor:pointer;letter-spacing:.06em">cancel</div>
+          </div>
+          <div style="font-size:12.5px;color:#5a5246;line-height:1.55;margin-bottom:14px">{{ slotPickHint }}</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <sc-for list="{{ frameSlotOptions }}" as="o" hint-placeholder-count="3">
+              <div onClick="{{ o.onClick }}" style="padding:11px 14px;border-radius:10px;border:1px solid rgba(60,50,30,.16);background:#fff;color:#4a443a;font-size:12.5px;line-height:1.45;cursor:pointer;text-align:left" style-hover="border-color:#d9962a;background:rgba(217,150,42,.12)">{{ o.label }}</div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ rightPanelGestalt }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(60,50,30,.09)">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.15em;color:#8a8170;margin-bottom:10px">GESTALT</div>
+            <sc-if value="{{ gestaltEmpty }}" hint-placeholder-val="{{ true }}">
+              <div style="font-size:12px;color:#b0a692;font-style:italic;line-height:1.5">Gestalt appears as this locus is penetrated.</div>
+            </sc-if>
+            <sc-for list="{{ gestaltItems }}" as="g" hint-placeholder-count="3">
+              <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:9px">
+                <span style="color:#d9962a;line-height:1.45;flex-shrink:0">+</span>
+                <span style="font-size:12.5px;line-height:1.45;color:#4a443a">{{ g.text }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ showAttrsPanel }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin:18px 0 12px;padding-top:14px;border-top:1px solid rgba(60,50,30,.09)">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.15em;color:#8a8170">DETERMINABLES</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#c08a1e">{{ insightCount }} signals</div>
+          </div>
+          <sc-for list="{{ attrs }}" as="a" hint-placeholder-count="4">
+            <div style="margin-bottom:17px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.16em;color:#c08a1e;margin-bottom:7px">{{ a.head }}</div>
+              <sc-if value="{{ a.empty }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:12px;color:#b0a692;font-style:italic">awaiting determination</div>
+              </sc-if>
+              <sc-for list="{{ a.items }}" as="b" hint-placeholder-count="1">
+                <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:7px;animation:panelIn .42s cubic-bezier(.2,.8,.2,1) both">
+                  <span style="color:#d9962a;line-height:1.45;flex-shrink:0">-</span>
+                  <span style="font-size:12.5px;line-height:1.45;color:#4a443a">{{ b.text }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </sc-if>
+
+        <div style="padding-top:6px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#b0a692;line-height:1.7">{{ entityFootnote }}</div>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  _mid = 0;
+  _lid = 0;
+  state = {
+    input: '',
+    chatOpen: false,
+    drawerHeight: 284,
+    typing: false,
+    hoveredId: null,
+    slotOpenId: null,
+    nodes: this.buildNodes(),
+    path: ['root'],
+    sessionActualized: false,
+  };
+  msgsRef = React.createRef();
+
+  seedSubjects() { return ['DRIVE', 'CRAFT', 'MIND', 'WITH OTHERS', 'FUTURE']; }
+  locusThemes() {
+    return [
+      { theme: 'What already pulls you', blurb: 'The desire or problem that keeps returning.' },
+      { theme: 'How you make things real', blurb: 'The medium, craft, or behavior that leaves evidence.' },
+      { theme: 'Who changes around you', blurb: 'The relational field that reveals impact.' },
+      { theme: 'Where the energy points', blurb: 'The future vector still taking shape.' },
+    ];
+  }
+  buildNodes() {
+    const root = {
+      id: 'root', kind: 'root', label: 'FIELD', childIds: ['seed'], messages: [],
+      statement: 'One coordinate is present only as negative space: a place where a person is about to become readable.',
+      subjects: ['SESSION'], bullets: { SESSION: [{ text: 'Complete three locus penetrations to actualize the coordinate.', src: 'system' }] },
+    };
+    const seed = {
+      id: 'seed', kind: 'coord', label: 'Negative space kernel', name: 'Negative space kernel',
+      vehicle: 'awaiting medium', distinction: 'not yet determined',
+      statement: 'A coordinate waiting for its first true determination.',
+      subjects: this.seedSubjects(), bullets: this.emptyBullets(this.seedSubjects()), childIds: [], messages: [],
+    };
+    const nodes = { root, seed };
+    this.locusThemes().forEach(th => {
+      const id = 'L' + (++this._lid);
+      nodes[id] = this.makeLocus(id, 'seed', th.theme, th.blurb);
+      seed.childIds.push(id);
+    });
+    return nodes;
+  }
+  emptyBullets(subjects) { const b = {}; subjects.forEach(s => { b[s] = []; }); return b; }
+  makeLocus(id, parentId, theme, blurb) {
+    return {
+      id, kind: 'locus', parentId, label: theme, name: theme, theme, blurb,
+      statement: 'Penetrating ' + theme.toLowerCase() + '.',
+      subjects: ['SIGNALS', 'TENSION', 'EVIDENCE', 'DIRECTION'],
+      bullets: this.emptyBullets(['SIGNALS', 'TENSION', 'EVIDENCE', 'DIRECTION']),
+      childIds: [], messages: [],
+      exploreStage: 'survey',
+      completedStages: { survey: false, lens: false, frame: false },
+      survey: this.genSurvey(theme),
+      surveyAnswers: {},
+      lenses: this.genLenses(theme),
+      lensId: null,
+      notations: [],
+      gestaltInsights: [],
+      frameTemplate: null,
+      frameFills: {},
+      frameSubjects: this.genFrameSubjects(theme),
+      subjectSelections: [],
+      frameConfirmed: false,
+      depthUsed: false,
+    };
+  }
+  genSurvey(theme) {
+    const t = theme.toLowerCase();
+    return [
+      { id: 'q1', prompt: 'When does ' + t + ' show up most clearly?', options: ['When I am building', 'When others need me', 'When something feels unfair'] },
+      { id: 'q2', prompt: 'What makes it feel personal instead of generic?', options: ['It cost me something', 'It changed someone else', 'I kept returning to it'] },
+      { id: 'q3', prompt: 'What raw evidence could prove it?', options: ['A made thing', 'A remembered scene', 'A repeated habit'] },
+    ];
+  }
+  genLenses(theme) {
+    return [
+      { id: 'l1', title: 'Behavioral read', blurb: 'Read this through what you repeatedly do when no one is assigning it.' },
+      { id: 'l2', title: 'Relational read', blurb: 'Read this through who is affected, helped, challenged, or pulled closer.' },
+      { id: 'l3', title: 'Inner-turn read', blurb: 'Read this through what changed inside you while the outside story was happening.' },
+    ];
+  }
+  genFrameTemplate(theme, lensTitle) {
+    const t = theme.toLowerCase();
+    return {
+      prompt: 'Assemble the first actual frame.',
+      segments: [
+        'The signal inside ' + t + ' is not just that I ',
+        { slotId: 's1', options: ['like solving hard problems', 'care about people noticing each other', 'keep making until the thing works'] },
+        ', but that I ',
+        { slotId: 's2', options: ['stay when the pattern gets messy', 'turn private pressure into public usefulness', 'bring others into the work before it is polished'] },
+        '. Through the ' + lensTitle.toLowerCase() + ', this becomes a coordinate rather than a fact.',
+      ],
+    };
+  }
+  genFrameSubjects(theme) {
+    return [
+      { id: 'f1', label: 'Needs a sharper scene' },
+      { id: 'f2', label: 'Could become essay spine' },
+      { id: 'f3', label: 'Worth asking family/friend' },
+      { id: 'f4', label: 'Contains contradiction' },
+    ];
+  }
+
+  cid() { return this.state.path[this.state.path.length - 1]; }
+  cur() { return this.state.nodes[this.cid()] || this.state.nodes.root; }
+  enterNode = (id) => this.setState(s => ({ path: [...s.path, id], chatOpen: false, input: '', slotOpenId: null }));
+  goCrumb = (idx) => this.setState(s => ({ path: s.path.slice(0, idx + 1), chatOpen: false, input: '', slotOpenId: null }));
+  collapse = () => this.setState({ chatOpen: false });
+
+  locusDone(node) {
+    const cs = node.completedStages || {};
+    let done = 0;
+    if (cs.survey) done++;
+    if (cs.lens) done++;
+    if (cs.frame && node.frameConfirmed) done++;
+    return { done, total: 3 };
+  }
+  completedLoci() {
+    const seed = this.state.nodes.seed;
+    return seed.childIds.map(id => this.state.nodes[id]).filter(l => this.locusDone(l).done >= 3);
+  }
+  seedReady() { return this.completedLoci().length >= 3 && !this.state.sessionActualized; }
+  cloneBullets(node, additions) {
+    const bullets = {};
+    node.subjects.forEach(s => { bullets[s] = (node.bullets[s] || []).slice(); });
+    additions.forEach(a => { const sj = node.subjects.indexOf(a.subject) >= 0 ? a.subject : node.subjects[0]; bullets[sj].push({ text: a.text, src: a.src || 'session' }); });
+    return bullets;
+  }
+
+  answerSurvey = (id, qid, option) => {
+    const c = this.state.nodes[id];
+    this.setState(s => ({ nodes: { ...s.nodes, [id]: { ...c, surveyAnswers: { ...c.surveyAnswers, [qid]: option } } } }));
+  };
+  proceedSurveyToLens = (id) => {
+    const c = this.state.nodes[id];
+    if (!(c.survey || []).every(q => (c.surveyAnswers || {})[q.id])) return;
+    const values = Object.values(c.surveyAnswers || {});
+    const gestalt = values.slice(0, 3).join(', ') + ' - enough raw signal to choose a lens.';
+    const bullets = this.cloneBullets(c, values.map(v => ({ subject: 'SIGNALS', text: v, src: 'survey' })));
+    this.setState(s => ({
+      nodes: { ...s.nodes, [id]: { ...c, bullets, exploreStage: 'lens', completedStages: { ...c.completedStages, survey: true }, gestaltInsights: [...c.gestaltInsights, { id: 'g' + (++this._mid), text: gestalt }] } },
+    }));
+  };
+  pickLocusLens = (id, lensId) => {
+    const c = this.state.nodes[id];
+    const lens = c.lenses.find(l => l.id === lensId);
+    if (!lens) return;
+    this.setState(s => ({ nodes: { ...s.nodes, [id]: { ...c, lensId, frameTemplate: this.genFrameTemplate(c.theme, lens.title), frameFills: {} } } }));
+  };
+  proceedLensToFrame = (id) => {
+    const c = this.state.nodes[id];
+    if (!c.lensId) return;
+    const lens = c.lenses.find(l => l.id === c.lensId);
+    const note = (c.notations || []).length ? 'Notation is now framing the read: ' + c.notations.map(n => n.text).slice(-2).join(' / ') : 'Lens chosen; frame can now test the claim.';
+    this.setState(s => ({
+      nodes: { ...s.nodes, [id]: { ...c, exploreStage: 'frame', completedStages: { ...c.completedStages, lens: true }, gestaltInsights: [...c.gestaltInsights, { id: 'g' + (++this._mid), text: (lens ? lens.title + ': ' : '') + note }] } },
+    }));
+  };
+  fillFrameSlot = (id, slotId, value) => {
+    const c = this.state.nodes[id];
+    this.setState(s => ({ nodes: { ...s.nodes, [id]: { ...c, frameFills: { ...c.frameFills, [slotId]: value } } }, slotOpenId: null }));
+  };
+  frameSlotsFilled(c) {
+    const segs = (c.frameTemplate && c.frameTemplate.segments) || [];
+    return segs.filter(s => s && s.slotId).every(s => (c.frameFills || {})[s.slotId]);
+  }
+  assembleFrameText(c) {
+    const segs = (c.frameTemplate && c.frameTemplate.segments) || [];
+    const fills = c.frameFills || {};
+    return segs.map(seg => typeof seg === 'string' ? seg : (fills[seg.slotId] || '...')).join('');
+  }
+  confirmFrame = (id) => {
+    const c = this.state.nodes[id];
+    if (!this.frameSlotsFilled(c)) return;
+    const frame = this.assembleFrameText(c);
+    const bullets = this.cloneBullets(c, [{ subject: 'DIRECTION', text: frame, src: 'frame' }]);
+    this.setState(s => ({
+      nodes: { ...s.nodes, [id]: { ...c, bullets, frameConfirmed: true, exploreStage: 'texture', completedStages: { ...c.completedStages, frame: true }, gestaltInsights: [...c.gestaltInsights, { id: 'g' + (++this._mid), text: 'Frame locked: ' + frame }] } },
+      slotOpenId: null,
+    }));
+  };
+  finishTexture = (id) => {
+    const c = this.state.nodes[id];
+    this.setState(s => ({ nodes: { ...s.nodes, [id]: { ...c, exploreStage: 'complete', depthUsed: true } } }), () => this.returnToCoord(id));
+  };
+  skipTexture = (id) => {
+    const c = this.state.nodes[id];
+    this.setState(s => ({ nodes: { ...s.nodes, [id]: { ...c, exploreStage: 'complete', depthUsed: false } } }), () => this.returnToCoord(id));
+  };
+  returnToCoord = (id) => {
+    const c = this.state.nodes[id];
+    const parentId = c && c.parentId;
+    this.setState(s => ({ path: parentId ? ['root', parentId] : ['root'], chatOpen: false, input: '', slotOpenId: null }));
+  };
+  texturePrefill = (text) => this.setState({ input: text, chatOpen: true });
+  actualizeSeed = () => {
+    const seed = this.state.nodes.seed;
+    const done = this.completedLoci();
+    if (done.length < 3) return;
+    const firstLens = done[0].lenses.find(l => l.id === done[0].lensId);
+    const name = 'Emerging coordinate';
+    const bullets = this.emptyBullets(seed.subjects);
+    done.forEach((l, idx) => {
+      const subject = seed.subjects[idx % seed.subjects.length];
+      const line = l.gestaltInsights.length ? l.gestaltInsights[l.gestaltInsights.length - 1].text : this.assembleFrameText(l);
+      bullets[subject].push({ text: line.length > 140 ? line.slice(0, 137) + '...' : line, src: 'actualized' });
+    });
+    const statement = 'A person who turns recurring pressure into a usable direction for other people.';
+    this.setState(s => ({
+      sessionActualized: true,
+      nodes: {
+        ...s.nodes,
+        seed: {
+          ...seed,
+          label: name,
+          name,
+          vehicle: firstLens ? firstLens.title : 'chosen pattern',
+          distinction: 'actualized from three penetrated loci',
+          statement,
+          bullets,
+        },
+        root: {
+          ...s.nodes.root,
+          statement: 'The first personalized coordinate is now readable; the constellation can keep growing from it.',
+        },
+      },
+    }), () => {
+      window.location.assign('./constellation%2Bexperiment.dc.html');
+    });
+  };
+
+  onInput = e => this.setState({ input: e.target.value });
+  onKey = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.send(); } };
+  send = () => {
+    const text = this.state.input.trim();
+    if (!text) { this.setState({ chatOpen: true }); return; }
+    const id = this.cid();
+    const cur = this.state.nodes[id];
+    this._mid++;
+    const userMsg = { id: 'm' + this._mid, role: 'user', text };
+    if (cur.kind === 'locus' && (cur.exploreStage === 'lens' || cur.exploreStage === 'texture')) {
+      const notation = { id: 'n' + (cur.notations || []).length, text: text.length > 120 ? text.slice(0, 117) + '...' : text };
+      const subject = cur.exploreStage === 'texture' ? 'TENSION' : 'EVIDENCE';
+      const bullets = this.cloneBullets(cur, [{ subject, text: notation.text, src: cur.exploreStage }]);
+      this.setState(s => ({
+        input: '',
+        chatOpen: true,
+        nodes: { ...s.nodes, [id]: { ...cur, messages: [...cur.messages, userMsg], notations: [...cur.notations, notation], bullets } },
+      }));
+      return;
+    }
+    this.setState(s => ({ input: '', chatOpen: true, nodes: { ...s.nodes, [id]: { ...cur, messages: [...cur.messages, userMsg] } } }));
+  };
+  componentDidUpdate() { const el = this.msgsRef.current; if (el && this.state.chatOpen) el.scrollTop = el.scrollHeight; }
+
+  renderVals() {
+    const path = this.state.path;
+    const cur = this.cur();
+    const isRoot = cur.kind === 'root';
+    const isLocus = cur.kind === 'locus';
+    const showConstellation = !isLocus;
+    const stageStyle = { flex: 1, position: 'relative', overflow: 'hidden', background: 'radial-gradient(ellipse at 50% 38%, #fffdf8 0%, #f6efe0 58%, #efe5d2 100%)' };
+    const panelStyle = { position: 'absolute', bottom: '24px', left: '50%', transform: 'translateX(-50%)', width: 'min(620px, calc(100% - 56px))', zIndex: 6, background: 'rgba(255,253,248,.82)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', border: '1px solid rgba(60,50,30,.13)', borderRadius: '26px', boxShadow: '0 24px 64px -28px rgba(90,70,20,.4), 0 0 0 1px rgba(255,255,255,.5)', display: 'flex', flexDirection: 'column', overflow: 'hidden' };
+    const conversationStyle = { height: this.state.chatOpen ? this.state.drawerHeight + 'px' : '0px', opacity: this.state.chatOpen ? 1 : 0, overflow: 'hidden', flexShrink: 0, transition: 'height .42s cubic-bezier(.22,.8,.2,1), opacity .3s ease' };
+    const crumbs = path.map((id, idx) => ({ id, label: (this.state.nodes[id].label || '').toUpperCase(), sep: idx < path.length - 1, onClick: () => this.goCrumb(idx) }));
+
+    const childNodes = cur.childIds.map(id => this.state.nodes[id]).filter(Boolean);
+    const k = childNodes.length;
+    const cx = 50, cy = isRoot ? 40 : 41, rx = isRoot ? 0 : 24, ry = isRoot ? 0 : 26;
+    const pos = childNodes.map((node, i) => {
+      if (isRoot) return { x: 50, y: 42 };
+      if (k === 1) return { x: cx, y: cy - ry };
+      const ang = -Math.PI / 2 + i * 2 * Math.PI / k;
+      return { x: +(cx + rx * Math.cos(ang)).toFixed(2), y: +(cy + ry * Math.sin(ang)).toFixed(2) };
+    });
+    const posById = {}; childNodes.forEach((nd, i) => { posById[nd.id] = pos[i]; });
+    const stageItems = childNodes.map((it, i) => {
+      const done = it.kind === 'locus' ? this.locusDone(it) : null;
+      const isSeed = it.id === 'seed' && !this.state.sessionActualized;
+      const complete = done && done.done >= done.total;
+      let glyphStyle;
+      if (isSeed) {
+        glyphStyle = { width: '34px', height: '34px', borderRadius: '50%', background: 'rgba(255,253,248,.55)', border: '1.5px dashed rgba(217,150,42,.9)', boxShadow: 'inset 0 0 18px rgba(255,253,248,.9),0 0 28px rgba(217,150,42,.26)', animation: 'pulseSeed 2.8s ease-in-out infinite' };
+      } else if (it.kind === 'locus') {
+        glyphStyle = { width: '13px', height: '13px', borderRadius: '50%', background: complete ? '#3fa776' : '#d9962a', boxShadow: '0 0 14px 2px rgba(217,150,42,.5)' };
+      } else {
+        glyphStyle = { width: '17px', height: '17px', borderRadius: '50%', background: '#3fa776', boxShadow: '0 0 14px 2px rgba(63,167,118,.5)' };
+      }
+      return {
+        id: it.id, label: it.label,
+        wrapStyle: { position: 'absolute', left: pos[i].x + '%', top: pos[i].y + '%', transform: 'translate(-50%,-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '9px', animation: 'itemIn .5s cubic-bezier(.2,.9,.3,1.2) both', zIndex: 3, cursor: 'pointer' },
+        glyphStyle,
+        onClick: () => this.enterNode(it.id),
+        onEnter: () => this.setState({ hoveredId: it.id }),
+        onLeave: () => this.setState({ hoveredId: null }),
+        showProgress: !!done,
+        progress: done ? done.done + '/' + done.total : '',
+      };
+    });
+    const lines = [];
+    if (!isRoot && k >= 3) {
+      for (let i = 0; i < k; i++) {
+        const a = pos[i], b = pos[(i + 1) % k];
+        lines.push({ id: 'l' + i, x1: a.x, y1: a.y, x2: b.x, y2: b.y });
+      }
+    } else if (!isRoot && k === 2) {
+      lines.push({ id: 'l0', x1: pos[0].x, y1: pos[0].y, x2: pos[1].x, y2: pos[1].y });
+    }
+
+    const hn = this.state.hoveredId ? this.state.nodes[this.state.hoveredId] : null;
+    const showHoverCard = !!hn && !!posById[(hn || {}).id];
+    let hoverCardStyle = {}, hoverName = '', hoverL1 = '', hoverV1 = '', hoverL2 = '', hoverV2 = '';
+    if (showHoverCard) {
+      const hp = posById[hn.id]; const below = hp.y < 30;
+      hoverCardStyle = { position: 'absolute', left: hp.x + '%', top: hp.y + '%', transform: below ? 'translate(-50%, 30px)' : 'translate(-50%, calc(-100% - 26px))', width: '224px', background: '#fffdf8', border: '1px solid rgba(217,150,42,.35)', borderRadius: '13px', padding: '14px 15px', boxShadow: '0 18px 44px -16px rgba(90,70,20,.4)', zIndex: 5, pointerEvents: 'none', animation: 'panelIn .18s ease both' };
+      hoverName = hn.kind === 'locus' ? hn.theme : hn.name;
+      hoverL1 = hn.kind === 'locus' ? 'THREAD' : 'VEHICLE';
+      hoverV1 = hn.kind === 'locus' ? hn.blurb : hn.vehicle;
+      hoverL2 = hn.kind === 'locus' ? 'PROGRESS' : 'DISTINCTION';
+      hoverV2 = hn.kind === 'locus' ? this.locusDone(hn).done + ' / 3 stages' : hn.distinction;
+    }
+
+    const messages = cur.messages.map(m => ({
+      id: m.id, text: m.text,
+      rowStyle: { display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' },
+      bubbleStyle: m.role === 'user'
+        ? { maxWidth: '80%', padding: '9px 13px', borderRadius: '15px 15px 5px 15px', background: '#d9962a', color: '#3a2700', fontSize: '13.5px', lineHeight: 1.5, boxShadow: '0 4px 14px -7px rgba(217,150,42,.8)', animation: 'msgSlide .3s ease both' }
+        : { maxWidth: '84%', padding: '9px 13px', borderRadius: '15px 15px 15px 5px', background: '#fffdf8', color: '#3a342b', fontSize: '13.5px', lineHeight: 1.55, border: '1px solid rgba(60,50,30,.1)', animation: 'msgSlide .3s ease both' },
+    }));
+
+    let centerKicker = isRoot ? 'BLANK CONSTELLATION' : 'PERSONALIZED COORDINATE';
+    let centralStatement = cur.statement;
+    let centerHint = isRoot ? 'Click the hollow coordinate to begin determining.' : (this.state.sessionActualized ? 'The seed has been actualized; continue penetrating loci.' : 'Complete three loci to actualize this coordinate.');
+    const sessionStatus = this.state.sessionActualized ? 'personalized constellation' : 'seed in progress';
+    const sessionDotStyle = { width: '6px', height: '6px', borderRadius: '50%', background: this.state.sessionActualized ? '#3fa776' : '#d9962a', boxShadow: this.state.sessionActualized ? '0 0 7px rgba(63,167,118,.6)' : '0 0 7px rgba(217,150,42,.6)' };
+
+    let themeName = '', doneCount = 0, total = 3, progressPct = 0, allDone = false;
+    let progressFillStyle = { width: '0%', height: '100%', background: '#d9962a', borderRadius: '999px', transition: 'width .5s cubic-bezier(.2,.8,.2,1)' };
+    let stageRail = [], stagePrompt = '', completionMsg = 'This locus is complete.';
+    let isSurveyStage = false, isLensStage = false, isFrameStage = false, isTextureStage = false, isCompleteStage = false;
+    let surveyProgress = '', surveySections = [], showProceedSurvey = false, proceedSurveyClick = () => {}, proceedSurveyStyle = {};
+    let lensChosen = false, lensNotChosen = true, lensModules = [], chosenLensTitle = '', chosenLensBlurb = '', notationItems = [], notationEmpty = true, proceedFrameClick = () => {}, proceedFrameStyle = {};
+    let frameParts = [], frameSlotOpen = false, frameSlotOptions = [], showFrameGapElev = false, confirmFrameClick = () => {}, confirmFrameStyle = {}, textureSuggestions = [], finishTextureClick = () => {}, skipDepthClick = () => {}, returnToCoordClick = () => {};
+    let rightPanelSlotPick = false, rightPanelGestalt = false, slotPickHint = '', slotCancelClick = () => {};
+    let gestaltItems = [], gestaltEmpty = true;
+    if (isLocus) {
+      themeName = cur.theme;
+      const d = this.locusDone(cur); doneCount = d.done; total = d.total; progressPct = Math.round(doneCount / total * 100); allDone = cur.exploreStage === 'complete';
+      progressFillStyle = { ...progressFillStyle, width: progressPct + '%' };
+      const st = cur.exploreStage || 'survey';
+      isSurveyStage = st === 'survey'; isLensStage = st === 'lens'; isFrameStage = st === 'frame'; isTextureStage = st === 'texture'; isCompleteStage = st === 'complete';
+      stageRail = ['survey', 'lens', 'frame', 'texture'].map(s => ({ id: s, label: s, style: { fontFamily: "'IBM Plex Mono',monospace", fontSize: '10px', letterSpacing: '.1em', color: s === st ? '#3a2700' : (cur.completedStages[s] ? '#3fa776' : '#b0a692'), background: s === st ? 'rgba(217,150,42,.16)' : 'transparent', padding: '5px 10px', borderRadius: '999px' } }));
+      stagePrompt = isSurveyStage ? 'Before this can become personal, gather raw signals about "' + cur.theme + '".'
+        : isLensStage ? 'Choose the lens that makes this thread most alive, then add one or two notations in chat.'
+        : isFrameStage ? 'Turn the raw material into an actual frame by filling the open slots.'
+        : isTextureStage ? 'Optional: test what is still worth exploring before you close this locus.'
+        : 'This thread is complete enough to feed the seed coordinate.';
+      surveyProgress = Object.keys(cur.surveyAnswers || {}).length + '/' + (cur.survey || []).length;
+      surveySections = (cur.survey || []).map(q => ({ id: q.id, prompt: q.prompt, options: q.options.map(o => { const sel = cur.surveyAnswers[q.id] === o; return { id: o, label: o, onClick: () => this.answerSurvey(cur.id, q.id, o), style: { padding: '10px 12px', borderRadius: '10px', border: sel ? '1.5px solid #d9962a' : '1px solid rgba(60,50,30,.14)', background: sel ? 'rgba(217,150,42,.12)' : '#fff', color: sel ? '#3a2700' : '#4a443a', fontSize: '12.5px', fontWeight: sel ? 600 : 400, cursor: 'pointer' } }; }) }));
+      showProceedSurvey = (cur.survey || []).every(q => (cur.surveyAnswers || {})[q.id]);
+      proceedSurveyClick = () => this.proceedSurveyToLens(cur.id);
+      proceedSurveyStyle = { margin: '16px auto 0', width: 'fit-content', padding: '10px 14px', borderRadius: '10px', background: '#d9962a', color: '#3a2700', fontSize: '12.5px', fontWeight: 600, cursor: 'pointer' };
+      lensChosen = !!cur.lensId; lensNotChosen = !lensChosen;
+      lensModules = cur.lenses.map(l => ({ id: l.id, title: l.title, blurb: l.blurb, onClick: () => this.pickLocusLens(cur.id, l.id), style: { padding: '14px', minHeight: '118px', borderRadius: '13px', border: cur.lensId === l.id ? '1.5px solid #d9962a' : '1px solid rgba(60,50,30,.12)', background: '#fff', cursor: 'pointer', boxShadow: cur.lensId === l.id ? '0 8px 24px -16px rgba(217,150,42,.55)' : 'none' } }));
+      const lens = cur.lenses.find(l => l.id === cur.lensId);
+      if (lens) { chosenLensTitle = lens.title; chosenLensBlurb = lens.blurb; }
+      notationItems = (cur.notations || []).map(n => ({ id: n.id, text: n.text }));
+      notationEmpty = notationItems.length === 0;
+      proceedFrameClick = () => this.proceedLensToFrame(cur.id);
+      proceedFrameStyle = { margin: '14px auto 0', width: 'fit-content', padding: '10px 14px', borderRadius: '10px', background: cur.lensId ? '#d9962a' : '#e6ddc9', color: cur.lensId ? '#3a2700' : '#a59b88', fontSize: '12.5px', fontWeight: 600, cursor: cur.lensId ? 'pointer' : 'default' };
+      if (isFrameStage) {
+        const ft = cur.frameTemplate || { prompt: 'Assemble the first actual frame.', segments: [] };
+        stagePrompt = ft.prompt || 'Assemble the first actual frame.';
+        showFrameGapElev = true;
+        const fills = cur.frameFills || {};
+        const openId = this.state.slotOpenId;
+        frameParts = (ft.segments || []).map((seg, i) => {
+          if (typeof seg === 'string') return { id: 't' + i, isText: true, isSlot: false, text: seg };
+          const filled = fills[seg.slotId];
+          const open = openId === seg.slotId;
+          return {
+            id: seg.slotId, isText: false, isSlot: true,
+            text: filled || 'choose +',
+            onClick: () => this.setState({ slotOpenId: open ? null : seg.slotId }),
+            style: filled
+              ? { color: '#3a2700', fontWeight: 600, borderBottom: '2px solid #d9962a', cursor: 'pointer', padding: '0 3px' }
+              : { display: 'inline-block', minWidth: '72px', padding: '1px 10px', borderRadius: '8px', border: '1.5px dashed #d9962a', color: '#c08a1e', cursor: 'pointer', fontSize: '13px' },
+          };
+        });
+        frameSlotOpen = !!openId;
+        const openSeg = (ft.segments || []).find(s => s && s.slotId === openId);
+        frameSlotOptions = openSeg ? openSeg.options.map(o => ({ id: o, label: o, onClick: () => this.fillFrameSlot(cur.id, openId, o) })) : [];
+        slotPickHint = openId === 's1' ? 'First slot — the move that carries the story.' : (openId === 's2' ? 'Second slot — the detail that makes it stick.' : 'Choose the phrase that fits this slot.');
+        const canConfirm = this.frameSlotsFilled(cur);
+        confirmFrameClick = () => this.confirmFrame(cur.id);
+        confirmFrameStyle = {
+          marginTop: '16px', padding: '12px 18px', borderRadius: '11px', textAlign: 'center', fontSize: '13.5px', fontWeight: 600,
+          background: canConfirm ? '#d9962a' : '#e6ddc9', color: canConfirm ? '#3a2700' : '#a59b88',
+          cursor: canConfirm ? 'pointer' : 'default',
+        };
+      }
+      if (isTextureStage) {
+        textureSuggestions = ['ask what this changes', 'find the contradiction', 'name the scene', 'test college relevance'].map(t => ({ id: t, label: t, onClick: () => this.texturePrefill(t), style: { padding: '9px 10px', borderRadius: '10px', border: '1px solid rgba(60,50,30,.12)', background: '#fff', color: '#5a5246', fontSize: '11.5px', cursor: 'pointer' } }));
+        finishTextureClick = () => this.finishTexture(cur.id);
+        skipDepthClick = () => this.skipTexture(cur.id);
+      }
+      returnToCoordClick = () => this.returnToCoord(cur.id);
+      gestaltItems = (cur.gestaltInsights || []).map(g => ({ id: g.id, text: g.text }));
+      gestaltEmpty = gestaltItems.length === 0;
+      rightPanelSlotPick = isFrameStage && !!this.state.slotOpenId;
+      rightPanelGestalt = !rightPanelSlotPick;
+      slotCancelClick = () => this.setState({ slotOpenId: null });
+    }
+
+    const seed = this.state.nodes.seed;
+    const completeCount = this.completedLoci().length;
+    const ready = this.seedReady();
+    const seedProgressPct = Math.min(100, Math.round(completeCount / 3 * 100));
+    const locusProgressRows = seed.childIds.map(id => {
+      const l = this.state.nodes[id]; const d = this.locusDone(l); const done = d.done >= 3;
+      return { id, label: l.theme, status: done ? 'complete' : d.done + '/3', onClick: () => this.setState({ path: ['root', 'seed', id], chatOpen: false }), style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', padding: '9px 10px', borderRadius: '10px', border: done ? '1px solid rgba(63,167,118,.35)' : '1px solid rgba(60,50,30,.1)', background: done ? 'rgba(63,167,118,.07)' : '#fff', color: '#4a443a', fontSize: '12px', cursor: 'pointer', marginBottom: '7px' } };
+    });
+    const attrs = cur.subjects.map(sj => {
+      const items = (cur.bullets[sj] || []).map((b, i) => ({ id: sj + i, text: b.text }));
+      return { id: sj, head: sj, items, empty: items.length === 0 };
+    });
+    const insightCount = cur.subjects.reduce((acc, sj) => acc + ((cur.bullets[sj] || []).length), 0);
+    const showSeedPanel = (cur.kind === 'root' || cur.kind === 'coord') && !isLocus;
+    const showAttrsPanel = cur.kind === 'coord';
+
+    return {
+      stageStyle, panelStyle, conversationStyle, crumbs, showConstellation, isLocus,
+      lines, stageItems, showHoverCard, hoverCardStyle, hoverName, hoverL1, hoverV1, hoverL2, hoverV2,
+      centerKicker, centralStatement, centerHint, sessionStatus, sessionDotStyle,
+      themeName, doneCount, total, progressPct, allDone, progressFillStyle, stageRail, stagePrompt, completionMsg,
+      isSurveyStage, isLensStage, isFrameStage, isTextureStage, isCompleteStage,
+      surveyProgress, surveySections, showProceedSurvey, proceedSurveyClick, proceedSurveyStyle,
+      lensChosen, lensNotChosen, lensModules, chosenLensTitle, chosenLensBlurb, notationItems, notationEmpty, proceedFrameClick, proceedFrameStyle,
+      frameParts, frameSlotOpen, frameSlotOptions, showFrameGapElev, confirmFrameClick, confirmFrameStyle, textureSuggestions, finishTextureClick, skipDepthClick, returnToCoordClick,
+      rightPanelSlotPick, rightPanelGestalt, slotPickHint, slotCancelClick,
+      messages, chatEmpty: cur.messages.length === 0, showTyping: this.state.typing, drawerLabel: isLocus ? 'locus notation' : 'seed session', inputValue: this.state.input, inputPlaceholder: isLocus ? 'Add a detail to this locus...' : 'Say what this seed should know...',
+      onInput: this.onInput, onKey: this.onKey, send: this.send, collapse: this.collapse, msgsRef: this.msgsRef,
+      entityName: isRoot ? 'DETERMINING SEED' : (isLocus ? cur.theme : cur.name),
+      readingIntro: isRoot ? 'A fresh session begins with one coordinate as negative space.' : (isLocus ? cur.blurb : 'The seed coordinate becomes readable through completed loci.'),
+      showSeedPanel, showAttrsPanel, seedReady: ready, actualizeSeed: this.actualizeSeed,
+      seedProgressStyle: { width: seedProgressPct + '%', height: '100%', background: ready ? '#3fa776' : '#d9962a', borderRadius: '999px', transition: 'width .5s cubic-bezier(.2,.8,.2,1)' },
+      seedProgressText: completeCount + '/3 required loci complete before the coordinate actualizes.',
+      locusProgressRows, gestaltItems, gestaltEmpty, attrs, insightCount,
+      entityFootnote: isLocus ? (rightPanelSlotPick ? 'Choose a phrase for the open slot.' : 'Gestalt accumulates as you penetrate this thread.') : 'This is intentionally blank until the user makes signal.',
+    };
+  }
+}
+</script>
+</body>
+</html>

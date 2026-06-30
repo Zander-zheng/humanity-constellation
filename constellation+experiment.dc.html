@@ -27,18 +27,76 @@ input{font-family:inherit}
 @keyframes twinkle{0%,100%{opacity:1}50%{opacity:.5}}
 @keyframes vbar{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
 @keyframes expIn{from{opacity:0;transform:scale(.99)}to{opacity:1;transform:none}}
+/* ===== Phase rail (HUMANITY / INSTITUTE) ===== */
+.phase-rail{position:relative;z-index:40;flex:0 0 auto;width:50px;display:flex;flex-direction:column;padding:13px 0;background:#efe6d3;border-right:1px solid rgba(60,50,30,.12);transition:width .22s cubic-bezier(.4,0,.2,1);overflow:hidden;cursor:pointer;outline:none}
+.phase-rail:focus-within{width:198px;box-shadow:16px 0 46px -26px rgba(60,50,30,.55);cursor:default}
+.rail-grip{align-self:flex-end;margin:-2px 17px 4px 0;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#b0a692;transition:transform .22s}
+.phase-rail:focus-within .rail-grip{transform:rotate(180deg)}
+.rail-top{display:flex;align-items:center;gap:11px;padding:0 0 13px 21px;border-bottom:1px solid rgba(60,50,30,.1)}
+.rail-dot{flex:0 0 auto;width:9px;height:9px;border-radius:50%;background:#d9962a;box-shadow:0 0 12px rgba(217,150,42,.7);animation:twinkle 3s ease-in-out infinite}
+.rail-label{opacity:0;transform:translateX(-4px);white-space:nowrap;transition:opacity .16s ease,transform .2s ease;font-family:'IBM Plex Mono',monospace}
+.phase-rail:hover .rail-label{opacity:1;transform:none}
+.rail-brand{font-family:'Space Grotesk',sans-serif;font-weight:600;letter-spacing:.14em;font-size:13px;color:#2e2a24}
+.rail-phases{display:flex;flex-direction:column;gap:5px;margin-top:14px}
+.rail-eyebrow{padding:0 0 7px 22px;font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.2em;color:#b0a692}
+.rail-item{display:flex;align-items:center;gap:14px;padding:11px 0 11px 19px;text-decoration:none;color:#8a8170;border-left:2px solid transparent;transition:background .15s,color .15s}
+.rail-item:hover{background:rgba(60,50,30,.06);color:#2e2a24}
+.rail-item--active{color:#2e2a24;border-left-color:#d9962a;background:rgba(217,150,42,.12)}
+.rail-ico{flex:0 0 22px;width:22px;height:22px;position:relative;display:flex;align-items:center;justify-content:center}
+.rail-name{font-size:11px;letter-spacing:.15em;font-weight:600}
+.rail-sub{display:block;margin-top:2px;font-size:8.5px;letter-spacing:.08em;color:#a59b88;font-weight:400}
+.rail-foot{margin-top:auto;padding:10px 0 0 22px;font-size:8.5px;letter-spacing:.16em;color:#b8af9b;border-top:1px solid rgba(60,50,30,.08)}
+.ico-hum i{position:absolute;width:4px;height:4px;border-radius:50%;background:currentColor}
+.ico-hum i:nth-child(1){top:2px;left:9px}.ico-hum i:nth-child(2){bottom:3px;left:2px}.ico-hum i:nth-child(3){bottom:4px;right:2px}
+.ico-hum::after{content:"";position:absolute;inset:0;background:linear-gradient(45deg,transparent 47%,currentColor 49%,currentColor 51%,transparent 53%),linear-gradient(-30deg,transparent 48%,currentColor 49.5%,currentColor 50.5%,transparent 52%);opacity:.28}
+.ico-inst{display:flex;align-items:flex-end;gap:2.5px}
+.ico-inst i{width:3px;background:currentColor;border-radius:1px}
+.ico-inst i:nth-child(1){height:11px}.ico-inst i:nth-child(2){height:16px}.ico-inst i:nth-child(3){height:13px}
+.ico-inst::before{content:"";position:absolute;top:2px;left:2px;right:2px;height:2px;background:currentColor;border-radius:1px}
+.ico-kernel::before{content:"";width:15px;height:15px;border-radius:50%;border:1.6px solid currentColor}
+.ico-kernel::after{content:"";position:absolute;top:50%;left:50%;width:4px;height:4px;border-radius:50%;background:currentColor;transform:translate(-50%,-50%)}
 </style>
 </helmet>
 
-<div style="height:100vh;display:flex;flex-direction:column;background:#f6efe0;font-family:'Space Grotesk',sans-serif;color:#2e2a24;overflow:hidden">
+<div style="height:100vh;display:flex;flex-direction:row;background:#f6efe0;font-family:'Space Grotesk',sans-serif;color:#2e2a24;overflow:hidden">
 
   <input type="file" multiple ref="{{ fileRef }}" onChange="{{ onFiles }}" style="display:none" />
 
+  <nav class="phase-rail" aria-label="Phase" tabindex="0" title="Click to expand phases">
+    <div class="rail-grip">›</div>
+    <div class="rail-top"><div class="rail-dot"></div><div class="rail-label rail-brand">FIELD</div></div>
+    <div class="rail-eyebrow rail-label">PHASE</div>
+    <div class="rail-phases">
+      <a class="rail-item" href="./Determining%20Seed.dc.html">
+        <span class="rail-ico ico-kernel"></span>
+        <span class="rail-name">ONBOARDING<span class="rail-sub rail-label">negative-space kernel</span></span>
+      </a>
+      <a class="rail-item rail-item--active" href="./constellation%2Bexperiment.dc.html">
+        <span class="rail-ico ico-hum"><i></i><i></i><i></i></span>
+        <span class="rail-name">HUMANITY<span class="rail-sub rail-label">the constellation</span></span>
+      </a>
+      <a class="rail-item" href="./Institute%20Session.dc.html">
+        <span class="rail-ico ico-inst"><i></i><i></i><i></i></span>
+        <span class="rail-name">INSTITUTE<span class="rail-sub rail-label">applications</span></span>
+      </a>
+    </div>
+    <div class="rail-foot rail-label">enter a phase</div>
+  </nav>
+
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;height:100vh">
+
   <div style="display:flex;align-items:center;justify-content:space-between;height:54px;padding:0 22px;border-bottom:1px solid rgba(60,50,30,.1);flex-shrink:0;background:#fbf5e9">
-    <div style="display:flex;align-items:center;gap:12px">
+    <div style="display:flex;align-items:center;gap:12px;min-width:0">
       <div style="width:9px;height:9px;border-radius:50%;background:#d9962a;box-shadow:0 0 12px rgba(217,150,42,.7);animation:twinkle 3s ease-in-out infinite"></div>
       <div style="font-weight:600;font-size:15px;letter-spacing:.14em">FIELD</div>
       <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a8170;letter-spacing:.03em;margin-left:4px">every student is a constellation</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-left:8px;padding-left:12px;border-left:1px solid rgba(60,50,30,.12);font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em;white-space:nowrap">
+        <div style="display:flex;align-items:center;gap:6px">
+          <a href="./constellation%2Bexperiment.dc.html" style="text-decoration:none;color:#3a2700;padding:5px 8px;border:1px solid #d9962a;border-radius:999px;background:rgba(217,150,42,.18);font-weight:600">CONSTELLATION</a>
+          <a href="./Gestalt.dc.html" style="text-decoration:none;color:#8a8170;padding:5px 8px;border:1px solid rgba(60,50,30,.12);border-radius:999px;background:#fffdf8">GESTALT</a>
+          <a href="./Application%20Workspace.dc.html?experiment=1" style="text-decoration:none;color:#8a8170;padding:5px 8px;border:1px solid rgba(60,50,30,.12);border-radius:999px;background:#fffdf8">WORKSPACE</a>
+        </div>
+      </div>
     </div>
     <div style="display:flex;align-items:center;gap:7px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8a8170">
       <span style="width:6px;height:6px;border-radius:50%;background:#3fa776;box-shadow:0 0 7px rgba(63,167,118,.6)"></span>live session
@@ -261,12 +319,6 @@ input{font-family:inherit}
           <div onClick="{{ startExplain }}" style="{{ explainBtnStyle }}">
             <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.6" stroke="#d9962a" stroke-width="1.2"/><path d="M7 6.2v3.4M7 4.2h.01" stroke="#d9962a" stroke-width="1.3" stroke-linecap="round"/></svg>Explain
           </div>
-          <div onClick="{{ openExperiment }}" style="{{ experimentBtnStyle }}">
-            <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M5.6 1.6h2.8M6.1 1.6v3.1L3.2 10.4a1 1 0 0 0 .9 1.5h5.8a1 1 0 0 0 .9-1.5L7.9 4.7V1.6" stroke="#d9962a" stroke-width="1.2" stroke-linejoin="round"/></svg>Experiment
-          </div>
-          <div onClick="{{ toggleChat }}" style="{{ chatBtnStyle }}">
-            <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 3h10v7H6l-3 2.2V10H2z" stroke="#d9962a" stroke-width="1.2" stroke-linejoin="round"/></svg>Chat
-          </div>
         </div>
       </div>
 
@@ -443,6 +495,7 @@ input{font-family:inherit}
       </sc-if>
     </div>
 
+  </div>
   </div>
 </div>
 </x-dc>
